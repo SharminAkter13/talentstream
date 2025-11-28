@@ -1,11 +1,10 @@
 import React from "react";
-import PortalLayout from "../layouts/PortalLayout";
 import PortalNavbar from "../portalComponent/PortalNavbar";
 import PortalFooter from "../portalComponent/PortalFooter";
 
 const Home = () => {
   return (
-    <PortalLayout>
+    <div>
       <PortalNavbar />
   {/* end intro section */}
   {/* Service  Section */}
@@ -709,7 +708,7 @@ const Home = () => {
   </section>
   {/* Infobox Section End */}
   <PortalFooter />
-    </PortalLayout>
+  </div>
   );
 };
 
