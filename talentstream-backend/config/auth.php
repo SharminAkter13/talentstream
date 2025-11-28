@@ -40,6 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        
+        // FIX: The 'api' guard was missing. Adding the standard Sanctum driver here.
+        'api' => [
+            'driver' => 'sanctum', // Ensure Laravel Sanctum is installed: composer require laravel/sanctum
+            'provider' => 'users',
+        ],
     ],
 
     /*
@@ -66,8 +72,8 @@ return [
         ],
 
         // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
+        //      'driver' => 'database',
+        //      'table' => 'users',
         // ],
     ],
 
@@ -107,6 +113,7 @@ return [
     | Here you may define the number of seconds before a password confirmation
     | window expires and users are asked to re-enter their password via the
     | confirmation screen. By default, the timeout lasts for three hours.
+    |
     |
     */
 

@@ -1,0 +1,48 @@
+.main-navigation .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Navbar header (logo + toggler) stays flex aligned */
+.main-navigation .navbar-header {
+  display: flex;
+  align-items: center;
+}
+
+/* Remove float if using flex on ul */
+.main-navigation .nav.navbar-nav {
+  display: flex;  /* flex container for nav items */
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+  /* remove float to prevent conflict */
+  float: none;
+}
+
+/* Nav items inline inside flex container */
+.main-navigation .nav.navbar-nav > li {
+  position: relative;
+  /* remove display:block to let flex handle it */
+  display: flex;  /* or inline-flex */
+  align-items: center; /* vertical center */
+}
+
+/* Dropdown style remains same */
+.main-navigation .nav.navbar-nav .drop:hover > .dropdown {
+  display: block;
+}
+
+/* Navbar right buttons: flex for proper alignment */
+.navbar-right {
+  display: flex !important;
+  margin-bottom: 0;
+  list-style: none;
+  float: none !important; /* remove float */
+}
+
+.navbar-right li {
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+}
