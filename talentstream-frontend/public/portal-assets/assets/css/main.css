@@ -1835,6 +1835,149 @@ button:focus {
 }
 
 
+/* ===========================
+   Pricing Table Styles (Bootstrap 5)
+   =========================== */
+
+/* Main heading */
+.section-header.section-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+/* Pricing Section Background */
+#pricing {
+  background: #F0F3FA;
+  padding: 60px 0;
+}
+
+/* Pricing Table Card */
+.pricing-table {
+  background: #fff;
+  border-radius: 8px;
+  padding: 30px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+}
+
+.pricing-table:hover {
+  box-shadow: 0 13px 21px rgba(0, 0, 0, 0.13);
+  transform: translateY(-5px);
+}
+
+/* Active / Highlighted Table */
+.pricing-table.active,
+.pricing-table.active .pricing-details {
+  border: 2px solid #fff;
+}
+
+.pricing-table.active:hover {
+  box-shadow: 0 13px 21px rgba(0, 0, 0, 0.15);
+}
+
+/* Icon */
+.pricing-table .icon {
+  font-size: 3rem;
+  color: #00BCD4;
+  margin-bottom: 20px;
+}
+
+/* Title */
+.pricing-table h2 {
+  font-size: 1.5rem;
+  font-weight: bold!important;
+  margin-bottom: 15px;
+}
+
+/* Price */
+.pricing-table .price {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 20px 0;
+  color: #00BCD4;
+}
+
+.pricing-table .price span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #777;
+}
+
+/* Features List */
+.pricing-table ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.pricing-table ul li {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #555;
+  padding: 6px 0;
+  border-bottom: 1px solid #fff;
+}
+
+.pricing-table ul li:last-child {
+  border-bottom: none;
+}
+
+/* Button */
+.pricing-table .plan-button a {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 1rem;
+  border: 2px solid #00BCD4;
+  border-radius: 50px;
+  color: #00BCD4;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.pricing-table .plan-button a:hover {
+  background-color: #00BCD4;
+  color: #fff;
+}
+
+/* Border Colors */
+.border-color-default {
+  border-top: 4px solid #00BCD4;
+}
+
+.border-color-red {
+  border-top: 4px solid #00BCD4!important;
+}
+
+.border-color-green {
+  border-top: 4px solid #00BCD4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .pricing-table {
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .pricing-table .icon {
+    font-size: 2.5rem;
+  }
+  .pricing-table h2 {
+    font-size: 1.25rem;
+  }
+  .pricing-table .price {
+    font-size: 1.5rem;
+  }
+}
+
+
 /* ==========================================================================
  Featured Listings Styles
  ========================================================================== */

@@ -379,17 +379,80 @@ const Home = () => {
       </section>
       {/* Testimonial Section End */}
 
-      {/* --- Pricing Table Section (Lite Version Warning, replacing original pricing) --- */}
-      <div id="pricing" className="section bg-gray">
-        <div className="container text-center wow fadeInUp">
-          <h1 className="section-title">You Using Free Lite Version :(</h1>
-          <h6>Purchase Full Version to Get All Pages, Features, Docs and Support!</h6>
-          <br/>
-          <a href="https://rebrand.ly/jobx-gg" target="_blank" rel="nofollow" className="btn btn-common btn-lg">
-            <span className="lni-pointer-right"></span> Purchase Now!
-          </a>
+      {/* --- Pricing Table Section --- */}
+<div id="pricing" className="section bg-gray">
+  <div className="container">
+    <div className="section-header text-center">  
+      <h2 className="section-title">Pricing Plan</h2>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit ellentesque dignissim quam et <br />
+        metus effici turac fringilla lorem facilisis.
+      </p>      
+    </div>
+
+    <div className="row g-4">
+      <div className="col-lg-4 col-md-6 col-12">
+        <div className="pricing-table border-color-default">
+          <div className="pricing-details">
+            <div className="icon"><i className="lni-rocket"></i></div>
+            <h2>Professional</h2>
+            <ul>
+              <li>Post 1 Job</li>
+              <li>No Featured Job</li>
+              <li>Edit Your Job Listing</li>
+              <li>Manage Application</li>
+              <li>30-day Expired</li>
+            </ul>
+            <div className="price"><span>$</span>0<span>/Month</span></div>
+          </div>
+          <div className="plan-button">
+            <a href="#" className="btn btn-border">Get Started</a>
+          </div>
         </div>
       </div>
+
+      <div className="col-lg-4 col-md-6 col-12">
+        <div className="pricing-table border-color-red active">
+          <div className="pricing-details">
+            <div className="icon"><i className="lni-drop"></i></div>
+            <h2>Advance</h2>
+            <ul>
+              <li>Post 1 Job</li>
+              <li>No Featured Job</li>
+              <li>Edit Your Job Listing</li>
+              <li>Manage Application</li>
+              <li>30-day Expired</li>
+            </ul>
+            <div className="price"><span>$</span>20<span>/Month</span></div>
+          </div>
+          <div className="plan-button">
+            <a href="#" className="btn btn-border">Get Started</a>
+          </div>
+        </div>
+      </div>
+
+      <div className="col-lg-4 col-md-6 col-12">
+        <div className="pricing-table border-color-green">
+          <div className="pricing-details">
+            <div className="icon"><i className="lni-briefcase"></i></div>
+            <h2>Premium</h2>
+            <ul>
+              <li>Post 1 Job</li>
+              <li>No Featured Job</li>
+              <li>Edit Your Job Listing</li>
+              <li>Manage Application</li>
+              <li>30-day Expired</li>
+            </ul>
+            <div className="price"><span>$</span>40<span>/Month</span></div>
+          </div>
+          <div className="plan-button">
+            <a href="#" className="btn btn-border">Get Started</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
       {/* End Pricing Table Section */}
 
 
