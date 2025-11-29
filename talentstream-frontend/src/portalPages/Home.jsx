@@ -4,13 +4,13 @@ import { Link } from 'react-router-dom';
 
 import PortalNavbar from "../portalComponent/PortalNavbar";
 import PortalFooter from "../portalComponent/PortalFooter";
+import HeroSection from './../portalComponent/HeroSection';
 
 const Home = () => {
   
   return (
     <div>
-      <PortalNavbar />
-      
+            <HeroSection />
       {/* Service Section (Retaining BS3 structure but replacing classes) */}
       <section id="service-main" className="section">
         <div className="container">
