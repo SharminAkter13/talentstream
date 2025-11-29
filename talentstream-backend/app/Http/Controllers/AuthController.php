@@ -34,7 +34,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid Credentials'], 401);
         }
 
-        // নতুন টোকেন জেনারেট
         $token = Str::random(60);
         $user->update(['api_token' => $token]);
 

@@ -311,73 +311,91 @@ const Home = () => {
       </section>
       {/* Listings Section End */}
 
-      {/* --- Testimonial Section Start (BS5 Version) --- */}
-      <section id="testimonial" className="section">
-        <div className="container">
-          <div className="section-header text-center">
-            <h2 className="section-title">Clients Review</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit ellentesque dignissim quam et <br /> metus effici turac fringilla lorem facilisis.</p>
-          </div>
-          <div className="row justify-content-center">
-            <div className="col-lg-8 col-md-12 col-sm-12">
-              <div id="testimonials" className="touch-slider owl-carousel">
-                {/* Testimonial Item 1 */}
-                <div className="item">
-                  <div className="testimonial-item">
-                    <div className="author">
-                      <div className="img-thumb">
-                        <img src="assets/img/testimonial/img1.png" alt="Jessica" />
-                      </div>
-                    </div>
-                    <div className="content-inner">
-                      <p className="description">Morbi quam enim, cursus non erat pretium veh icula finibus ex stibulum venenatis viverra dui Morbi quam enim, cursus non erat pretium veh icula finibus ex stibulum venenatis viverra dui Morbi quam enim, cursus non erat pretium veh icula finibus ex stibulum venenatis viverra dui.</p>
-                      <div className="author-info">
-                        <h2><a href="#">Jessica</a></h2>
-                        <span>Senior Accountant</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Testimonial Item 2 */}
-                <div className="item">
-                  <div className="testimonial-item">
-                    <div className="author">
-                      <div className="img-thumb">
-                        <img src="assets/img/testimonial/img2.png" alt="John Doe" />
-                      </div>
-                    </div>
-                    <div className="content-inner">
-                      <p className="description">Morbi quam enim, cursus non erat pretium veh icula finibus ex stibulum venenatis viverra dui Morbi quam enim, cursus non erat pretium veh icula finibus ex stibulum venenatis viverra dui Morbi quam enim, cursus non erat pretium veh icula finibus ex stibulum venenatis viverra dui.</p>
-                      <div className="author-info">
-                        <h2><a href="#">John Doe</a></h2>
-                        <span>Project Menager</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Testimonial Item 3 */}
-                <div className="item">
-                  <div className="testimonial-item">
-                    <div className="author">
-                      <div className="img-thumb">
-                        <img src="assets/img/testimonial/img3.png" alt="Helen" />
-                      </div>
-                    </div>
-                    <div className="content-inner">
-                      <p className="description">Morbi quam enim, cursus non erat pretium veh icula finibus ex stibulum venenatis viverra dui Morbi quam enim, cursus non erat pretium veh icula finibus ex stibulum venenatis viverra dui Morbi quam enim, cursus non erat pretium veh icula finibus ex stibulum venenatis viverra dui.</p>
-                      <div className="author-info">
-                        <h2><a href="#">Helen</a></h2>
-                        <span>Engineer</span>
-                      </div>
-                    </div>
-                  </div>
+<section id="testimonial" className="position-relative">
+      <div
+        id="testimonialCarousel"
+        className="carousel slide"
+        data-bs-ride="carousel"
+      >
+        <div className="carousel-inner">
+
+          {/* Testimonial 1 */}
+          <div className="carousel-item active">
+            <div className="testimonial-item text-center">
+
+              <div className="img-member mx-auto">
+                <img
+                  src="/img/testimonial/user1.jpg"
+                  className="img-fluid"
+                  alt="John Doe"
+                />
+              </div>
+
+              <div className="client-info">
+                <div className="client-name">
+                  John Doe <span>CEO, Company</span>
                 </div>
               </div>
+
+              <p>
+                <i className="bi bi-quote quote-icon"></i>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                <i className="bi bi-quote quote-icon"></i>
+              </p>
+
             </div>
           </div>
+
+          {/* Testimonial 2 */}
+          <div className="carousel-item">
+            <div className="testimonial-item text-center">
+
+              <div className="img-member mx-auto">
+                <img
+                  src="/img/testimonial/user2.jpg"
+                  className="img-fluid"
+                  alt="Jane Smith"
+                />
+              </div>
+
+              <div className="client-info">
+                <div className="client-name">
+                  Jane Smith <span>Manager</span>
+                </div>
+              </div>
+
+              <p>
+                <i className="bi bi-quote quote-icon"></i>
+                Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                <i className="bi bi-quote quote-icon"></i>
+              </p>
+
+            </div>
+          </div>
+
         </div>
-      </section>
-      {/* Testimonial Section End */}
+
+        {/* Carousel Navigation */}
+        <button
+          className="carousel-control-prev"
+          type="button"
+          data-bs-target="#testimonialCarousel"
+          data-bs-slide="prev"
+        >
+          <span className="carousel-control-prev-icon"></span>
+        </button>
+
+        <button
+          className="carousel-control-next"
+          type="button"
+          data-bs-target="#testimonialCarousel"
+          data-bs-slide="next"
+        >
+          <span className="carousel-control-next-icon"></span>
+        </button>
+      </div>
+    </section>
+          {/* Testimonial Section End */}
 
       {/* --- Pricing Table Section --- */}
 <div id="pricing" className="section bg-gray">
