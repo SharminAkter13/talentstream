@@ -80,8 +80,12 @@ const App = () => {
         {/* ========================================================= */}
         {/* 2. STANDALONE ROUTES (Admin/Login, no PortalLayout) */}
         {/* ========================================================= */}
+
+<Route path="/admin-dashboard" element={ hasRole(1) ? <Dashboard/> : <Navigate to="/login" /> } />
+<Route path="/employer-dashboard" element={ hasRole(2) ? <EmployerDashboard/> : <Navigate to="/login" /> } />
+<Route path="/candidate-dashboard" element={ hasRole(3) ? <CandidateDashboard/> : <Navigate to="/login" /> } />
+
         <Route path="/my-account" element={<MyAccount/>} />
-    <Route path="/dashboard" element={<Dashboard />} />
     <Route path="/master" element={<Master />} />
     <Route path="/add-user" element={<CreateUser />} />
     <Route path="/manage-user" element={<ManageUser />} />
