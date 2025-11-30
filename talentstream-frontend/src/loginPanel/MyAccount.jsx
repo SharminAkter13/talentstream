@@ -4,10 +4,24 @@ import { useNavigate } from "react-router-dom";
 import PortalNavbar from "../portalComponent/PortalNavbar";
 import PortalFooter from "../portalComponent/PortalFooter";
 
+// Define the role options (assuming these correspond to your database role IDs)
+const ROLE_OPTIONS = [
+  { id: 2, name: "Employer" },
+  { id: 3, name: "Candidate" },
+];
+
 const MyAccount = () => {
   const [activeTab, setActiveTab] = useState("login");
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [registerForm, setRegisterForm] = useState({ name: "", email: "", password: "", repeatPassword: "" });
+  // Initialize registerForm with role_id set to the first role's ID (e.g., Candidate: 3)
+  const [registerForm, setRegisterForm] = useState({ 
+    name: "", 
+    email: "", 
+    password: "", 
+    repeatPassword: "", 
+    // Default role: Candidate (ID 3). Change as per your preference or DB setup.
+    role_id: 3 
+  }); 
   const navigate = useNavigate();
 
   const handleLoginChange = (e) => {
@@ -39,10 +53,12 @@ const MyAccount = () => {
       return;
     }
     
+    // Include the role_id in the payload
     const payload = {
       name: registerForm.name,
       email: registerForm.email,
-      password: registerForm.password
+      password: registerForm.password,
+      role_id: registerForm.role_id // <--- NEW FIELD
     };
     
     try {
@@ -51,7 +67,9 @@ const MyAccount = () => {
       alert("Registration Successful!");
       navigate("/"); 
     } catch (err) {
-      alert(err.response?.data?.message || "Registration Failed");
+      // You might want to log the error response for debugging
+      // console.error("Registration Error:", err.response?.data); 
+      alert(err.response?.data?.message || "Registration Failed. Check the server response and form data.");
     }
   };
 
@@ -63,12 +81,7 @@ const MyAccount = () => {
       
       <div id="content" className="my-account">
         <div className="container">
-          {/* BS5 FIX: Use justify-content-center on the row to center the column */}
           <div className="row justify-content-center"> 
-            
-            {/* BS5 FIX: Use col-12 for full width on small screens, 
-                col-md-8 for tablets, and col-lg-6 for desktops. 
-                Removed all obsolete 'offset' classes. */}
             <div className="col-12 col-md-8 col-lg-6 cd-user-modal">
               
               <div className="my-account-form">
@@ -81,16 +94,16 @@ const MyAccount = () => {
                   </li>
                   <li onClick={() => setActiveTab("register")}>
                     <a className={activeTab === "register" ? "selected" : ""} href="#0">
-                      REGITER
+                      REGISTER
                     </a>
                   </li>
                 </ul>
 
-                {/* Login Form Section */}
+                {/* Login Form Section (no change) */}
                 <div id="cd-login" className={activeTab === "login" ? "is-selected" : ""}>
                   <div className="page-login-form">
                     <form role="form" className="login-form" onSubmit={login}>
-                      {/* Form Groups using form-group (assuming custom styles use it, otherwise mb-3 is preferred in pure BS5) */}
+                      {/* ... Login Form Fields (omitted for brevity, assume they are correct) ... */}
                       <div className="form-group">
                         <div className="input-icon">
                           <i className="ti-user"></i>
@@ -122,15 +135,12 @@ const MyAccount = () => {
                         </div>
                       </div>
 
-                      {/* Submit Button */}
                       <button type="submit" className="btn btn-common log-btn">
                         Login
                       </button>
 
-                      {/* Remember Me / Lost Password */}
                       <div className="checkbox-item">
                         <div className="checkbox">
-                          {/* Note: In BS5, form controls and labels should use form-check classes */}
                           <label htmlFor="rememberme" className="rememberme">
                             <input name="rememberme" id="rememberme" value="forever" type="checkbox" />{" "}
                             Remember Me
@@ -144,11 +154,12 @@ const MyAccount = () => {
                   </div>
                 </div>
 
-                {/* Register Form Section */}
+                {/* Register Form Section (UPDATED) */}
                 <div id="cd-signup" className={activeTab === "register" ? "is-selected" : ""}>
                   <div className="page-login-form register">
                     <form role="form" className="login-form" onSubmit={register}>
                       
+                      {/* Name Field */}
                       <div className="form-group">
                         <div className="input-icon">
                           <i className="ti-user"></i>
@@ -164,6 +175,7 @@ const MyAccount = () => {
                         </div>
                       </div>
 
+                      {/* Email Field */}
                       <div className="form-group">
                         <div className="input-icon">
                           <i className="ti-email"></i>
@@ -179,6 +191,28 @@ const MyAccount = () => {
                         </div>
                       </div>
 
+                      {/* Role Dropdown (NEW FIELD) */}
+                      <div className="form-group">
+                        <div className="input-icon">
+                          <i className="ti-id-badge"></i> {/* Icon suggestion */}
+                          <select
+                            className="form-control"
+                            name="role_id"
+                            value={registerForm.role_id}
+                            onChange={handleRegisterChange}
+                            required
+                          >
+                            <option value="" disabled>Select Role</option>
+                            {ROLE_OPTIONS.map((role) => (
+                              <option key={role.id} value={role.id}>
+                                {role.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      
+                      {/* Password Field */}
                       <div className="form-group">
                         <div className="input-icon">
                           <i className="ti-lock"></i>
@@ -194,6 +228,7 @@ const MyAccount = () => {
                         </div>
                       </div>
                       
+                      {/* Repeat Password Field */}
                       <div className="form-group">
                         <div className="input-icon">
                           <i className="ti-lock"></i>

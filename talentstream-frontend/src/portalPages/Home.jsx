@@ -605,7 +605,6 @@ const Home = () => {
       </section>
       {/* download Section Start */}
 
-      <PortalFooter />
     </div>
   );
 };
