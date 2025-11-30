@@ -1,0 +1,18 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use DB;
+
+class RoleSeeder extends Seeder
+{
+    public function run()
+    {
+        DB::table('roles')->insert([
+            ['id' => 1, 'name' => 'Admin'],
+            ['id' => 2, 'name' => 'Employer'],
+            ['id' => 3, 'name' => 'Candidate'],
+        ]);
+    }
+}
