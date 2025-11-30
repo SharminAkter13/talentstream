@@ -33,45 +33,62 @@ const MyAccount = () => {
   };
 
   // LOGIN Function
-  const login = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("http://127.0.0.1:8000/api/login", loginForm);
-      localStorage.setItem("token", res.data.token);
-      alert("Login Successful!");
-      navigate("/"); 
-    } catch (err) {
-      alert(err.response?.data?.message || "Invalid credentials");
-    }
-  };
+const roleToRoute = {
+  1: '/admin/dashboard',
+  2: '/employer/dashboard',
+  3: '/candidate/dashboard'
+};
+
+const login = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await axios.post("http://127.0.0.1:8000/api/login", loginForm);
+    const { token, user } = res.data;
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    // set default authorization header for future requests
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    alert("Login Successful!");
+
+    const route = roleToRoute[user.role_id] || '/';
+    navigate(route);
+  } catch (err) {
+    alert(err.response?.data?.message || "Invalid credentials");
+  }
+};
 
   // REGISTER Function
-  const register = async (e) => {
-    e.preventDefault();
-    if (registerForm.password !== registerForm.repeatPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-    
-    // Include the role_id in the payload
-    const payload = {
-      name: registerForm.name,
-      email: registerForm.email,
-      password: registerForm.password,
-      role_id: registerForm.role_id // <--- NEW FIELD
-    };
-    
-    try {
-      const res = await axios.post("http://127.0.0.1:8000/api/register", payload);
-      localStorage.setItem("token", res.data.token);
-      alert("Registration Successful!");
-      navigate("/"); 
-    } catch (err) {
-      // You might want to log the error response for debugging
-      // console.error("Registration Error:", err.response?.data); 
-      alert(err.response?.data?.message || "Registration Failed. Check the server response and form data.");
-    }
+const register = async (e) => {
+  e.preventDefault();
+  if (registerForm.password !== registerForm.repeatPassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  const payload = {
+    name: registerForm.name,
+    email: registerForm.email,
+    password: registerForm.password,
+    password_confirmation: registerForm.repeatPassword,
+    role_id: registerForm.role_id
   };
+
+  try {
+    const res = await axios.post("http://127.0.0.1:8000/api/register", payload);
+    const { token, user } = res.data;
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    alert("Registration Successful!");
+    const route = roleToRoute[user.role_id] || '/';
+    navigate(route);
+  } catch (err) {
+    alert(err.response?.data?.message || "Registration Failed.");
+  }
+};
 
   // --- JSX Rendering ---
 
