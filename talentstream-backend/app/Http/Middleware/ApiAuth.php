@@ -9,17 +9,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ApiAuth
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->header('Authorization');
+        $header = $request->header('Authorization');
+        if (!$header) {
+            return response()->json(['message' => 'Unauthorized - missing header'], 401);
+        }
 
-        if (!$token) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        // Accept "Bearer <token>" or direct token
+        if (str_starts_with($header, 'Bearer ')) {
+            $token = substr($header, 7);
+        } else {
+            $token = $header;
         }
 
         $user = User::where('api_token', $token)->first();
