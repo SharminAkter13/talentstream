@@ -6,5 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobAlert extends Model
 {
-    //
+    protected $fillable = [
+        'user_id',
+        'title',
+        'keywords',
+        'location',
+        'contract_type',
+        'frequency',
+    ];
+
+    // Relation to user
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
