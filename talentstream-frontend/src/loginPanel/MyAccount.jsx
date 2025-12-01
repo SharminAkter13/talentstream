@@ -1,21 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-// Mock Navbar/Footer (replace with real ones if available)
-const PortalNavbar = () => (
-  <header className="bg-gray-800 text-white p-4">
-    <div className="container mx-auto">
-      <h1 className="text-xl font-bold">Job Portal</h1>
-    </div>
-  </header>
-);
-
-const PortalFooter = () => (
-  <footer className="bg-gray-800 text-white p-4 text-center mt-8">
-    <p>&copy; {new Date().getFullYear()} Job Portal. All rights reserved.</p>
-  </footer>
-);
+// IMPORT THE REAL COMPONENTS
+import PortalNavbar from '../portalComponent/PortalNavbar';
+import PortalFooter from '../portalComponent/PortalFooter';
 
 // Role options
 const ROLE_OPTIONS = [
@@ -58,7 +46,6 @@ const MyAccount = () => {
     }
   }, []);
 
-
   // Form change handlers
   const handleLoginChange = (e) =>
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
@@ -72,6 +59,7 @@ const MyAccount = () => {
   const login = async (e) => {
     e.preventDefault();
     try {
+      // NOTE: Replace the hardcoded URL with an environment variable in a real app
       const res = await axios.post("http://127.0.0.1:8000/api/login", loginForm);
       const { token, user } = res.data;
 
@@ -104,6 +92,7 @@ const MyAccount = () => {
     };
 
     try {
+      // NOTE: Replace the hardcoded URL with an environment variable in a real app
       const res = await axios.post("http://127.0.0.1:8000/api/register", payload);
       const { token, user } = res.data;
 
@@ -120,110 +109,174 @@ const MyAccount = () => {
   };
 
   return (
-    <>
-      <PortalNavbar />
-      <div id="content" className="my-account">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-12 col-md-8 col-lg-6 cd-user-modal">
-              <div className="my-account-form">
-                {/* Tabs */}
-                <ul className="cd-switcher">
-                  <li onClick={() => setActiveTab("login")}>
-                    <a className={activeTab === "login" ? "selected" : ""} href="#0">
-                      LOGIN
-                    </a>
-                  </li>
-                  <li onClick={() => setActiveTab("register")}>
-                    <a className={activeTab === "register" ? "selected" : ""} href="#0">
-                      REGISTER
-                    </a>
-                  </li>
-                </ul>
+<>
+  <PortalNavbar />
 
-                {/* Login Form */}
-                <div id="cd-login" className={activeTab === "login" ? "is-selected" : ""}>
-                  <form onSubmit={login} className="page-login-form">
+  <div id="content" className="py-5" style={{ background: "#f7f9fc" }}>
+    <div className="container">
+      <div className="row justify-content-center align-items-center" style={{ minHeight: "75vh" }}>
+        <div className="col-12 col-md-8 col-lg-6">
+
+          <div className="card shadow-lg border-0 rounded-4">
+            {/* Tabs */}
+            <div className="card-header bg-white p-0 border-0 rounded-4">
+              <div className="d-flex">
+                <button
+                  className={`flex-fill py-3 fw-bold border-0 rounded-start-4 ${
+                    activeTab === "login"
+                      ? "bg-info text-white"
+                      : "bg-light text-secondary"
+                  }`}
+                  onClick={() => setActiveTab("login")}
+                >
+                  LOGIN
+                </button>
+
+                <button
+                  className={`flex-fill py-3 fw-bold border-0 rounded-end-4 ${
+                    activeTab === "register"
+                      ? "bg-info text-white"
+                      : "bg-light text-secondary"
+                  }`}
+                  onClick={() => setActiveTab("register")}
+                >
+                  REGISTER
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="card-body p-4">
+
+              {/* LOGIN */}
+              <div className={`${activeTab === "login" ? "d-block" : "d-none"}`}>
+                <h4 className="text-center mb-4 fw-semibold">Welcome Back 👋</h4>
+                <form onSubmit={login}>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-medium">Email Address</label>
                     <input
-                      type="text"
+                      type="email"
                       name="email"
-                      placeholder="Email"
+                      className="form-control form-control-lg rounded-3"
+                      placeholder="name@example.com"
                       value={loginForm.email}
                       onChange={handleLoginChange}
                       required
                     />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-medium">Password</label>
                     <input
                       type="password"
                       name="password"
-                      placeholder="Password"
+                      className="form-control form-control-lg rounded-3"
+                      placeholder="Enter your password"
                       value={loginForm.password}
                       onChange={handleLoginChange}
                       required
                     />
-                    <button type="submit">Login</button>
-                  </form>
-                </div>
+                  </div>
 
-                {/* Register Form */}
-                <div id="cd-signup" className={activeTab === "register" ? "is-selected" : ""}>
-                  <form onSubmit={register} className="page-login-form register">
+                  <button className="btn btn-info w-100 btn-lg mt-3 rounded-3 fw-semibold">
+                    Login
+                  </button>
+                </form>
+              </div>
+
+              {/* REGISTER */}
+              <div className={`${activeTab === "register" ? "d-block" : "d-none"}`}>
+                <h4 className="text-center mb-4 fw-semibold">Create Your Account ✨</h4>
+
+                <form onSubmit={register}>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-medium">Full Name</label>
                     <input
                       type="text"
                       name="name"
-                      placeholder="Name"
+                      className="form-control form-control-lg rounded-3"
+                      placeholder="Enter your name"
                       value={registerForm.name}
                       onChange={handleRegisterChange}
                       required
                     />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-medium">Email Address</label>
                     <input
                       type="email"
                       name="email"
-                      placeholder="Email"
+                      className="form-control form-control-lg rounded-3"
+                      placeholder="name@example.com"
                       value={registerForm.email}
                       onChange={handleRegisterChange}
                       required
                     />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-medium">Role</label>
                     <select
                       name="role_id"
+                      className="form-select form-select-lg rounded-3"
                       value={registerForm.role_id}
                       onChange={handleRegisterChange}
                       required
                     >
-                      <option value="" disabled>
-                        Select Role
-                      </option>
+                      <option value="" disabled>Select role</option>
                       {ROLE_OPTIONS.map((role) => (
                         <option key={role.id} value={role.id}>
                           {role.name}
                         </option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-medium">Password</label>
                     <input
                       type="password"
                       name="password"
-                      placeholder="Password"
+                      className="form-control form-control-lg rounded-3"
+                      placeholder="Enter password"
                       value={registerForm.password}
                       onChange={handleRegisterChange}
                       required
                     />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-medium">Confirm Password</label>
                     <input
                       type="password"
                       name="repeatPassword"
-                      placeholder="Repeat Password"
+                      className="form-control form-control-lg rounded-3"
+                      placeholder="Confirm password"
                       value={registerForm.repeatPassword}
                       onChange={handleRegisterChange}
                       required
                     />
-                    <button type="submit">Register</button>
-                  </form>
-                </div>
+                  </div>
+
+                  <button className="btn btn-info w-100 btn-lg mt-3 rounded-3 fw-semibold">
+                    Register
+                  </button>
+                </form>
               </div>
+
             </div>
           </div>
+
         </div>
       </div>
-      <PortalFooter />
-    </>
+    </div>
+  </div>
+
+  <PortalFooter />
+</>
   );
 };
 

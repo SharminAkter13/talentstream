@@ -22,8 +22,13 @@ import ManageApplications from './pages/ManageApplication';
 import Profile from './pages/Profile';
 import ProfileSettings from './pages/ProfileSettings';
 import Help from './pages/Help';
-import Logout from './pages/Logout';
+// NOTE: Removed duplicate import of Logout (now in loginPanel)
 import Reports from './pages/Reports';
+
+// =============================
+// AUTH IMPORTS (loginPanel)
+// =============================
+import Logout from './loginPanel/Logout'; // <--- CORRECTED PATH
 import MyAccount from './loginPanel/MyAccount';
 
 // =============================
@@ -52,82 +57,86 @@ import EmployerDashboard from './pages/EmployerDashboard';
 import CandidateDashboard from './pages/CandidateDashboard';
 
 const App = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
+    return (
+        <BrowserRouter>
+            <Routes>
 
-        {/* ============================= */}
-        {/* 1. PUBLIC PORTAL ROUTES      */}
-        {/* ============================= */}
-        <Route element={<PortalLayout />}>
+                {/* ============================= */}
+                {/* 1. PUBLIC PORTAL ROUTES      */}
+                {/* ============================= */}
+                <Route element={<PortalLayout />}>
 
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/post-job" element={<PostJob />} />
-          <Route path="/job-page" element={<JobPage />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/post-job" element={<PostJob />} />
+                    <Route path="/job-page" element={<JobPage />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
 
-          {/* Candidate area */}
-          <Route path="/add-resume" element={<AddResume />} />
-          <Route path="/browse-job" element={<BrowseJobs />} />
-          <Route path="/browse-cat" element={<BrowseCategories />} />
+                    {/* Candidate area */}
+                    <Route path="/add-resume" element={<AddResume />} />
+                    <Route path="/browse-job" element={<BrowseJobs />} />
+                    <Route path="/browse-cat" element={<BrowseCategories />} />
 
-          {/* Employer area */}
-          <Route path="/add-job" element={<AddJob />} />
-          <Route path="/manage-job" element={<ManageJob />} />
-          <Route path="/manage-application" element={<ManageApplicationPortal />} />
-          <Route path="/browse-resume" element={<BrowseResumes />} />
-        </Route>
+                    {/* Employer area */}
+                    <Route path="/add-job" element={<AddJob />} />
+                    <Route path="/manage-job" element={<ManageJob />} />
+                    <Route path="/manage-application" element={<ManageApplicationPortal />} />
+                    <Route path="/browse-resume" element={<BrowseResumes />} />
+                </Route>
 
-        {/* ============================= */}
-        {/* 2. DASHBOARDS (protected)     */}
-        {/* ============================= */}
-        <Route path="/logout" element={<Logout />} />
-        <Route 
-          path="/admin/dashboard" 
-          element={hasRole(1) ? <Dashboard /> : <Navigate to="/my-account" />} 
-        />
+                {/* ============================= */}
+                {/* 2. AUTH & DASHBOARDS (protected) */}
+                {/* ============================= */}
+                
+                {/* LOGOUT ROUTE: Calls Logout component, clears session, and redirects to /my-account */}
+                <Route path="/logout" element={<Logout />} />
+                
+                {/* Dashboard Routes with Role Protection */}
+                <Route 
+                    path="/admin/dashboard" 
+                    element={hasRole(1) ? <Dashboard /> : <Navigate to="/my-account" />} 
+                />
 
-        <Route 
-          path="/employer/dashboard" 
-          element={hasRole(2) ? <EmployerDashboard /> : <Navigate to="/my-account" />} 
-        />
+                <Route 
+                    path="/employer/dashboard" 
+                    element={hasRole(2) ? <EmployerDashboard /> : <Navigate to="/my-account" />} 
+                />
 
-        <Route 
-          path="/candidate/dashboard" 
-          element={hasRole(3) ? <CandidateDashboard /> : <Navigate to="/my-account" />} 
-        />
+                <Route 
+                    path="/candidate/dashboard" 
+                    element={hasRole(3) ? <CandidateDashboard /> : <Navigate to="/my-account" />} 
+                />
 
-        {/* ============================= */}
-        {/* 3. OTHER INTERNAL PAGES       */}
-        {/* ============================= */}
+                {/* ============================= */}
+                {/* 3. OTHER INTERNAL PAGES       */}
+                {/* ============================= */}
 
-        <Route path="/my-account" element={<MyAccount />} />
+                <Route path="/my-account" element={<MyAccount />} />
+                
+                {/* Other Internal Pages (Master, Job, User management, etc.) */}
+                <Route path="/master" element={<Master />} />
+                <Route path="/add-user" element={<CreateUser />} />
+                <Route path="/manage-user" element={<ManageUser />} />
+                <Route path="/add-cat" element={<CreateCategory />} />
+                <Route path="/manage-cat" element={<ManageCategory />} />
+                <Route path="/job-list" element={<JobList />} />
+                <Route path="/create-job" element={<CreateJob />} />
+                <Route path="/resume" element={<Resume />} />
+                <Route path="/application" element={<Application />} />
+                <Route path="/manage-application-admin" element={<ManageApplications />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/skills" element={<Skills />} />
+                <Route path="/interviews" element={<Interviews />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile-setting" element={<ProfileSettings />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/reports" element={<Reports />} />
 
-        <Route path="/master" element={<Master />} />
-        <Route path="/add-user" element={<CreateUser />} />
-        <Route path="/manage-user" element={<ManageUser />} />
-        <Route path="/add-cat" element={<CreateCategory />} />
-        <Route path="/manage-cat" element={<ManageCategory />} />
-        <Route path="/job-list" element={<JobList />} />
-        <Route path="/create-job" element={<CreateJob />} />
-        <Route path="/resume" element={<Resume />} />
-        <Route path="/application" element={<Application />} />
-        <Route path="/manage-application-admin" element={<ManageApplications />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/skills" element={<Skills />} />
-        <Route path="/interviews" element={<Interviews />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/profile-setting" element={<ProfileSettings />} />
-        <Route path="/help" element={<Help />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/reports" element={<Reports />} />
-
-      </Routes>
-    </BrowserRouter>
-  );
+            </Routes>
+        </BrowserRouter>
+    );
 };
 
 export default App;

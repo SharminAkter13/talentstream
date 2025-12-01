@@ -45,9 +45,12 @@ const Logout = () => {
     }, [navigate]);
 
     return (
+        <div>
+            
         <div style={{ padding: '40px', textAlign: 'center' }}>
             <h2>👋 Logging you out...</h2>
             <p>Ending session and redirecting to the Login page.</p>
+        </div>
         </div>
     );
 };
