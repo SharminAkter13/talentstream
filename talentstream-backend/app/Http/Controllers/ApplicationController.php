@@ -21,7 +21,6 @@ class ApplicationController extends Controller
                 ->latest()
                 ->paginate(10);
         }
-        // Candidate: can see only their own
         elseif ($user->role?->name === 'candidate') {
             $candidate = $user->candidate;
 
@@ -52,7 +51,6 @@ class ApplicationController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        return view('pages.applications.index', compact('applications'));
     }
 
     /**
@@ -61,7 +59,6 @@ class ApplicationController extends Controller
     public function create($jobId)
     {
         $job = Job::findOrFail($jobId);
-        return view('pages.applications.create', compact('job'));
     }
 
     /**
@@ -132,6 +129,5 @@ class ApplicationController extends Controller
 
         // Admin: full access — no restriction
 
-        return view('pages.applications.show', compact('application'));
     }
 }
