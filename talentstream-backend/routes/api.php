@@ -3,16 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    // --- Authentication & Core ---
     AuthController,
     ProfileController,
-
-    // --- Dashboard Controllers ---
     AdminDashboardController,
     CandidateDashboardController,
     EmployerDashboardController,
-
-    // --- CRUD/Resource Controllers ---
     CandidateController,
     CategoryController,
     EmployerController,
@@ -24,23 +19,17 @@ use App\Http\Controllers\{
     EmployerPackageController,
     PackageController,
     JobLocationController,
-
-    // --- Portal/Feature Controllers ---
-    PortalController, // For public portal data
+    PortalController,
     JobBookmarkController,
     JobViewController,
     NotificationController,
     MessageController,
-
-    // --- Application & Resume Flow ---
     ApplicationController,
     PortalJobController,
     ResumePortalController,
     EmployerResumeController,
     CandidateManageApplicationController,
     EmployerManageJobController,
-
-    // --- Browsing Controllers (Public/Auth Shared) ---
     BrowseCategoryController,
     BrowseJobController,
     PortalJobAlertsController,
@@ -51,38 +40,33 @@ use App\Http\Controllers\{
 |--------------------------------------------------------------------------
 | Public Routes (No Authentication Required)
 |--------------------------------------------------------------------------
-| These routes expose data needed for initial page loads (e.g., job lists)
-| and the core login/registration functionality.
 */
 
-// Authentication
-Route::middleware('auth:api')->post('/logout', [AuthController::class, 'logout']);
+// Auth
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
-// General Public Data
-Route::get('/', [PortalController::class, 'index']); // Main public data endpoint
+// Public portal data
+Route::get('/', [PortalController::class, 'index']);
 Route::get('/browse-jobs', [BrowseJobController::class, 'index']);
 Route::get('/browse-categories', [BrowseCategoryController::class, 'index']);
-Route::get('/jobs/{job}', [JobController::class, 'show']); // View single job
+Route::get('/jobs/{job}', [JobController::class, 'show']);
 Route::get('/companies/{company}/details', [CompanyController::class, 'getCompanyDetails']);
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes (Requires API Token)
+| Authenticated Routes (API Token Required)
 |--------------------------------------------------------------------------
-| Uses the 'auth:sanctum' guard.
 */
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['api.auth'])->group(function () {
 
-    // 🔑 Core Auth & Profile
-    Route::get('/user', function (Request $request) { return $request->user(); });
+    // Core Auth & Profile
     Route::get('/me', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [ProfileController::class, 'index']);
 
-    // 🔔 Notifications
+    // Notifications
     Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
         Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
@@ -90,7 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [NotificationController::class, 'destroy']);
     });
 
-    // 💬 Messaging
+    // Messaging
     Route::prefix('chat')->group(function () {
         Route::get('/', [MessageController::class, 'index']);
         Route::get('/contacts', [MessageController::class, 'getContacts']);
@@ -99,33 +83,31 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{conversation}/read', [MessageController::class, 'markAsRead']);
     });
 
-    // 🚨 Job Alerts
+    // Job Alerts
     Route::resource('job_alerts', JobAlertController::class)->except(['show']);
     Route::get('/portal-job-alerts', [PortalJobAlertsController::class, 'index']);
 
-    // 🔖 Job Bookmark
+    // Job Bookmarks
     Route::prefix('bookmarks')->group(function () {
         Route::get('/', [JobBookmarkController::class, 'index']);
         Route::post('/{jobId}', [JobBookmarkController::class, 'store']);
         Route::delete('/{id}', [JobBookmarkController::class, 'destroy']);
     });
 
-    // 👁️ Job View Tracking
+    // Job View Tracking
     Route::post('/jobs/{job}/view', [JobViewController::class, 'store']);
 });
 
 /*
 |--------------------------------------------------------------------------
-| 🛡️ Role Protected Routes (auth:sanctum AND role:X)
+| Role-Based Routes (API Auth + Role)
 |--------------------------------------------------------------------------
 */
 
-// --- 👑 Admin Routes (Role ID: 1) ---
-Route::middleware(['auth:sanctum', 'role:1'])->prefix('admin')->group(function () {
+// --- Admin Routes (role_id = 1)
+Route::middleware(['api.auth', 'role:1'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
 
-    Route::get('/dashboard', [AdminDashboardController::class, 'dashboard']); // Your dashboard-data
-
-    // CRUD/Resource Management
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('users', UserController::class)->except(['show']);
     Route::post('users/{user}/approve', [UserController::class, 'approve']);
@@ -138,39 +120,31 @@ Route::middleware(['auth:sanctum', 'role:1'])->prefix('admin')->group(function (
     Route::resource('packages', PackageController::class);
     Route::resource('employer_packages', EmployerPackageController::class);
 
-    // Admin-Specific Views
-    Route::get('/job-views', [JobViewController::class, 'index']); // Admin view of job views
+    Route::get('/job-views', [JobViewController::class, 'index']);
 });
 
-// --- 💼 Employer Routes (Role ID: 2) ---
-Route::middleware(['auth:sanctum', 'role:2'])->prefix('employer')->group(function () {
+// --- Employer Routes (role_id = 2)
+Route::middleware(['api.auth', 'role:2'])->prefix('employer')->group(function () {
+    Route::get('/dashboard', [EmployerDashboardController::class, 'dashboard']);
 
-    Route::get('/dashboard', [EmployerDashboardController::class, 'dashboard']); // Your dashboard-data
-
-    // Job Posting & Management
     Route::get('/post-job', [PortalJobController::class, 'create']);
     Route::post('/post-job', [PortalJobController::class, 'store']);
     Route::get('/manage-jobs', [PortalJobController::class, 'index']);
-    
-    // Application Viewing
+
     Route::get('/job/{jobId}/applications', [EmployerManageJobController::class, 'viewApplications']);
 
-    // Resume Browsing (Employers view Candidate Resumes)
     Route::get('/browse-resumes', [EmployerResumeController::class, 'index']);
     Route::get('/browse-resumes/{id}', [EmployerResumeController::class, 'show']);
 });
 
-// --- 👤 Candidate Routes (Role ID: 3) ---
-Route::middleware(['auth:sanctum', 'role:3'])->prefix('candidate')->group(function () {
+// --- Candidate Routes (role_id = 3)
+Route::middleware(['api.auth', 'role:3'])->prefix('candidate')->group(function () {
+    Route::get('/dashboard', [CandidateDashboardController::class, 'dashboard']);
 
-    Route::get('/dashboard', [CandidateDashboardController::class, 'dashboard']); // Your dashboard-data
-
-    // Resume Management
     Route::get('/resume/create', [ResumePortalController::class, 'create']);
     Route::post('/resume/store', [ResumePortalController::class, 'store']);
     Route::get('/manage-resumes', [PortalResumeController::class, 'index']);
 
-    // Application Management
     Route::get('/manage-applications', [CandidateManageApplicationController::class, 'index']);
     Route::get('/applications', [ApplicationController::class, 'index']);
     Route::get('/applications/{id}', [ApplicationController::class, 'show']);
