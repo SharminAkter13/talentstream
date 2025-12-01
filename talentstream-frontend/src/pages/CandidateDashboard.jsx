@@ -104,7 +104,7 @@ class Dashboard extends Component {
           <div className="row">
             <div className="col-md-6 col-sm-12">
               <div className="title">
-                <h4>blank</h4>
+                <h4>Candidate Dashboard</h4>
               </div>
               <nav aria-label="breadcrumb" role="navigation">
                 <ol className="breadcrumb">

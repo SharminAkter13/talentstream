@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
 import { hasRole } from "./services/auth"; // adjust the path if needed
 
 // ADMIN/INTERNAL IMPORTS (Assuming these are internal/protected pages)
