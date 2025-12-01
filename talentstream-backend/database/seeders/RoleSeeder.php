@@ -3,8 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use DB;
-
+use Illuminate\Support\Facades\DB;
 class RoleSeeder extends Seeder
 {
     public function run()

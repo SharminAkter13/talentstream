@@ -11,14 +11,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1️⃣ Seed roles first
-        $this->call(RoleSeeder::class);
-
-        // 2️⃣ Seed a default test user (optional)
-        \App\Models\User::factory()->create([
-            'name'  => 'Test User',
-            'email' => 'testuser@example.com',
-            'role_id' => 3, // Assign role if you have role_id
+        $this->call([
+            RoleSeeder::class, 
+            UserSeeder::class, 
         ]);
+
+      
     }
 }
