@@ -21,16 +21,16 @@ Route::middleware(['api_auth'])->group(function() {
 
     // Admin-only
     Route::middleware(['role:1'])->prefix('admin')->group(function() {
-        Route::get('/dashboard-data', [AdminController::class, 'dashboard']);
+        Route::get('/dashboard-data', [AdminDashboardController::class, 'dashboard']);
     });
 
     // Employer
     Route::middleware(['role:2'])->prefix('employer')->group(function() {
-        Route::get('/dashboard-data', [EmployerController::class, 'dashboard']);
+        Route::get('/dashboard-data', [EmployerDashboardController::class, 'dashboard']);
     });
 
     // Candidate
     Route::middleware(['role:3'])->prefix('candidate')->group(function() {
-        Route::get('/dashboard-data', [CandidateController::class, 'dashboard']);
+        Route::get('/dashboard-data', [CandidateDashboardController::class, 'dashboard']);
     });
 });
