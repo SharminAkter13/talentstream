@@ -9,16 +9,10 @@ class CompanyController extends Controller
     public function index()
     {
         $companies = Company::all();
-        return view('pages.companies.index', compact('companies'));
+        // Changed to return JSON
+        return response()->json(['companies' => $companies]);
     }
 
-  
-    public function create()
-    {
-        return view('pages.companies.create');
-    }
-
-   
     public function store(Request $request)
     {
         $request->validate([
@@ -31,14 +25,22 @@ class CompanyController extends Controller
             'contact_phone' => 'nullable|string',
         ]);
 
-        Company::create($request->all());
+        $company = Company::create($request->all());
 
-        return redirect()->route('companies.index')->with('success', 'Company created successfully!');
+        // Changed to return JSON (201 Created)
+        return response()->json([
+            'message' => 'Company created successfully!',
+            'company' => $company
+        ], 201);
     }
 
-    public function edit(Company $company)
+    /**
+     * Display the specified company (Used by Edit in React).
+     */
+    public function show(Company $company)
     {
-        return view('pages.companies.edit', compact('company'));
+        // Changed to return JSON
+        return response()->json(['company' => $company]);
     }
 
     public function update(Request $request, Company $company)
@@ -55,22 +57,30 @@ class CompanyController extends Controller
 
         $company->update($request->all());
 
-        return redirect()->route('companies.index')->with('success', 'Company updated successfully!');
+        // Changed to return JSON
+        return response()->json([
+            'message' => 'Company updated successfully!',
+            'company' => $company
+        ]);
     }
 
     public function destroy(Company $company)
     {
         if ($company->employers()->count() > 0) {
-            return redirect()->route('companies.index')->with('error', 'Cannot delete company with associated employers.');
+            // Changed to return JSON (409 Conflict)
+            return response()->json([
+                'message' => 'Cannot delete company with associated employers.'
+            ], 409);
         }
 
         $company->delete();
-        return redirect()->route('companies.index')->with('success', 'Company deleted successfully!');
+        // Changed to return JSON
+        return response()->json(['message' => 'Company deleted successfully!']);
     }
 
-   
     public function getCompanyDetails(Company $company)
     {
+        // Already returns JSON (good)
         return response()->json([
             'website' => $company->website,
             'phone' => $company->contact_phone, 

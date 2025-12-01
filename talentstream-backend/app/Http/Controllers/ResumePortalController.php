@@ -3,16 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-class ResumePortalController extends Controller
-{
-    //
-}
-
-<?php
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
 use App\Models\{Resume, Education, Experience, Skill};
 use Illuminate\Support\Facades\Auth;
 

@@ -4,41 +4,58 @@ namespace App\Http\Controllers;
 use App\Models\Employer;
 use App\Models\User;
 use App\Models\Role;
-use App\Models\Company; // <-- NEW: Import Company model
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class EmployerController extends Controller
 {
+    /**
+     * Display a listing of the employers.
+     * Used by Admin dashboard to list all employers.
+     */
     public function index()
     {
-        // UPDATED: Eager load 'company' relationship for efficiency in the index view
+        // Eager load 'company' relationship for efficiency
         $employers = Employer::with('user', 'company')->get();
-        return view('pages.employers.index', compact('employers'));
+        
+        // Changed from view to JSON
+        return response()->json(['employers' => $employers]);
     }
 
+    /**
+     * Show the form for creating a new employer.
+     * Used by React to fetch necessary data (companies list).
+     */
     public function create()
     {
-        // UPDATED: Pass the list of companies to the view for the dropdown
         $companies = Company::all();
-        return view('pages.employers.create', compact('companies'));
+        
+        // Changed from view to JSON
+        return response()->json(['companies' => $companies]);
     }
 
+    /**
+     * Store a newly created employer in storage.
+     */
     public function store(Request $request)
     {
-        // UPDATED: Validate company_id instead of company_name
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'company_id' => 'required|exists:companies,id', // <-- VALIDATE ID
+            'company_id' => 'required|exists:companies,id',
             'website' => 'nullable|string',
             'phone' => 'nullable|string',
             'address' => 'nullable|string',
         ]);
 
         $role = Role::where('name', 'employer')->first();
+
+        if (!$role) {
+             return response()->json(['error' => 'Employer role not defined.'], 500);
+        }
 
         // Create User with status pending
         $user = User::create([
@@ -49,31 +66,55 @@ class EmployerController extends Controller
             'status' => 'pending', // must be approved by admin
         ]);
 
-        // NEW: Create Employer profile linked to the User and Company ID
-        $user->employer()->create([
+        // Create Employer profile linked to the User and Company ID
+        $employer = $user->employer()->create([
             'company_id' => $request->company_id,
             'website' => $request->website,
             'phone' => $request->phone,
             'address' => $request->address,
         ]);
 
-        return redirect()->route('employers.index')->with('success', 'Employer created successfully. Awaiting admin approval.');
+        // Changed from redirect to JSON (201 Created)
+        return response()->json([
+            'message' => 'Employer created successfully. Awaiting admin approval.',
+            'user_id' => $user->id,
+            'employer' => $employer->load('user', 'company')
+        ], 201);
+    }
+    
+    /**
+     * Display the specified employer (often used for detail view or pre-populating edit forms).
+     */
+    public function show(Employer $employer)
+    {
+        // Load relationships for complete data
+        return response()->json(['employer' => $employer->load('user', 'company')]);
     }
 
+    /**
+     * Show the form for editing the specified employer.
+     * Used by React to fetch the specific employer data and the companies list.
+     */
     public function edit(Employer $employer)
     {
-        // UPDATED: Pass the list of companies to the view for the dropdown
         $companies = Company::all();
-        return view('pages.employers.edit', compact('employer', 'companies'));
+        
+        // Changed from view to JSON
+        return response()->json([
+            'employer' => $employer->load('user'),
+            'companies' => $companies
+        ]);
     }
 
+    /**
+     * Update the specified employer in storage.
+     */
     public function update(Request $request, Employer $employer)
     {
-        // UPDATED: Validate company_id instead of company_name
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$employer->user_id,
-            'company_id' => 'required|exists:companies,id', // <-- VALIDATE ID
+            'company_id' => 'required|exists:companies,id',
             'website' => 'nullable|string',
             'phone' => 'nullable|string',
             'address' => 'nullable|string',
@@ -85,15 +126,25 @@ class EmployerController extends Controller
             'email' => $request->email,
         ]);
 
-        // UPDATED: Update Employer profile using company_id
+        // Update Employer profile
         $employer->update($request->only(['company_id','website','phone','address']));
 
-        return redirect()->route('employers.index')->with('success', 'Employer updated successfully!');
+        // Changed from redirect to JSON
+        return response()->json([
+            'message' => 'Employer updated successfully!',
+            'employer' => $employer->load('user', 'company')
+        ]);
     }
 
+    /**
+     * Remove the specified employer from storage.
+     */
     public function destroy(Employer $employer)
     {
-        $employer->user()->delete(); // deletes employer profile automatically
-        return redirect()->route('employers.index')->with('success', 'Employer deleted successfully!');
+        // Delete User, which should cascade delete the Employer profile
+        $employer->user()->delete(); 
+        
+        // Changed from redirect to JSON
+        return response()->json(['message' => 'Employer deleted successfully!']);
     }
 }

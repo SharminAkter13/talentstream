@@ -14,6 +14,7 @@ class ApplicationController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $applications = collect(); // Initialize a collection
 
         // Admin: can see all applications
         if ($user->role?->name === 'admin') {
@@ -25,7 +26,8 @@ class ApplicationController extends Controller
             $candidate = $user->candidate;
 
             if (!$candidate) {
-                return back()->with('error', 'No candidate profile found.');
+                // Changed to return JSON error
+                return response()->json(['error' => 'No candidate profile found.'], 404);
             }
 
             $applications = Application::with(['job', 'candidate'])
@@ -33,12 +35,13 @@ class ApplicationController extends Controller
                 ->latest()
                 ->paginate(10);
         }
-        // Employer (optional): see applications for their jobs
+        // Employer: see applications for their jobs
         elseif ($user->role?->name === 'employer') {
             $employer = $user->employer;
 
             if (!$employer) {
-                return back()->with('error', 'No employer profile found.');
+                // Changed to return JSON error
+                return response()->json(['error' => 'No employer profile found.'], 404);
             }
 
             $applications = Application::with(['job', 'candidate'])
@@ -48,17 +51,12 @@ class ApplicationController extends Controller
         }
         // Anyone else — deny access
         else {
-            abort(403, 'Unauthorized access.');
+            // Changed to return JSON error (403 Forbidden)
+            return response()->json(['error' => 'Unauthorized access.'], 403);
         }
-
-    }
-
-    /**
-     * Show the form for creating a new application.
-     */
-    public function create($jobId)
-    {
-        $job = Job::findOrFail($jobId);
+        
+        // Final return for success path
+        return response()->json(['applications' => $applications]);
     }
 
     /**
@@ -68,14 +66,16 @@ class ApplicationController extends Controller
     {
         $request->validate([
             'job_id' => 'required|exists:jobs,id',
-            'resume' => 'required|mimes:pdf,doc,docx|max:2048',
+            // Ensure React handles file upload as form-data
+            'resume' => 'required|mimes:pdf,doc,docx|max:2048', 
             'cover_letter' => 'nullable|string',
         ]);
 
         $candidate = Auth::user()->candidate;
 
         if (!$candidate) {
-            return back()->with('error', 'Only candidates can apply for jobs.');
+            // Changed to return JSON error (403 Forbidden)
+            return response()->json(['error' => 'Only candidates can apply for jobs.'], 403);
         }
 
         // Prevent duplicate applications
@@ -84,14 +84,15 @@ class ApplicationController extends Controller
             ->exists();
 
         if ($alreadyApplied) {
-            return back()->with('error', 'You have already applied to this job.');
+            // Changed to return JSON error (409 Conflict)
+            return response()->json(['error' => 'You have already applied to this job.'], 409);
         }
 
         // Upload resume
         $resumePath = $request->file('resume')->store('resumes', 'public');
 
         // Create new application
-        Application::create([
+        $application = Application::create([
             'job_id' => $request->job_id,
             'candidate_id' => $candidate->id,
             'applied_date' => now(),
@@ -100,9 +101,11 @@ class ApplicationController extends Controller
             'status' => 'active',
         ]);
 
-        return redirect()
-            ->route('jobs.show', $request->job_id)
-            ->with('success', 'Your application has been submitted successfully!');
+        // Changed to return JSON (201 Created)
+        return response()->json([
+            'message' => 'Your application has been submitted successfully!',
+            'application' => $application
+        ], 201);
     }
 
     /**
@@ -115,7 +118,7 @@ class ApplicationController extends Controller
 
         // Candidate: can only see their own
         if ($user->role?->name === 'candidate' && $application->candidate_id !== $user->candidate->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, 'Unauthorized access.'); // Using abort is fine for a quick 403
         }
 
         // Employer: can only see applications for their jobs
@@ -129,5 +132,7 @@ class ApplicationController extends Controller
 
         // Admin: full access — no restriction
 
+        // Changed to return JSON
+        return response()->json(['application' => $application]);
     }
 }

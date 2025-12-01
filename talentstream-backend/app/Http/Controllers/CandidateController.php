@@ -14,13 +14,8 @@ class CandidateController extends Controller
     public function index()
     {
         $candidates = Candidate::with('user')->get();
-        return view('pages.candidates.index', compact('candidates'));
-    }
-
-    // Show create form
-    public function create()
-    {
-        return view('pages.candidates.create');
+        // Changed to return JSON
+        return response()->json(['candidates' => $candidates]);
     }
 
     // Store new candidate (linked to user)
@@ -47,13 +42,21 @@ class CandidateController extends Controller
         ]);
 
         // Candidate profile will be created only after admin approval
-        return redirect()->route('candidates.index')->with('success', 'Candidate created successfully. Awaiting admin approval.');
+        // Changed to return JSON (201 Created)
+        return response()->json([
+            'message' => 'Candidate created successfully. Awaiting admin approval.',
+            'user_id' => $user->id
+        ], 201);
     }
 
-    // Edit candidate profile
-    public function edit(Candidate $candidate)
+    /**
+     * Display the specified candidate (Used by Edit in React).
+     */
+    public function show(Candidate $candidate)
     {
-        return view('pages.candidates.edit', compact('candidate'));
+        $candidate->load('user'); // Load user relationship for profile display
+        // Changed to return JSON
+        return response()->json(['candidate' => $candidate]);
     }
 
     // Update candidate and user info
@@ -76,13 +79,18 @@ class CandidateController extends Controller
         // Update candidate profile
         $candidate->update($request->only(['resume','phone','address']));
 
-        return redirect()->route('candidates.index')->with('success', 'Candidate updated successfully!');
+        // Changed to return JSON
+        return response()->json([
+            'message' => 'Candidate updated successfully!',
+            'candidate' => $candidate->load('user')
+        ]);
     }
 
     // Delete candidate
     public function destroy(Candidate $candidate)
     {
         $candidate->user()->delete(); // cascade deletes candidate
-        return redirect()->route('candidates.index')->with('success', 'Candidate deleted successfully!');
+        // Changed to return JSON
+        return response()->json(['message' => 'Candidate deleted successfully!']);
     }
 }

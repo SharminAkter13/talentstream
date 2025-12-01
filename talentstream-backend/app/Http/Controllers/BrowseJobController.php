@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -18,6 +17,7 @@ class BrowseJobController extends Controller
         $locations = JobLocation::has('jobs')->withCount('jobs')->get();
         $types = JobType::withCount('jobs')->get();
 
-        return view('portal_pages.candidates.browse_jobs', compact('jobs', 'categories', 'locations', 'types'));
+        // Changed to return JSON
+        return response()->json(compact('jobs', 'categories', 'locations', 'types'));
     }
 }

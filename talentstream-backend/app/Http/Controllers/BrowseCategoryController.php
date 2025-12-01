@@ -15,6 +15,7 @@ class BrowseCategoryController extends Controller
             ->orderBy('sort_order', 'asc')
             ->get();
 
-        return view('portal_pages.candidates.browse_categories', compact('categories'));
+        // Changed to return JSON
+        return response()->json(['categories' => $categories]);
     }
 }
