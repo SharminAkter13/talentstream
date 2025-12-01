@@ -59,6 +59,24 @@ class AuthController extends Controller
             'user'    => $user->only(['id','name','email','role_id'])
         ]);
     }
+    // app/Http/Controllers/AuthController.php (New Method)
+    public function logout(Request $request)
+    {
+        // 1. Get the authenticated user (requires 'auth:api' or similar middleware)
+        $user = $request->user();
+
+        if ($user) {
+            // 2. Clear the existing api_token (revoke the token)
+            $user->update(['api_token' => null]);
+            
+            return response()->json([
+                'message' => 'Successfully logged out and token revoked.'
+            ], 200);
+        }
+
+        // Should not happen if middleware is set up correctly
+        return response()->json(['message' => 'Unauthorized or No user found.'], 401);
+    }
 
     public function user()
     {

@@ -56,6 +56,7 @@ use App\Http\Controllers\{
 */
 
 // Authentication
+Route::middleware('auth:api')->post('/logout', [AuthController::class, 'logout']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 

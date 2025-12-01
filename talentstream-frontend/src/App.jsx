@@ -84,7 +84,7 @@ const App = () => {
         {/* ============================= */}
         {/* 2. DASHBOARDS (protected)     */}
         {/* ============================= */}
-
+        <Route path="/logout" element={<Logout />} />
         <Route 
           path="/admin/dashboard" 
           element={hasRole(1) ? <Dashboard /> : <Navigate to="/my-account" />} 
