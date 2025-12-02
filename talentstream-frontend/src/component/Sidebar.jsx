@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link,  } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { hasRole } from "../services/auth"; // adjust path if needed
 
 const Sidebar = () => {
@@ -174,23 +174,44 @@ const Sidebar = () => {
             {isCandidate && (
               <>
                 <li>
-                  <Link to="/add-resume" onClick={handleCloseMenu}>
+                  <Link to="/add-resume" className="dropdown-toggle no-arrow" onClick={handleCloseMenu}>
                     <span className="micon dw dw-file" />
                     <span className="mtext">Upload Resume</span>
                   </Link>
                 </li>
 
                 <li>
-                  <Link to="/browse-job" onClick={handleCloseMenu}>
+                  <Link to="/browse-job" className="dropdown-toggle no-arrow" onClick={handleCloseMenu}>
                     <span className="micon dw dw-list" />
                     <span className="mtext">Browse Jobs</span>
                   </Link>
                 </li>
 
                 <li>
-                  <Link to="/browse-cat" onClick={handleCloseMenu}>
+                  <Link to="/browse-cat" className="dropdown-toggle no-arrow" onClick={handleCloseMenu}>
                     <span className="micon dw dw-menu" />
                     <span className="mtext">Browse Categories</span>
+                  </Link>
+                </li>
+              </>
+            )}
+
+            {/* =====================
+                COMMON MENUS FOR EMPLOYER & CANDIDATE
+            ====================== */}
+            {(isEmployer || isCandidate) && (
+              <>
+                <li>
+                  <Link to="/messages" className="dropdown-toggle no-arrow" onClick={handleCloseMenu}>
+                    <span className="micon dw dw-chat" />
+                    <span className="mtext">Messages</span>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link to="/applications" className="dropdown-toggle no-arrow" onClick={handleCloseMenu}>
+                    <span className="micon dw dw-file" />
+                    <span className="mtext">Applications</span>
                   </Link>
                 </li>
               </>

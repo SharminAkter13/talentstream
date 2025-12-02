@@ -1105,11 +1105,6 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 .user-info-dropdown{
 	padding: 5px 10px 5px 0;
 }
-.header-right .user-info-dropdown .dropdown-menu.dropdown-menu-right.dropdown-menu-icon-list {
-    min-width: 280px !important;
-    width: 280px !important;
-}
-
 .user-info-dropdown .dropdown-toggle{
 	display: block;
 	padding: 5px 0;
@@ -1148,7 +1143,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 .dropdown-menu-icon-list .dropdown-item {
     display: flex;
     align-items: center;
-    gap: 22px!important;  /* spacing between icon & text */
+    gap: 2px!important;  /* spacing between icon & text */
     padding: 8px 16px;
 }
 
@@ -1156,6 +1151,24 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
     position: static;
     font-size: 18px;
 }
+.user-messages {
+    position: relative;
+    display: inline-block;
+    margin-left: 20px; /* space between icons */
+}
+
+.user-messages .badge.message-active {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-radius: 50%;
+    border: 2px solid white; /* border to match background */
+    display: inline-block;
+}
+
 
 .user-notification{
 	float: right;
