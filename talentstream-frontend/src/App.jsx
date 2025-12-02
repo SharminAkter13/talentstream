@@ -62,7 +62,7 @@ const App = () => {
             <Routes>
 
                 {/* ============================= */}
-                {/* 1. PUBLIC PORTAL ROUTES      */}
+                {/* 1. PUBLIC PORTAL ROUTES   */}
                 {/* ============================= */}
                 <Route element={<PortalLayout />}>
 
@@ -110,7 +110,7 @@ const App = () => {
                 />
 
                 {/* ============================= */}
-                {/* 3. OTHER INTERNAL PAGES       */}
+                {/* 3. OTHER INTERNAL PAGES    */}
                 {/* ============================= */}
 
                 <Route path="/my-account" element={<MyAccount />} />

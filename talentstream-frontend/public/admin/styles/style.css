@@ -1105,6 +1105,11 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 .user-info-dropdown{
 	padding: 5px 10px 5px 0;
 }
+.header-right .user-info-dropdown .dropdown-menu.dropdown-menu-right.dropdown-menu-icon-list {
+    min-width: 280px !important;
+    width: 280px !important;
+}
+
 .user-info-dropdown .dropdown-toggle{
 	display: block;
 	padding: 5px 0;
@@ -1140,23 +1145,16 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 	color: #131e22;
 	font-family: 'Inter', sans-serif;
 }
-.user-info-dropdown .dropdown-menu{
-	min-width: 185px;
+.dropdown-menu-icon-list .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 22px!important;  /* spacing between icon & text */
+    padding: 8px 16px;
 }
-.dropdown-menu-icon-list .dropdown-item{
-	position: relative;
-	padding-left: 45px;
-}
-.dropdown-menu-icon-list .dropdown-item i{
-	position: absolute;
-	left: 16px;
-	top: 50%;
-	font-size: 18px;
-	-webkit-transform: translate(0px, -50%);
-	-moz-transform: translate(0px, -50%);
-	-o-transform: translate(0px, -50%);
-	-ms-transform: translate(0px, -50%);
-	transform: translate(0px, -50%);
+
+.dropdown-menu-icon-list .dropdown-item i {
+    position: static;
+    font-size: 18px;
 }
 
 .user-notification{
