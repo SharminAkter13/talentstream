@@ -109,3 +109,7 @@ export const loginUser = async (credentials) => {
         throw error.response.data; 
     }
 };
+
+export const isLoggedIn = () => {
+    return !!localStorage.getItem('authToken');
+};
