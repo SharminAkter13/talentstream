@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -16,34 +15,17 @@ class UserController extends BaseController
 
     public function __construct()
     {
-        // Apply middleware to restrict access to authenticated admin users
-        // Note: 'store' and 'create' are excluded if they are used for public registration
-        $this->middleware('auth:web')->except(['create', 'store']);
-        $this->middleware('can:isAdmin')->except(['create', 'store']);
+        // No middleware needed here if the routes are wrapped in API middleware group
     }
 
-    /**
-     * List all users
-     */
+    
     public function index()
     {
         $users = User::with('role')->get();
-        return view('pages.users.index', compact('users'));
+        return response()->json($users); 
     }
 
-    /**
-     * Show create form
-     */
-    public function create()
-    {
-        // This is typically open for public registration or requires specific admin privilege
-        $roles = Role::all();
-        return view('pages.users.create', compact('roles'));
-    }
-
-    /**
-     * Store new user
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -54,35 +36,52 @@ class UserController extends BaseController
         ]);
 
         $selectedRole = Role::findOrFail($request->role_id);
+        $currentUser = $request->user();
 
-        // Security Check: Only admin can create other admin users
-        if (Auth::check() && Auth::user()->role->name !== 'admin' && $selectedRole->name === 'admin') {
-            return back()->with('error', 'Unauthorized to create admin accounts.')->withInput();
+        // Prevent non-admin users from creating admin accounts (assuming role ID 1 is Admin)
+        if ($currentUser && optional($currentUser->role)->id !== 1 && $selectedRole->id === 1) { 
+            return response()->json(['error' => 'Unauthorized to create admin accounts.'], 403);
         }
+
+        // FIX: Set status to 'active' if the role is Admin (ID 1), otherwise 'pending'
+        $initialStatus = ($selectedRole->id === 1) ? 'active' : 'pending';
 
         $user = User::create([
             'name'      => $request->name,
             'email'     => $request->email,
             'password'  => Hash::make($request->password),
             'role_id'   => $request->role_id,
-            'status'    => 'pending', // default status before admin approval
+            'status'    => $initialStatus, // Use the dynamically determined status
         ]);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully. Awaiting admin approval.');
-    }
+        // If the user is active immediately (e.g., an Admin), create their profile now
+        if ($initialStatus === 'active') {
+            $this->createRoleProfile($user);
+        }
 
-    /**
-     * Show edit form
-     */
-    public function edit(User $user)
+        return response()->json([
+            'message' => 'User created successfully.' . ($initialStatus === 'pending' ? ' Awaiting admin approval.' : ''), 
+            'user' => $user->load('role')
+        ], 201);
+    }
+    
+    public function create()
     {
         $roles = Role::all();
-        return view('pages.users.edit', compact('user', 'roles'));
+        return response()->json($roles);
     }
 
-    /**
-     * Update user
-     */
+ 
+    public function edit(User $user)
+    {
+        $roles = Role::all();        
+        return response()->json([
+            'user' => $user->load('role'),
+            'roles' => $roles
+        ]); 
+    }
+
+ 
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -90,24 +89,26 @@ class UserController extends BaseController
             'email'     => 'required|email|unique:users,email,' . $user->id,
             'password'  => 'nullable|string|min:6',
             'role_id'   => 'required|exists:roles,id',
+            'status'    => 'required|in:active,pending,banned', 
         ]);
 
         $newRole = Role::findOrFail($request->role_id);
-        $currentUser = Auth::user();
+        $currentUser = $request->user();
 
-        // Security Check 1: Prevent non-admins from promoting to admin
-        if ($currentUser->role->name !== 'admin' && $newRole->name === 'admin') {
-            return back()->with('error', 'Unauthorized to assign the admin role.');
+        // Prevent non-admin users from assigning the admin role
+        if (optional($currentUser->role)->id !== 1 && $newRole->id === 1) {
+            return response()->json(['error' => 'Unauthorized to assign the admin role.'], 403);
         }
 
-        // Security Check 2: Prevent the admin from revoking their own admin role
-        if ($currentUser->id === $user->id && $newRole->name !== 'admin') {
-             return back()->with('error', 'You cannot revoke your own admin role.');
+        // Prevent an admin from revoking their own admin role
+        if ($currentUser->id === $user->id && $newRole->id !== 1) {
+             return response()->json(['error' => 'You cannot revoke your own admin role.'], 403);
         }
 
         $user->name = $request->name;
         $user->email = $request->email;
         $user->role_id = $request->role_id;
+        $user->status = $request->status; 
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
@@ -115,52 +116,49 @@ class UserController extends BaseController
 
         $user->save();
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+        return response()->json([
+            'message' => 'User updated successfully.', 
+            'user' => $user->load('role')
+        ]);
     }
 
-    /**
-     * Delete user
-     */
-    public function destroy(User $user)
+    
+    public function destroy(Request $request, User $user) 
     {
-        // Prevent admin from deleting their own account
-        if (Auth::id() === $user->id) {
-            return redirect()->route('users.index')->with('error', 'You cannot delete your own account.');
+        if ($request->user()->id === $user->id) {
+            return response()->json(['error' => 'You cannot delete your own account.'], 403);
         }
 
-        // This should cascade delete related candidate/employer records if set up in models
         $user->delete();
 
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+        return response()->json(['message' => 'User deleted successfully.']);
     }
 
-    /**
-     * Approve user (admin action)
-     */
+    
     public function approve(User $user)
     {
         if ($user->status === 'active') {
-            return redirect()->back()->with('success', 'User already approved.');
+            return response()->json(['message' => 'User already approved.']);
         }
 
         $user->status = 'active';
         $user->save();
 
-        // Create related role profile if missing
+        // Create the role profile when the user is approved
         $this->createRoleProfile($user);
 
-        return redirect()->back()->with('success', 'User approved successfully!');
+        return response()->json([
+            'message' => 'User approved successfully!',
+            'user' => $user->load('role')
+        ]);
     }
 
-    /**
-     * Helper function to create candidate/employer profile
-     * This is crucial for linking the user account to its specific profile table.
-     */
+
     private function createRoleProfile(User $user)
     {
         if ($user->role->name === 'candidate' && !$user->candidate) {
             $user->candidate()->create([
-                'user_id' => $user->id, // Ensure user_id is explicitly passed if not auto-filled by relationship
+                'user_id' => $user->id,
                 'name'    => $user->name,
                 'resume'  => null,
                 'phone'   => null,
@@ -168,9 +166,8 @@ class UserController extends BaseController
             ]);
         } elseif ($user->role->name === 'employer' && !$user->employer) {
             $user->employer()->create([
-                'user_id'      => $user->id, // Ensure user_id is explicitly passed if not auto-filled by relationship
+                'user_id'      => $user->id,
                 'name'         => $user->name,
-                // Note: company_id is nullable here, as it might be set later by the admin
                 'company_id'   => null,
                 'website'      => null,
                 'phone'        => null,

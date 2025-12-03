@@ -4,8 +4,10 @@ import Sidebar from "../../component/Sidebar";
 import Footer from "../../component/Footer";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_URL, getToken } from "../../services/auth";
 
 const EditUser = () => {
+    // This expects the ID to come from the URL parameter (e.g., /edit-user/3)
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -18,53 +20,114 @@ const EditUser = () => {
     });
 
     const [roles, setRoles] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
+    const fetchData = async () => {
+        setLoading(true);
+        setError(null);
+        const token = getToken();
 
-    // GET /users/{id}/edit
-    const fetchUser = async () => {
+        // Check if ID is available before fetching
+        if (!id) {
+            setError("Error: User ID is missing from the URL.");
+            setLoading(false);
+            return;
+        }
+
+        if (!token) {
+            setError("Authentication token missing. Please log in again.");
+            setLoading(false);
+            return;
+        }
+
         try {
-            const res = await axios.get(`/api/users/${id}`);
+            // FIX: This API call relies on 'id' being correct (not 'undefined')
+            const res = await axios.get(`${API_URL}/admin/users/${id}/edit`, {
+                 headers: { Authorization: `Bearer ${token}` },
+            }); 
+
+            const { user, roles } = res.data;
+
+            // Defensive check for structure (previous error)
+            if (!user || !roles) {
+                throw new Error("Invalid data structure returned by the server.");
+            }
+
             setForm({
-                name: res.data.name,
-                email: res.data.email,
-                password: "",
-                role_id: res.data.role_id,
-                status: res.data.status,
+                name: user.name,
+                email: user.email,
+                password: "", 
+                role_id: user.role_id,
+                status: user.status,
             });
+
+            if (Array.isArray(roles)) {
+                setRoles(roles);
+            } else {
+                console.error("Roles data is not an array:", roles);
+                setRoles([]);
+            }
+            
         } catch (err) {
-            console.log(err);
+            console.error("Error fetching user data:", err.response?.data || err.message);
+            setError(`Failed to load user data: ${err.response?.data?.message || err.message}`);
+        } finally {
+            setLoading(false);
         }
     };
 
-    // GET /roles
-    const fetchRoles = async () => {
-        try {
-            const res = await axios.get("/api/roles");
-            setRoles(res.data);
-        } catch (err) {
-            console.log(err);
-        }
-    };
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    // PUT /users/{id}
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const token = getToken();
+
+        if (!token) {
+            alert("Authentication failed. Please log in.");
+            return;
+        }
+
         try {
-            await axios.put(`/api/users/${id}`, form);
-            navigate("/manage-users");
+            await axios.put(`${API_URL}/admin/users/${id}`, form, {
+                 headers: { Authorization: `Bearer ${token}` },
+            }); 
+            navigate("/manage-user"); // Note: Corrected to /manage-user based on App.jsx route
         } catch (err) {
-            console.log(err);
+            console.error("Error updating user:", err.response?.data || err.message);
+            alert("Update failed: " + (err.response?.data?.error || err.response?.data?.message || "Check console for details."));
         }
     };
-        useEffect(() => {
-        fetchUser();
-        fetchRoles();
-    }, []);
+    
+    useEffect(() => {
+        fetchData();
+    }, [id]);
 
+
+    if (loading) {
+        return (
+            <div>
+                <Navbar /><Sidebar />
+                <div className="main-container"><div className="text-center py-5">Loading user data...</div></div>
+                <Footer />
+            </div>
+        );
+    }
+
+    if (error) {
+         return (
+            <div>
+                <Navbar /><Sidebar />
+                <div className="main-container"><div className="pd-ltr-20 xs-pd-20-10"><div className="alert alert-danger">{error}</div></div></div>
+                <Footer />
+            </div>
+        );
+    }
+    
+    // ... (Rest of the component's JSX remains the same)
 
     return (
         <div>
@@ -82,7 +145,7 @@ const EditUser = () => {
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb">
                                             <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                            <li className="breadcrumb-item"><a href="#">Users</a></li>
+                                            <li className="breadcrumb-item"><a href="/manage-user">Users</a></li>
                                             <li className="breadcrumb-item active" aria-current="page">Edit</li>
                                         </ol>
                                     </nav>
@@ -167,6 +230,7 @@ const EditUser = () => {
                                                 >
                                                     <option value="active">Active</option>
                                                     <option value="pending">Pending</option>
+                                                    <option value="banned">Banned</option>
                                                 </select>
                                             </div>
 

@@ -89,7 +89,8 @@ const CreateUser = () => {
                     required
                   >
                     <option value="">Select Role</option>
-                    {roles.map((role) => (
+                    {/* Only call map if roles is confirmed to be an array */}
+                    {Array.isArray(roles) && roles.map((role) => (
                       <option key={role.id} value={role.id}>
                         {role.name}
                       </option>

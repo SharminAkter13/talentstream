@@ -3,7 +3,7 @@ import axios from "axios";
 // ================================
 //  API BASE URL
 // ================================
-const API_URL = "http://localhost:8000/api";
+export const API_URL = "http://localhost:8000/api";
 
 // ================================
 // TOKEN + USER HELPERS

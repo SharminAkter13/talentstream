@@ -1,29 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 
-// ===============================
-// AUTH STATUS FROM LOCAL STORAGE
-// ===============================
-const useAuthStatus = () => {
-  const token = localStorage.getItem("authToken");
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  return {
-    isAuthenticated: !!token,
-    userRole: user?.role_id || null,   // 1 = Admin, 2 = Employer, 3 = Candidate
-    isLoaded: true
-  };
-};
+import { isLoggedIn, getCurrentUser, logoutUser } from "../services/auth";
 
 // =============================
 // NAVBAR COMPONENT
 // =============================
 const PortalNavbar = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(isLoggedIn());
+  const [userRole, setUserRole] = useState(getCurrentUser()?.role_id || null);
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  const { isAuthenticated, userRole, isLoaded } = useAuthStatus();
+  // Sync auth state with localStorage changes (including cross-tab)
+  useEffect(() => {
+    const syncAuth = () => {
+      setIsAuthenticated(isLoggedIn());
+      setUserRole(getCurrentUser()?.role_id || null);
+    };
+
+    // Listen for localStorage changes in other tabs
+    window.addEventListener('storage', syncAuth);
+
+    // Optional: Poll localStorage changes in current tab every second
+    // to catch login/logout changes without page reload
+    const interval = setInterval(syncAuth, 1000);
+
+    return () => {
+      window.removeEventListener('storage', syncAuth);
+      clearInterval(interval);
+    };
+  }, []);
 
   const navId = "main-navbar";
 
@@ -37,23 +45,25 @@ const PortalNavbar = () => {
     setOpenDropdown(openDropdown === name ? null : name);
   };
 
-  // ===============================
-  // DASHBOARD LINK BASED ON ROLE
-  // ===============================
+  // Dashboard link based on user role
   const getDashboardLink = () => {
     switch (userRole) {
-      case 1:
-        return "/admin/dashboard";
-      case 2:
-        return "/employer/dashboard";
-      case 3:
-        return "/candidate/dashboard";
-      default:
-        return "/my-account";
+      case 1: return "/admin/dashboard";
+      case 2: return "/employer/dashboard";
+      case 3: return "/candidate/dashboard";
+      default: return "/my-account";
     }
   };
 
-  if (!isLoaded) return null;
+  // Logout handler
+  const handleLogout = () => {
+    logoutUser();
+    setIsAuthenticated(false);
+    setUserRole(null);
+    closeNav();
+    // Optionally redirect user after logout
+    window.location.href = "/my-account";
+  };
 
   return (
     <header id="home">
@@ -86,12 +96,10 @@ const PortalNavbar = () => {
                   <Link className="nav-link" to="/" onClick={closeNav}>Home</Link>
                 </li>
 
-                {/* ========================== */}
-                {/* CANDIDATE SERVICES MENU   */}
-                {/* ========================== */}
+                {/* CANDIDATE SERVICES */}
                 {isAuthenticated && userRole === 3 && (
                   <li className={`nav-item dropdown ${openDropdown === "candidate" ? "show" : ""}`}>
-                    <a href="#" className="nav-link dropdown-toggle"
+                    <a href="#!" className="nav-link dropdown-toggle"
                       onClick={(e) => { e.preventDefault(); toggleDropdown("candidate"); }}>
                       Services
                     </a>
@@ -105,12 +113,10 @@ const PortalNavbar = () => {
                   </li>
                 )}
 
-                {/* ========================== */}
-                {/* EMPLOYER SERVICES MENU    */}
-                {/* ========================== */}
+                {/* EMPLOYER SERVICES */}
                 {isAuthenticated && userRole === 2 && (
                   <li className={`nav-item dropdown ${openDropdown === "employer" ? "show" : ""}`}>
-                    <a href="#" className="nav-link dropdown-toggle"
+                    <a href="#!" className="nav-link dropdown-toggle"
                       onClick={(e) => { e.preventDefault(); toggleDropdown("employer"); }}>
                       Services
                     </a>
@@ -124,12 +130,10 @@ const PortalNavbar = () => {
                   </li>
                 )}
 
-                {/* ========================== */}
-                {/* GUEST MENU (EXPLORE)      */}
-                {/* ========================== */}
+                {/* GUEST MENU (EXPLORE) */}
                 {!isAuthenticated && (
                   <li className={`nav-item dropdown ${openDropdown === "explore" ? "show" : ""}`}>
-                    <a href="#" className="nav-link dropdown-toggle"
+                    <a href="#!" className="nav-link dropdown-toggle"
                       onClick={(e) => { e.preventDefault(); toggleDropdown("explore"); }}>
                       Explore
                     </a>
@@ -151,10 +155,7 @@ const PortalNavbar = () => {
                   <Link className="nav-link" to="/contact" onClick={closeNav}>Contact</Link>
                 </li>
 
-                {/* ========================== */}
-                {/* AUTH SECTION               */}
-                {/* ========================== */}
-
+                {/* AUTH SECTION */}
                 {!isAuthenticated ? (
                   // GUEST → SHOW SIGN IN
                   <li className="nav-item">
@@ -163,7 +164,7 @@ const PortalNavbar = () => {
                 ) : (
                   // AUTHENTICATED USER → MY ACCOUNT DROPDOWN
                   <li className={`nav-item dropdown ${openDropdown === "account" ? "show" : ""}`}>
-                    <a href="#" className="nav-link dropdown-toggle"
+                    <a href="#!" className="nav-link dropdown-toggle"
                       onClick={(e) => { e.preventDefault(); toggleDropdown("account"); }}>
                       My Account
                     </a>
@@ -176,12 +177,7 @@ const PortalNavbar = () => {
                       </li>
 
                       <li>
-                        <button className="dropdown-item"
-                          onClick={() => {
-                            localStorage.removeItem("authToken");
-                            localStorage.removeItem("user");
-                            window.location.href = "/my-account";
-                          }}>
+                        <button className="dropdown-item" onClick={handleLogout}>
                           Logout
                         </button>
                       </li>
@@ -189,10 +185,7 @@ const PortalNavbar = () => {
                   </li>
                 )}
 
-                {/* ========================== */}
-                {/* POST JOB BUTTON           */}
-                {/* Only Employer + Guests    */}
-                {/* ========================== */}
+                {/* POST JOB BUTTON (Only Employer + Guests) */}
                 {(userRole === 2 || !isAuthenticated) && (
                   <li className="button-group p-2">
                     <Link to="/post-job" className="btn btn-common" onClick={closeNav}>
