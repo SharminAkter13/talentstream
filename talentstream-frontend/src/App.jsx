@@ -1,10 +1,15 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+    BrowserRouter,
+    Routes,
+    Route,
+    Navigate,
+    Outlet,
+    useLocation,
+} from "react-router-dom";
 import { hasRole, isLoggedIn } from "./services/auth";
 
-// =============================
-// ADMIN / INTERNAL IMPORTS
-// =============================
+// pages...
 import Master from "./pages/Master";
 import ManageUser from "./pages/user/ManageUser";
 import ManageCategory from "./pages/category/ManageCategory";
@@ -24,13 +29,9 @@ import ProfileSettings from "./pages/ProfileSettings";
 import Help from "./pages/Help";
 import Reports from "./pages/Reports";
 
-// AUTH (Login Panel)
 import Logout from "./loginPanel/Logout";
 import MyAccount from "./loginPanel/MyAccount";
 
-// =============================
-// PORTAL / PUBLIC IMPORTS
-// =============================
 import Home from "./portalPages/Home";
 import Blog from "./portalPages/Blog";
 import AddResume from "./portalPages/candidate/AddResume";
@@ -46,34 +47,43 @@ import BrowseCategories from "./portalPages/candidate/BrowseCategories";
 import BrowseJobs from "./portalPages/candidate/BrowseJobs";
 import PrivacyPolicy from "./portalPages/PrivacyPolicy";
 
-// Layout
 import PortalLayout from "./PortalLayout";
 
-// Dashboards
 import EmployerDashboard from "./pages/EmployerDashboard";
 import CandidateDashboard from "./pages/CandidateDashboard";
 
 
-// =============================
-// REUSABLE PROTECTED ROUTE
-// =============================
-const ProtectedRoute = ({ role, element }) => {
-    if (!isLoggedIn()) return <Navigate to="/my-account" />;
+// ===============================================
+// 🚀 FIXED PROTECTED ROUTE
+// ===============================================
+const ProtectedRoute = ({ role }) => {
+    const location = useLocation();
 
-    if (role && !hasRole(role)) return <Navigate to="/my-account" />;
+    const onLoginPage = location.pathname === "/my-account";
 
-    return element;
+    // NOT LOGGED IN → only redirect if NOT already on login page
+    if (!isLoggedIn()) {
+        return onLoginPage ? <Outlet /> : <Navigate to="/my-account" replace />;
+    }
+
+    // LOGGED IN but wrong role → redirect ONLY if not already on correct dashboard
+    if (role && !hasRole(role)) {
+        return onLoginPage ? <Outlet /> : <Navigate to="/my-account" replace />;
+    }
+
+    return <Outlet />;
 };
 
 
+// ===============================================
+// 🚀 FIXED APP ROUTES
+// ===============================================
 const App = () => {
     return (
         <BrowserRouter>
             <Routes>
 
-                {/* ============================= */}
-                {/* 1. PUBLIC PORTAL ROUTES       */}
-                {/* ============================= */}
+                {/* PUBLIC */}
                 <Route element={<PortalLayout />}>
                     <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
@@ -83,128 +93,55 @@ const App = () => {
                     <Route path="/job-page" element={<JobPage />} />
                     <Route path="/privacy" element={<PrivacyPolicy />} />
 
-                    {/* Candidate public pages */}
                     <Route path="/add-resume" element={<AddResume />} />
                     <Route path="/browse-job" element={<BrowseJobs />} />
                     <Route path="/browse-cat" element={<BrowseCategories />} />
 
-                    {/* Employer public pages */}
                     <Route path="/add-job" element={<AddJob />} />
                     <Route path="/manage-job" element={<ManageJob />} />
                     <Route path="/manage-application" element={<ManageApplicationPortal />} />
                     <Route path="/browse-resume" element={<BrowseResumes />} />
                 </Route>
 
-                {/* ============================= */}
-                {/* 2. AUTH & DASHBOARDS          */}
-                {/* ============================= */}
+                {/* AUTH */}
                 <Route path="/my-account" element={<MyAccount />} />
                 <Route path="/logout" element={<Logout />} />
 
-                <Route 
-                    path="/admin/dashboard"
-                    element={<ProtectedRoute role={1} element={<Dashboard />} />}
-                />
+                {/* ADMIN */}
+                <Route element={<ProtectedRoute role={1} />}>
+                    <Route path="/admin/dashboard" element={<Dashboard />} />
+                    <Route path="/master" element={<Master />} />
+                    <Route path="/add-user" element={<CreateUser />} />
+                    <Route path="/manage-user" element={<ManageUser />} />
+                    <Route path="/add-cat" element={<CreateCategory />} />
+                    <Route path="/manage-cat" element={<ManageCategory />} />
+                    <Route path="/job-list" element={<JobList />} />
+                    <Route path="/create-job" element={<CreateJob />} />
+                    <Route path="/manage-application-admin" element={<ManageApplications />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/skills" element={<Skills />} />
+                    <Route path="/interviews" element={<Interviews />} />
+                    <Route path="/reports" element={<Reports />} />
+                </Route>
 
-                <Route 
-                    path="/employer/dashboard"
-                    element={<ProtectedRoute role={2} element={<EmployerDashboard />} />}
-                />
+                {/* EMPLOYER */}
+                <Route element={<ProtectedRoute role={2} />}>
+                    <Route path="/employer/dashboard" element={<EmployerDashboard />} />
+                </Route>
 
-                <Route 
-                    path="/candidate/dashboard"
-                    element={<ProtectedRoute role={3} element={<CandidateDashboard />} />}
-                />
+                {/* CANDIDATE */}
+                <Route element={<ProtectedRoute role={3} />}>
+                    <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
+                </Route>
 
-                {/* ============================= */}
-                {/* 3. ADMIN INTERNAL PAGES       */}
-                {/* ============================= */}
-
-                <Route 
-                    path="/master"
-                    element={<ProtectedRoute role={1} element={<Master />} />}
-                />
-
-                <Route 
-                    path="/add-user"
-                    element={<ProtectedRoute role={1} element={<CreateUser />} />}
-                />
-
-                <Route 
-                    path="/manage-user"
-                    element={<ProtectedRoute role={1} element={<ManageUser />} />}
-                />
-
-                <Route 
-                    path="/add-cat"
-                    element={<ProtectedRoute role={1} element={<CreateCategory />} />}
-                />
-
-                <Route 
-                    path="/manage-cat"
-                    element={<ProtectedRoute role={1} element={<ManageCategory />} />}
-                />
-
-                <Route 
-                    path="/job-list"
-                    element={<ProtectedRoute role={1} element={<JobList />} />}
-                />
-
-                <Route 
-                    path="/create-job"
-                    element={<ProtectedRoute role={1} element={<CreateJob />} />}
-                />
-
-                <Route 
-                    path="/manage-application-admin"
-                    element={<ProtectedRoute role={1} element={<ManageApplications />} />}
-                />
-
-                <Route 
-                    path="/settings"
-                    element={<ProtectedRoute role={1} element={<Settings />} />}
-                />
-
-                <Route 
-                    path="/skills"
-                    element={<ProtectedRoute role={1} element={<Skills />} />}
-                />
-
-                <Route 
-                    path="/interviews"
-                    element={<ProtectedRoute role={1} element={<Interviews />} />}
-                />
-
-                <Route 
-                    path="/reports"
-                    element={<ProtectedRoute role={1} element={<Reports />} />}
-                />
-
-                {/* Candidate + Employer internal (must login) */}
-                <Route
-                    path="/resume"
-                    element={<ProtectedRoute element={<Resume />} />}
-                />
-
-                <Route
-                    path="/application"
-                    element={<ProtectedRoute element={<Application />} />}
-                />
-
-                <Route
-                    path="/profile"
-                    element={<ProtectedRoute element={<Profile />} />}
-                />
-
-                <Route
-                    path="/profile-setting"
-                    element={<ProtectedRoute element={<ProfileSettings />} />}
-                />
-
-                <Route
-                    path="/help"
-                    element={<ProtectedRoute element={<Help />} />}
-                />
+                {/* SHARED AUTH ROUTES */}
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/resume" element={<Resume />} />
+                    <Route path="/application" element={<Application />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/profile-setting" element={<ProfileSettings />} />
+                    <Route path="/help" element={<Help />} />
+                </Route>
 
             </Routes>
         </BrowserRouter>

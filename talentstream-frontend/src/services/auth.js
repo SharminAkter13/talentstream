@@ -1,115 +1,114 @@
-// services/auth.js
-import axios from 'axios';
+import axios from "axios";
 
-// --- CONFIGURATION ---
-// 🚨 IMPORTANT: Replace with your actual Laravel API base URL
-const API_URL = 'http://localhost:8000/api'; 
+// ================================
+//  API BASE URL
+// ================================
+const API_URL = "http://localhost:8000/api";
 
-// Function to get the current authentication token (e.g., from local storage)
-const getAuthToken = () => {
-    // Replace 'authToken' with the actual key you use to store the Bearer token
-    return localStorage.getItem('authToken'); 
-};
-
-// Create a configured Axios instance
-const api = axios.create({
-    baseURL: API_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-
-// Interceptor to attach the JWT token to every request
-api.interceptors.request.use(config => {
-    const token = getAuthToken();
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-}, error => {
-    return Promise.reject(error);
-});
-
-// --- EXISTING FUNCTIONS ---
-
+// ================================
+// TOKEN + USER HELPERS
+// ================================
+export const getToken = () => localStorage.getItem("token");
 export const getCurrentUser = () => {
-    const u = localStorage.getItem('user');
+    const u = localStorage.getItem("user");
     return u ? JSON.parse(u) : null;
 };
+
+export const isLoggedIn = () => !!getToken();
 
 export const hasRole = (roleId) => {
     const user = getCurrentUser();
     return user && user.role_id === roleId;
 };
 
-// --- NEW DYNAMIC FETCH FUNCTIONS ---
+// ================================
+// AXIOS INSTANCE (AUTO AUTH HEADER)
+// ================================
+const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
 
-/**
- * Fetches detailed user information (name, avatar, role_id) from the backend.
- * Laravel Endpoint: /api/user
- */
+// Attach token automatically
+api.interceptors.request.use(
+    (config) => {
+        const token = getToken();
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// ================================
+// LOGIN (FIXED)
+// Laravel returns: { token, user }
+// ================================
+export const loginUser = async (credentials) => {
+    const res = await axios.post(`${API_URL}/login`, credentials);
+
+    const { token, user } = res.data;
+
+    // Save token + user
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    return user;
+};
+
+// ================================
+// LOGOUT
+// ================================
+export const logoutUser = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+};
+
+// ================================
+// FETCH USER FROM BACKEND (AUTH)
+// ================================
 export const getUserInfo = async () => {
     try {
-        // Assuming Laravel provides user details via a protected '/user' route
-        const response = await api.get('/user'); 
+        const res = await api.get("/user");
+        return res.data;
+    } catch (err) {
+        console.error("User fetch error:", err);
         
-        // Return the user data (e.g., { id: 1, name: '...', avatar: '...', role_id: 1 })
-        return response.data; 
-    } catch (error) {
-        console.error("Error fetching user info:", error);
-        // Fallback to local storage or return null/default structure
-        return getCurrentUser() || { name: 'Guest', avatar: '/default-avatar.jpg', role_id: 0 };
+        // If token invalid → force logout
+        logoutUser();
+
+        return null;
     }
 };
 
-/**
- * Fetches the list of notifications for the current user.
- * Laravel Endpoint: /api/notifications
- */
+// ================================
+// FETCH NOTIFICATIONS
+// ================================
 export const getNotifications = async () => {
     try {
-        const response = await api.get('/notifications'); 
-        // Example structure: [{ title: '...', message: '...', read: false, link: '...' }]
-        return response.data; 
-    } catch (error) {
-        console.error("Error fetching notifications:", error);
-        return []; // Return an empty array on failure
+        const res = await api.get("/notifications");
+        return res.data;
+    } catch (err) {
+        console.error("Notification fetch error:", err);
+        return [];
     }
 };
 
-/**
- * Fetches the list of messages for the current user.
- * Laravel Endpoint: /api/messages
- */
-export const getMessages = async () => {
-    try {
-        const response = await api.get('/messages'); 
-        // Example structure: [{ id: 1, sender: '...', text: '...', avatar: '...', read: false }]
-        return response.data; 
-    } catch (error) {
-        console.error("Error fetching messages:", error);
-        return []; // Return an empty array on failure
-    }
+// ================================
+// FETCH MESSAGES
+// ================================
+export const getMessages = async (otherUserId) => {
+  try {
+    const response = await api.get(`/chat/messages/${otherUserId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Message fetch error:", error);
+    return [];
+  }
 };
 
-// You might also want a generic login/logout function
-export const loginUser = async (credentials) => {
-    try {
-        const response = await axios.post(`${API_URL}/login`, credentials);
-        const { access_token, user } = response.data;
 
-        // Store token for future authenticated requests
-        localStorage.setItem('authToken', access_token);
-        // Store basic user info for quick client-side checks
-        localStorage.setItem('user', JSON.stringify(user)); 
-        
-        return user;
-    } catch (error) {
-        // Handle login errors
-        throw error.response.data; 
-    }
-};
-
-export const isLoggedIn = () => {
-    return !!localStorage.getItem('authToken');
-};
+export default api;

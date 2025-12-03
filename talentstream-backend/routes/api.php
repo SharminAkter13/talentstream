@@ -43,7 +43,7 @@ use App\Http\Controllers\{
 */
 
 // Auth
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register']);
 
 // Public portal data
@@ -62,7 +62,7 @@ Route::get('/companies/{company}/details', [CompanyController::class, 'getCompan
 Route::middleware(['api.auth'])->group(function () {
 
     // Core Auth & Profile
-    Route::get('/me', [AuthController::class, 'user']);
+    Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [ProfileController::class, 'index']);
 

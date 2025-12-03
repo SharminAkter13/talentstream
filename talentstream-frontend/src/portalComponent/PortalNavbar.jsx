@@ -2,222 +2,212 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 
-// ⚠️ Placeholder for a custom hook that fetches/provides auth status and role.
-// You will need to implement this based on your state management solution (Context/Redux)
-// and your Laravel API integration.
+// ===============================
+// AUTH STATUS FROM LOCAL STORAGE
+// ===============================
 const useAuthStatus = () => {
-  // Example state for an unauthenticated user (Guest)
-  // return { isAuthenticated: false, userRole: null, isLoaded: true };
-  
-  // Example state for a Candidate user
-  // return { isAuthenticated: true, userRole: 'candidate', isLoaded: true };
+  const token = localStorage.getItem("authToken");
+  const user = JSON.parse(localStorage.getItem("user"));
 
-  // Example state for an Employer user
-  // return { isAuthenticated: true, userRole: 'employer', isLoaded: true };
-  
-  // For demonstration, let's assume we are logged in as a 'candidate' for now.
-  // *** Change this value to test different roles: 'candidate', 'employer', or null ***
-  const isAuthenticated = true; // Set to true if logged in
-  const userRole = 'candidate'; // Set to 'candidate', 'employer', or null if not logged in
-
-  return { isAuthenticated, userRole, isLoaded: true }; 
+  return {
+    isAuthenticated: !!token,
+    userRole: user?.role_id || null,   // 1 = Admin, 2 = Employer, 3 = Candidate
+    isLoaded: true
+  };
 };
 
-
+// =============================
+// NAVBAR COMPONENT
+// =============================
 const PortalNavbar = () => {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
-  const [openDropdown, setOpenDropdown] = useState(null); 
-  const navId = 'main-navbar'; 
-  
-  // --- Auth/Role Integration ---
+  const [openDropdown, setOpenDropdown] = useState(null);
+
   const { isAuthenticated, userRole, isLoaded } = useAuthStatus();
-  // -----------------------------
+
+  const navId = "main-navbar";
 
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
-
   const closeNav = () => {
-    if (!isNavCollapsed) {
-      setIsNavCollapsed(true);
-    }
+    setIsNavCollapsed(true);
     setOpenDropdown(null);
   };
 
-  const toggleDropdown = (dropdownName) => {
-    setOpenDropdown(openDropdown === dropdownName ? null : dropdownName);
+  const toggleDropdown = (name) => {
+    setOpenDropdown(openDropdown === name ? null : name);
   };
 
-  // Helper to determine the dashboard link based on the role
+  // ===============================
+  // DASHBOARD LINK BASED ON ROLE
+  // ===============================
   const getDashboardLink = () => {
     switch (userRole) {
-      case 'candidate':
-        return '/candidate/dashboard'; // Replace with actual route
-      case 'employer':
-        return '/employer/dashboard'; // Replace with actual route
-      case 'admin':
-        return '/admin/dashboard'; // Replace with actual route
+      case 1:
+        return "/admin/dashboard";
+      case 2:
+        return "/employer/dashboard";
+      case 3:
+        return "/candidate/dashboard";
       default:
-        return '/my-account';
+        return "/my-account";
     }
   };
 
-  if (!isLoaded) {
-    // You might want a simple spinner or null while auth status is loading
-    return null; 
-  }
+  if (!isLoaded) return null;
 
   return (
-    <header id="home" >
-      <nav className="navbar navbar-expand-lg fixed-top scrolling-navba">
+    <header id="home">
+      <nav className="navbar navbar-expand-lg fixed-top scrolling-navbar">
         <div className="container">
           <div className="theme-header clearfix">
-            
-            {/* Brand and toggle button */}
+
+            {/* BRAND / LOGO */}
             <div className="navbar-header">
               <button
                 className="navbar-toggler"
                 type="button"
-                data-target={`#${navId}`}
-                aria-controls={navId}
-                aria-expanded={!isNavCollapsed}
-                aria-label="Toggle navigation"
                 onClick={handleNavCollapse}
+                aria-expanded={!isNavCollapsed}
               >
                 <span className="navbar-toggler-icon"></span>
               </button>
-            
+
               <Link to="/" className="navbar-brand" onClick={closeNav}>
-                <img src="assets/img/logo.png" alt="Company Logo" />
+                <img src="/assets/img/logo.png" alt="Company Logo" />
               </Link>
             </div>
 
-            {/* Navbar Links - Controlled by isNavCollapsed state */}
-            <div
-              className={`${isNavCollapsed ? 'collapse' : 'show'} navbar-collapse`}
-              id={navId}
-            >
-              <ul className="navbar-nav mr-auto w-100 justify-content-end">
-                
-                {/* Home Link */}
-                <li className="nav-item active">
-                  <Link className="nav-link" to="/" onClick={closeNav}>
-                    Home
-                  </Link>
+            {/* NAVBAR MENU */}
+            <div className={`${isNavCollapsed ? "collapse" : "show"} navbar-collapse`} id={navId}>
+              <ul className="navbar-nav ml-auto">
+
+                {/* HOME */}
+                <li className="nav-item">
+                  <Link className="nav-link" to="/" onClick={closeNav}>Home</Link>
                 </li>
-              
-                {/* 1. Candidate Menu (Authenticated Candidate Only) */}
-                {isAuthenticated && userRole === 'candidate' && (
-                  <li className={`nav-item dropdown ${openDropdown === 'candidate' ? 'show' : ''}`}>
-                    <a 
-                      className="nav-link dropdown-toggle" 
-                      href="#" 
-                      onClick={(e) => { e.preventDefault(); toggleDropdown('candidate'); }}
-                      aria-expanded={openDropdown === 'candidate'}
-                    >
+
+                {/* ========================== */}
+                {/* CANDIDATE SERVICES MENU   */}
+                {/* ========================== */}
+                {isAuthenticated && userRole === 3 && (
+                  <li className={`nav-item dropdown ${openDropdown === "candidate" ? "show" : ""}`}>
+                    <a href="#" className="nav-link dropdown-toggle"
+                      onClick={(e) => { e.preventDefault(); toggleDropdown("candidate"); }}>
                       Services
                     </a>
-                    <ul className={`dropdown-menu ${openDropdown === 'candidate' ? 'show' : ''}`}>
+
+                    <ul className={`dropdown-menu ${openDropdown === "candidate" ? "show" : ""}`}>
                       <li><Link className="dropdown-item" to="/browse-job" onClick={closeNav}>Browse Jobs</Link></li>
                       <li><Link className="dropdown-item" to="/browse-cat" onClick={closeNav}>Job Categories</Link></li>
                       <li><Link className="dropdown-item" to="/add-resume" onClick={closeNav}>Add Resume</Link></li>
-                      <li><Link className="dropdown-item" to="/manage-resumes" onClick={closeNav}>Manage Resumes</Link></li>
-                      <li><Link className="dropdown-item" to="/job-alerts" onClick={closeNav}>Job Alerts</Link></li>
                       <li><Link className="dropdown-item" to="/my-applications" onClick={closeNav}>My Applications</Link></li>
                     </ul>
                   </li>
                 )}
-                
-                {/* 2. Employer Menu (Authenticated Employer Only) */}
-                {isAuthenticated && userRole === 'employer' && (
-                  <li className={`nav-item dropdown ${openDropdown === 'employer' ? 'show' : ''}`}>
-                    <a 
-                      className="nav-link dropdown-toggle" 
-                      href="#" 
-                      onClick={(e) => { e.preventDefault(); toggleDropdown('employer'); }}
-                      aria-expanded={openDropdown === 'employer'}
-                    >
+
+                {/* ========================== */}
+                {/* EMPLOYER SERVICES MENU    */}
+                {/* ========================== */}
+                {isAuthenticated && userRole === 2 && (
+                  <li className={`nav-item dropdown ${openDropdown === "employer" ? "show" : ""}`}>
+                    <a href="#" className="nav-link dropdown-toggle"
+                      onClick={(e) => { e.preventDefault(); toggleDropdown("employer"); }}>
                       Services
                     </a>
-                    <ul className={`dropdown-menu ${openDropdown === 'employer' ? 'show' : ''}`}>
+
+                    <ul className={`dropdown-menu ${openDropdown === "employer" ? "show" : ""}`}>
                       <li><Link className="dropdown-item" to="/add-job" onClick={closeNav}>Post New Job</Link></li>
                       <li><Link className="dropdown-item" to="/manage-job" onClick={closeNav}>Manage Jobs</Link></li>
-                      {/* Note: In React, you'll need the job ID in the route, or link to a general applications page */}
-                      <li><Link className="dropdown-item" to="/manage-application" onClick={closeNav}>Applications</Link></li> 
+                      <li><Link className="dropdown-item" to="/manage-application" onClick={closeNav}>Applications</Link></li>
                       <li><Link className="dropdown-item" to="/browse-resume" onClick={closeNav}>Browse Resumes</Link></li>
                     </ul>
                   </li>
                 )}
 
-                {/* 3. Guest Menu (Unauthenticated Users Only) - Matches your Laravel 'Explore' */}
+                {/* ========================== */}
+                {/* GUEST MENU (EXPLORE)      */}
+                {/* ========================== */}
                 {!isAuthenticated && (
-                  <li className={`nav-item dropdown ${openDropdown === 'explore' ? 'show' : ''}`}>
-                    <a 
-                      className="nav-link dropdown-toggle" 
-                      href="#" 
-                      onClick={(e) => { e.preventDefault(); toggleDropdown('explore'); }}
-                      aria-expanded={openDropdown === 'explore'}
-                    >
+                  <li className={`nav-item dropdown ${openDropdown === "explore" ? "show" : ""}`}>
+                    <a href="#" className="nav-link dropdown-toggle"
+                      onClick={(e) => { e.preventDefault(); toggleDropdown("explore"); }}>
                       Explore
                     </a>
-                    <ul className={`dropdown-menu ${openDropdown === 'explore' ? 'show' : ''}`}>
+
+                    <ul className={`dropdown-menu ${openDropdown === "explore" ? "show" : ""}`}>
                       <li><Link className="dropdown-item" to="/browse-job" onClick={closeNav}>Browse Jobs</Link></li>
                       <li><Link className="dropdown-item" to="/browse-resume" onClick={closeNav}>Browse Resumes</Link></li>
                       <li><Link className="dropdown-item" to="/browse-cat" onClick={closeNav}>Job Categories</Link></li>
                     </ul>
                   </li>
                 )}
-              
-                {/* Static Links */}
+
+                {/* STATIC LINKS */}
                 <li className="nav-item">
                   <Link className="nav-link" to="/about" onClick={closeNav}>About</Link>
                 </li>
+
                 <li className="nav-item">
                   <Link className="nav-link" to="/contact" onClick={closeNav}>Contact</Link>
                 </li>
-                
-                {/* --- RIGHT SIDE: Auth/Account and Button --- */}
-                
-                {/* Authentication Links */}
+
+                {/* ========================== */}
+                {/* AUTH SECTION               */}
+                {/* ========================== */}
+
                 {!isAuthenticated ? (
-                  // Sign In (Guest)
+                  // GUEST → SHOW SIGN IN
                   <li className="nav-item">
-                    <Link className="nav-link" to="/login" onClick={closeNav}>Sign In</Link>
+                    <Link className="nav-link" to="/my-account" onClick={closeNav}>Sign In</Link>
                   </li>
                 ) : (
-                  // My Account / Dashboard (Authenticated User)
-                  <li className={`nav-item dropdown ${openDropdown === 'account' ? 'show' : ''}`}>
-                    <a 
-                      className="nav-link dropdown-toggle" 
-                      href="#" 
-                      onClick={(e) => { e.preventDefault(); toggleDropdown('account'); }}
-                      aria-expanded={openDropdown === 'account'}
-                    >
+                  // AUTHENTICATED USER → MY ACCOUNT DROPDOWN
+                  <li className={`nav-item dropdown ${openDropdown === "account" ? "show" : ""}`}>
+                    <a href="#" className="nav-link dropdown-toggle"
+                      onClick={(e) => { e.preventDefault(); toggleDropdown("account"); }}>
                       My Account
                     </a>
-                    <ul className={`dropdown-menu ${openDropdown === 'account' ? 'show' : ''}`}>
-                      <li><Link className="dropdown-item" to={getDashboardLink()} onClick={closeNav}>Dashboard</Link></li>
-                      {/* Logout is typically an action, not a link. In React, this would trigger an API call and state reset. */}
-                      <li><button className="dropdown-item" onClick={() => { console.log('Logout action triggered'); closeNav(); }}>Logout</button></li>
+
+                    <ul className={`dropdown-menu ${openDropdown === "account" ? "show" : ""}`}>
+                      <li>
+                        <Link className="dropdown-item" to={getDashboardLink()} onClick={closeNav}>
+                          Dashboard
+                        </Link>
+                      </li>
+
+                      <li>
+                        <button className="dropdown-item"
+                          onClick={() => {
+                            localStorage.removeItem("authToken");
+                            localStorage.removeItem("user");
+                            window.location.href = "/my-account";
+                          }}>
+                          Logout
+                        </button>
+                      </li>
                     </ul>
                   </li>
                 )}
-                
-                {/* Post a Job Button (Employer/Guest) */}
-                {(userRole === 'employer' || !isAuthenticated) && (
-                  <li className="button-group">
-                    <Link 
-                      to="/post-job" 
-                      className="button btn btn-common" 
-                      onClick={closeNav}
-                    >
+
+                {/* ========================== */}
+                {/* POST JOB BUTTON           */}
+                {/* Only Employer + Guests    */}
+                {/* ========================== */}
+                {(userRole === 2 || !isAuthenticated) && (
+                  <li className="button-group p-2">
+                    <Link to="/post-job" className="btn btn-common" onClick={closeNav}>
                       Post a Job
                     </Link>
                   </li>
                 )}
+
               </ul>
             </div>
+
           </div>
         </div>
-        <div className="mobile-menu" data-logo="assets/img/logo-mobile.png"></div>
+
+        <div className="mobile-menu" data-logo="/assets/img/logo-mobile.png"></div>
       </nav>
     </header>
   );

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// IMPORT THE REAL COMPONENTS
 import PortalNavbar from '../portalComponent/PortalNavbar';
 import PortalFooter from '../portalComponent/PortalFooter';
 
@@ -27,57 +26,84 @@ const MyAccount = () => {
     email: "",
     password: "",
     repeatPassword: "",
-    role_id: 3, // Default: Candidate
+    role_id: 3, // default = Candidate
   });
 
   const navigate = useNavigate();
 
+  // ==========================
+  // SAFE REDIRECT FUNCTION
+  // ==========================
   const handleRoleBasedRedirect = (roleId) => {
     const path = ROLE_REDIRECT_MAP[roleId] || ROLE_REDIRECT_MAP.default;
-    navigate(path);
+
+    // 🚀 Prevent infinite redirects
+    if (window.location.pathname !== path) {
+      navigate(path, { replace: true });
+    }
   };
-  // Persist login and set Axios auth header
+
+  // ==========================
+  // AUTO LOGIN CHECK (SAFE)
+  // ==========================
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     const token = localStorage.getItem("token");
-    if (user && token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      handleRoleBasedRedirect(user.role_id);
+
+    if (!user || !token) return;
+
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    const expectedPath = ROLE_REDIRECT_MAP[user.role_id] || "/";
+
+    // 🚀 Prevent redirect loop
+    if (window.location.pathname !== expectedPath) {
+      navigate(expectedPath, { replace: true });
     }
   }, []);
 
-  // Form change handlers
+  // ==========================
+  // FORM HANDLERS
+  // ==========================
   const handleLoginChange = (e) =>
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
 
   const handleRegisterChange = (e) => {
-    const value = e.target.name === "role_id" ? parseInt(e.target.value) : e.target.value;
+    const value = e.target.name === "role_id"
+      ? parseInt(e.target.value)
+      : e.target.value;
+
     setRegisterForm({ ...registerForm, [e.target.name]: value });
   };
 
-  // Login handler
+  // ==========================
+  // LOGIN HANDLER
+  // ==========================
   const login = async (e) => {
     e.preventDefault();
+
     try {
-      // NOTE: Replace the hardcoded URL with an environment variable in a real app
       const res = await axios.post("http://127.0.0.1:8000/api/login", loginForm);
       const { token, user } = res.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       alert("Login Successful!");
       handleRoleBasedRedirect(user.role_id);
+
     } catch (err) {
       alert(err.response?.data?.message || "Invalid credentials");
     }
   };
 
-  // Register handler
+  // ==========================
+  // REGISTER HANDLER
+  // ==========================
   const register = async (e) => {
     e.preventDefault();
+
     if (registerForm.password !== registerForm.repeatPassword) {
       alert("Passwords do not match!");
       return;
@@ -92,191 +118,193 @@ const MyAccount = () => {
     };
 
     try {
-      // NOTE: Replace the hardcoded URL with an environment variable in a real app
       const res = await axios.post("http://127.0.0.1:8000/api/register", payload);
       const { token, user } = res.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       alert("Registration Successful!");
       handleRoleBasedRedirect(user.role_id);
+
     } catch (err) {
       alert(err.response?.data?.message || "Registration Failed");
     }
   };
 
+  // ==========================
+  // UI + RETURN
+  // ==========================
   return (
-<>
-  <PortalNavbar />
+    <>
+      <PortalNavbar />
 
-  <div id="content" className="py-5" style={{ background: "#f7f9fc" }}>
-    <div className="container">
-      <div className="row justify-content-center align-items-center" style={{ minHeight: "75vh" }}>
-        <div className="col-12 col-md-8 col-lg-6">
+      <div id="content" className="py-5" style={{ background: "#f7f9fc" }}>
+        <div className="container">
+          <div className="row justify-content-center align-items-center" style={{ minHeight: "75vh" }}>
+            <div className="col-12 col-md-8 col-lg-6">
+              <div className="card shadow-lg border-0 rounded-4">
 
-          <div className="card shadow-lg border-0 rounded-4">
-            {/* Tabs */}
-            <div className="card-header bg-white p-0 border-0 rounded-4">
-              <div className="d-flex">
-                <button
-                  className={`flex-fill py-3 fw-bold border-0 rounded-start-4 ${
-                    activeTab === "login"
-                      ? "bg-info text-white"
-                      : "bg-light text-secondary"
-                  }`}
-                  onClick={() => setActiveTab("login")}
-                >
-                  LOGIN
-                </button>
-
-                <button
-                  className={`flex-fill py-3 fw-bold border-0 rounded-end-4 ${
-                    activeTab === "register"
-                      ? "bg-info text-white"
-                      : "bg-light text-secondary"
-                  }`}
-                  onClick={() => setActiveTab("register")}
-                >
-                  REGISTER
-                </button>
-              </div>
-            </div>
-
-            {/* Body */}
-            <div className="card-body p-4">
-
-              {/* LOGIN */}
-              <div className={`${activeTab === "login" ? "d-block" : "d-none"}`}>
-                <h4 className="text-center mb-4 fw-semibold">Welcome Back 👋</h4>
-                <form onSubmit={login}>
-
-                  <div className="mb-3">
-                    <label className="form-label fw-medium">Email Address</label>
-                    <input
-                      type="email"
-                      name="email"
-                      className="form-control form-control-lg rounded-3"
-                      placeholder="name@example.com"
-                      value={loginForm.email}
-                      onChange={handleLoginChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label fw-medium">Password</label>
-                    <input
-                      type="password"
-                      name="password"
-                      className="form-control form-control-lg rounded-3"
-                      placeholder="Enter your password"
-                      value={loginForm.password}
-                      onChange={handleLoginChange}
-                      required
-                    />
-                  </div>
-
-                  <button className="btn btn-info w-100 btn-lg mt-3 rounded-3 fw-semibold">
-                    Login
-                  </button>
-                </form>
-              </div>
-
-              {/* REGISTER */}
-              <div className={`${activeTab === "register" ? "d-block" : "d-none"}`}>
-                <h4 className="text-center mb-4 fw-semibold">Create Your Account ✨</h4>
-
-                <form onSubmit={register}>
-
-                  <div className="mb-3">
-                    <label className="form-label fw-medium">Full Name</label>
-                    <input
-                      type="text"
-                      name="name"
-                      className="form-control form-control-lg rounded-3"
-                      placeholder="Enter your name"
-                      value={registerForm.name}
-                      onChange={handleRegisterChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label fw-medium">Email Address</label>
-                    <input
-                      type="email"
-                      name="email"
-                      className="form-control form-control-lg rounded-3"
-                      placeholder="name@example.com"
-                      value={registerForm.email}
-                      onChange={handleRegisterChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label fw-medium">Role</label>
-                    <select
-                      name="role_id"
-                      className="form-select form-select-lg rounded-3"
-                      value={registerForm.role_id}
-                      onChange={handleRegisterChange}
-                      required
+                {/* Tabs */}
+                <div className="card-header bg-white p-0 border-0 rounded-4">
+                  <div className="d-flex">
+                    <button
+                      className={`flex-fill py-3 fw-bold border-0 rounded-start-4 ${
+                        activeTab === "login"
+                          ? "bg-info text-white"
+                          : "bg-light text-secondary"
+                      }`}
+                      onClick={() => setActiveTab("login")}
                     >
-                      <option value="" disabled>Select role</option>
-                      {ROLE_OPTIONS.map((role) => (
-                        <option key={role.id} value={role.id}>
-                          {role.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                      LOGIN
+                    </button>
 
-                  <div className="mb-3">
-                    <label className="form-label fw-medium">Password</label>
-                    <input
-                      type="password"
-                      name="password"
-                      className="form-control form-control-lg rounded-3"
-                      placeholder="Enter password"
-                      value={registerForm.password}
-                      onChange={handleRegisterChange}
-                      required
-                    />
+                    <button
+                      className={`flex-fill py-3 fw-bold border-0 rounded-end-4 ${
+                        activeTab === "register"
+                          ? "bg-info text-white"
+                          : "bg-light text-secondary"
+                      }`}
+                      onClick={() => setActiveTab("register")}
+                    >
+                      REGISTER
+                    </button>
                   </div>
+                </div>
 
-                  <div className="mb-3">
-                    <label className="form-label fw-medium">Confirm Password</label>
-                    <input
-                      type="password"
-                      name="repeatPassword"
-                      className="form-control form-control-lg rounded-3"
-                      placeholder="Confirm password"
-                      value={registerForm.repeatPassword}
-                      onChange={handleRegisterChange}
-                      required
-                    />
-                  </div>
+                {/* Body */}
+                <div className="card-body p-4">
 
-                  <button className="btn btn-info w-100 btn-lg mt-3 rounded-3 fw-semibold">
-                    Register
-                  </button>
-                </form>
+                  {/* LOGIN */}
+                  {activeTab === "login" && (
+                    <div>
+                      <h4 className="text-center mb-4 fw-semibold">Welcome Back 👋</h4>
+                      <form onSubmit={login}>
+                        <div className="mb-3">
+                          <label className="form-label fw-medium">Email Address</label>
+                          <input
+                            type="email"
+                            name="email"
+                            className="form-control form-control-lg rounded-3"
+                            placeholder="name@example.com"
+                            value={loginForm.email}
+                            onChange={handleLoginChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label fw-medium">Password</label>
+                          <input
+                            type="password"
+                            name="password"
+                            className="form-control form-control-lg rounded-3"
+                            placeholder="Enter your password"
+                            value={loginForm.password}
+                            onChange={handleLoginChange}
+                            required
+                          />
+                        </div>
+
+                        <button className="btn btn-info w-100 btn-lg mt-3 rounded-3 fw-semibold">
+                          Login
+                        </button>
+                      </form>
+                    </div>
+                  )}
+
+                  {/* REGISTER */}
+                  {activeTab === "register" && (
+                    <div>
+                      <h4 className="text-center mb-4 fw-semibold">Create Your Account ✨</h4>
+
+                      <form onSubmit={register}>
+                        <div className="mb-3">
+                          <label className="form-label fw-medium">Full Name</label>
+                          <input
+                            type="text"
+                            name="name"
+                            className="form-control form-control-lg rounded-3"
+                            placeholder="Enter your name"
+                            value={registerForm.name}
+                            onChange={handleRegisterChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label fw-medium">Email Address</label>
+                          <input
+                            type="email"
+                            name="email"
+                            className="form-control form-control-lg rounded-3"
+                            placeholder="name@example.com"
+                            value={registerForm.email}
+                            onChange={handleRegisterChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label fw-medium">Role</label>
+                          <select
+                            name="role_id"
+                            className="form-select form-select-lg rounded-3"
+                            value={registerForm.role_id}
+                            onChange={handleRegisterChange}
+                            required
+                          >
+                            {ROLE_OPTIONS.map((role) => (
+                              <option key={role.id} value={role.id}>
+                                {role.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label fw-medium">Password</label>
+                          <input
+                            type="password"
+                            name="password"
+                            className="form-control form-control-lg rounded-3"
+                            placeholder="Enter password"
+                            value={registerForm.password}
+                            onChange={handleRegisterChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label fw-medium">Confirm Password</label>
+                          <input
+                            type="password"
+                            name="repeatPassword"
+                            className="form-control form-control-lg rounded-3"
+                            placeholder="Confirm password"
+                            value={registerForm.repeatPassword}
+                            onChange={handleRegisterChange}
+                            required
+                          />
+                        </div>
+
+                        <button className="btn btn-info w-100 btn-lg mt-3 rounded-3 fw-semibold">
+                          Register
+                        </button>
+                      </form>
+                    </div>
+                  )}
+
+                </div>
               </div>
-
             </div>
           </div>
-
         </div>
       </div>
-    </div>
-  </div>
 
-  <PortalFooter />
-</>
+      <PortalFooter />
+    </>
   );
 };
 
