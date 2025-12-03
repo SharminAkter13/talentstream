@@ -82,7 +82,7 @@ const ProtectedRoute = ({ role }) => {
 const App = () => {
     return (
         <BrowserRouter>
-            <Routes>
+            <Routes> 
 
                 {/* PUBLIC */}
                 <Route element={<PortalLayout />}>
