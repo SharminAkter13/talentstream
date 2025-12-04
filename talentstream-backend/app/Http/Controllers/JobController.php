@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage; 
 
 /**
  * @mixin \Illuminate\Routing\Controller
@@ -23,14 +24,11 @@ class JobController extends BaseController
         // Protect all routes with sanctum authentication
         $this->middleware('auth:sanctum');
 
-        // Middleware to enforce roles (Employer and Admin can manage jobs)
         $this->middleware('role:employer,admin')->except(['index', 'show']);
     }
 
     /* ============================
         LIST ALL JOBS (index page)
-        Filters jobs based on user role: Admin sees all, Employer sees only theirs.
-        Candidates/others should ideally use the BrowseJobController for public listings.
     ============================ */
     public function index()
     {
@@ -44,10 +42,8 @@ class JobController extends BaseController
             $employerId = $user->employer->id ?? null;
 
             if ($employerId) {
-                // If user is an employer, only show their jobs
                 $jobsQuery->where('employer_id', $employerId);
             } else {
-                // If user is neither admin nor a registered employer, deny access or show nothing
                 return response()->json(['message' => 'Unauthorized or no employer profile linked.'], 403);
             }
         }
@@ -62,7 +58,6 @@ class JobController extends BaseController
 
     /* ============================
         SHOW SINGLE JOB
-        Returns details of a single job, along with related and featured jobs.
     ============================ */
     public function show($id)
     {
@@ -100,7 +95,6 @@ class JobController extends BaseController
 
     /* ============================
         CREATE JOB FORM DATA
-        Returns the lists of categories, locations, and types needed for the form.
     ============================ */
     public function create()
     {
@@ -117,7 +111,7 @@ class JobController extends BaseController
             'categories' => Category::all(),
             'locations' => JobLocation::all(),
             'types' => JobType::all(),
-            'company' => $company, // Company details pre-fill
+            'company' => $company, 
             'message' => 'Job creation form data retrieved.'
         ]);
     }
@@ -153,23 +147,19 @@ class JobController extends BaseController
 
         $company = $employer->company ?? null;
 
-        // Handle cover image upload
+        // Handle cover image upload using Storage facade
         $cover_image = null;
         if ($request->hasFile('cover_image')) {
-            // Note: In an API context, usually files are handled via S3 or similar.
-            // Keeping local file move logic for consistency with original file structure.
-            $file = $request->file('cover_image');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/jobs'), $filename);
-            $cover_image = 'uploads/jobs/' . $filename;
+            $path = $request->file('cover_image')->store('uploads/jobs', 'public');
+            $cover_image = $path;
         }
 
         $job = Job::create([
             'user_email'        => $user->email,
             'employer_id'       => $employer->id,
             'company_id'        => $company->id ?? null,
-            'company_name'      => $company->name ?? $request->company_name, // Fallback to request input if no linked company
-            'website'           => $company->website ?? $request->website,   // Fallback to request input if no linked company
+            'company_name'      => $company->name ?? $request->company_name, 
+            'website'           => $company->website ?? $request->website,   
             'title'             => $data['title'],
             'category_id'       => $data['category_id'],
             'job_location_id'   => $data['job_location_id'],
@@ -187,25 +177,23 @@ class JobController extends BaseController
         return response()->json([
             'message' => 'Job added successfully.',
             'job' => $job
-        ], 201); // 201 Created
+        ], 201); 
     }
 
     /* ============================
         EDIT JOB FORM DATA
-        Returns the job data and lookup lists for the edit form.
     ============================ */
     public function edit($id)
     {
         $job = Job::with(['employer', 'company'])->findOrFail($id);
         $user = Auth::user();
 
-        // Authorization check (using Policy or manual check)
+        // Authorization check 
         if ($user->role !== 'admin' && $job->employer_id !== ($user->employer->id ?? null)) {
             return response()->json(['message' => 'Unauthorized action.'], 403);
         }
 
-        $company = $user->employer->company ?? null; // The company associated with the *editing user*
-
+        $company = $user->employer->company ?? null; 
         return response()->json([
             'job' => $job,
             'categories' => Category::all(),
@@ -224,8 +212,9 @@ class JobController extends BaseController
         $job = Job::findOrFail($id);
         $user = Auth::user();
 
-        // Authorization check: Ensure user can edit this job
-        if ($user->role !== 'admin' && $job->employer_id !== ($user->employer->id ?? null)) {
+        // Authorization check: 
+        $isJobOwner = $job->employer_id === ($user->employer->id ?? null);
+        if ($user->role !== 'admin' && !$isJobOwner) {
             return response()->json(['message' => 'Unauthorized action.'], 403);
         }
 
@@ -248,15 +237,20 @@ class JobController extends BaseController
         $employer = $user->employer ?? null;
         $company = $employer->company ?? null;
 
-        // Handle cover image upload (and removal of old image, if applicable)
-        $cover_image = $job->cover_image; // Start by keeping existing image
+        // Handle cover image upload 
+        $cover_image = $job->cover_image; 
+        
         if ($request->hasFile('cover_image')) {
-            // New file uploaded: handle new file and possibly delete old one
-            // NOTE: Deleting old file is omitted here for simplicity, but recommended in production.
-            $file = $request->file('cover_image');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/jobs'), $filename);
-            $cover_image = 'uploads/jobs/' . $filename;
+            // New file uploaded:
+            
+            // 1. Delete old image if it exists
+            if ($job->cover_image) {
+                Storage::disk('public')->delete($job->cover_image); 
+            }
+            
+            // 2. Upload new file
+            $path = $request->file('cover_image')->store('uploads/jobs', 'public');
+            $cover_image = $path;
         }
 
         $job->update([
@@ -290,12 +284,15 @@ class JobController extends BaseController
         $job = Job::findOrFail($id);
         $user = Auth::user();
 
-        // Authorization check: Ensure user can delete this job
-        if ($user->role !== 'admin' && $job->employer_id !== ($user->employer->id ?? null)) {
+        // Authorization check: 
+        $isJobOwner = $job->employer_id === ($user->employer->id ?? null);
+        if ($user->role !== 'admin' && !$isJobOwner) {
             return response()->json(['message' => 'Unauthorized action.'], 403);
         }
 
-        // NOTE: Also delete associated cover image file here in a production environment
+        if ($job->cover_image) {
+            Storage::disk('public')->delete($job->cover_image); 
+        }
 
         $job->delete();
         

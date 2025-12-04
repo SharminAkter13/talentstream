@@ -1,122 +1,104 @@
-import React from 'react';
-import Navbar from './../../component/Navbar';
-import Sidebar from './../../component/Sidebar';
-import Footer from './../../component/Footer';
+import React, { useEffect, useState } from "react";
+import { API_URL, getToken } from "../../services/auth";
+import { Link } from "react-router-dom";
+import Master from './../Master';
+
+const JOB_API = "/jobs";
 
 const JobList = () => {
-  const jobs = [
-    {
-      id: 1,
-      title: "Frontend Developer",
-      company: "TechCorp",
-      location: "Dhaka, Bangladesh",
-      type: "Full-Time",
-      salary: "$800 - $1000",
-      posted: "2025-09-20",
-      status: "Open",
-    },
-    {
-      id: 2,
-      title: "Backend Engineer",
-      company: "CodeWorks",
-      location: "Chittagong, Bangladesh",
-      type: "Contract",
-      salary: "$1200",
-      posted: "2025-09-22",
-      status: "Closed",
-    },
-  ];
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchJobs = async () => {
+    const token = getToken();
+
+    const res = await fetch(`${API_URL}${JOB_API}`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    setJobs(data.jobs || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const deleteJob = async (id) => {
+    if (!window.confirm("Delete this job?")) return;
+
+    const token = getToken();
+
+    await fetch(`${API_URL}${JOB_API}/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setJobs(jobs.filter((job) => job.id !== id));
+  };
+
+  if (loading) return <Master>Loading...</Master>;
 
   return (
-    <div>
-      {/* Navbar */}
-      <Navbar />
-      {/* Sidebar */}
-      <Sidebar />
+    <Master>
+      <h2>Manage Jobs</h2>
 
-      <div className="main-container">
-        <div className="pd-ltr-20 xs-pd-20-10">
-          <div className="min-height-200px">
-            <div className="page-header">
-              <div className="row">
-                <div className="col-md-6 col-sm-12">
-                  <div className="title">
-                    <h4>Job Listings</h4>
-                  </div>
-                  <nav aria-label="breadcrumb" role="navigation">
-                    <ol className="breadcrumb">
-                      <li className="breadcrumb-item"><a href="#">Home</a></li>
-                      <li className="breadcrumb-item active" aria-current="page">Jobs</li>
-                    </ol>
-                  </nav>
-                </div>
-              </div>
-            </div>
+      <Link className="btn btn-primary mb-3" to="/create-job">
+        + Create Job
+      </Link>
 
-            <div className="pd-20 bg-white border-radius-4 box-shadow mb-30">
-              <h3 className="mb-4">Job Listings</h3>
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Company</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th width="200">Actions</th>
+          </tr>
+        </thead>
 
-              <div className="table-responsive">
-                <table className="table table-bordered table-hover align-middle">
-                  <thead className="table-dark">
-                    <tr>
-                      <th>#</th>
-                      <th>Job Title</th>
-                      <th>Company</th>
-                      <th>Location</th>
-                      <th>Type</th>
-                      <th>Salary</th>
-                      <th>Posted</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {jobs.map((job, index) => (
-                      <tr key={job.id}>
-                        <td>{index + 1}</td>
-                        <td>{job.title}</td>
-                        <td>{job.company}</td>
-                        <td>{job.location}</td>
-                        <td>
-                          <span className="badge bg-primary">{job.type}</span>
-                        </td>
-                        <td>{job.salary}</td>
-                        <td>{job.posted}</td>
-                        <td>
-                          <span
-                            className={`badge ${
-                              job.status === "Open"
-                                ? "bg-success"
-                                : "bg-secondary"
-                            }`}
-                          >
-                            {job.status}
-                          </span>
-                        </td>
-                        <td>
-                          <button className="btn btn-sm btn-info me-2 text-white">
-                            <i className="bi bi-eye"></i>
-                          </button>
-                          <button className="btn btn-sm btn-warning me-2">
-                            <i className="bi bi-pencil-square"></i>
-                          </button>
-                          <button className="btn btn-sm btn-danger">
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        <tbody>
+          {jobs.length === 0 && (
+            <tr>
+              <td colSpan="6" className="text-center">
+                No jobs found
+              </td>
+            </tr>
+          )}
 
-      <Footer />
-    </div>
+          {jobs.map((job) => (
+            <tr key={job.id}>
+              <td>{job.title}</td>
+              <td>{job.company_name}</td>
+              <td>{job.type?.name}</td>
+              <td>{job.location?.city}</td>
+              <td>{job.status}</td>
+
+              <td>
+                <Link to={`/jobs/${job.id}`} className="btn btn-info btn-sm me-2">
+                  View
+                </Link>
+                <Link to={`/jobs/${job.id}/edit`} className="btn btn-warning btn-sm me-2">
+                  Edit
+                </Link>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => deleteJob(job.id)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Master>
   );
 };
 

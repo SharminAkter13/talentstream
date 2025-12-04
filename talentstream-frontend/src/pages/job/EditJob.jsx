@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { API_URL, getToken } from "../../services/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Master from './../Master';
 
 const JOB_API = "/jobs";
 
-const CreateJob = () => {
+const EditJob = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -25,112 +26,89 @@ const CreateJob = () => {
     status: "active",
   });
 
-  const [coverImage, setCoverImage] = useState(null);
   const [lookups, setLookups] = useState({
     categories: [],
     types: [],
     locations: [],
   });
 
+  const [coverImage, setCoverImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    const fetchCreateData = async () => {
-      const token = getToken();
-
-      const res = await fetch(`${API_URL}${JOB_API}/create`, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Failed to load form data");
-        setLoading(false);
-        return;
-      }
-
-      setLookups({
-        categories: data.categories,
-        types: data.types,
-        locations: data.locations,
-      });
-
-      setForm((prev) => ({
-        ...prev,
-        user_email: data.user?.email || "",
-        company_name: data.company?.name || "",
-        website: data.company?.website || "",
-      }));
-
-      setLoading(false);
-    };
-
-    fetchCreateData();
-  }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleFile = (e) => {
-    setCoverImage(e.target.files[0]);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError(null);
-
+  // ============================
+  // FIX: fetchJob defined BEFORE useEffect + wrapped in useCallback
+  // ============================
+  const fetchJob = useCallback(async () => {
     const token = getToken();
 
-    const formData = new FormData();
-    Object.entries(form).forEach(([key, val]) => {
-      formData.append(key, val);
-    });
-
-    if (coverImage) {
-      formData.append("cover_image", coverImage);
-    }
-
-    const res = await fetch(`${API_URL}${JOB_API}`, {
-      method: "POST",
+    const res = await fetch(`${API_URL}${JOB_API}/${id}/edit`, {
       headers: {
-        Authorization: `Bearer ${token}`,
         Accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: formData,
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      setError(
-        data.errors
-          ? Object.values(data.errors).flat().join(" | ")
-          : data.message
-      );
-      setSubmitting(false);
+      setError("Failed to load job data");
+      return;
+    }
+
+    setForm(data.job);
+
+    setLookups({
+      categories: data.categories,
+      types: data.types,
+      locations: data.locations,
+    });
+
+    setLoading(false);
+  }, [id]);
+
+  useEffect(() => {
+    fetchJob();
+  }, [fetchJob]); // FIXED dependency
+
+  // ============================
+  // Handle Input Changes
+  // ============================
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // ============================
+  // Submit Data
+  // ============================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const token = getToken();
+    const formData = new FormData();
+
+    Object.entries(form).forEach(([k, v]) => formData.append(k, v));
+    if (coverImage) formData.append("cover_image", coverImage);
+
+    const res = await fetch(`${API_URL}${JOB_API}/${id}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      setError("Update failed");
       return;
     }
 
     navigate("/manage-jobs");
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Master>Loading...</Master>;
 
   return (
     <Master>
-      <h2>Create Job</h2>
+      <h2>Edit Job</h2>
 
       {error && <div className="alert alert-danger">{error}</div>}
 
@@ -314,13 +292,11 @@ const CreateJob = () => {
           <input
             type="file"
             className="form-control"
-            onChange={handleFile}
+            onChange={(e) => setCoverImage(e.target.files[0])}
           />
         </div>
 
-        <button className="btn btn-success" disabled={submitting}>
-          {submitting ? "Posting..." : "Create Job"}
-        </button>
+        <button className="btn btn-warning">Update Job</button>
 
         <button
           type="button"
@@ -329,10 +305,9 @@ const CreateJob = () => {
         >
           Cancel
         </button>
-
       </form>
     </Master>
   );
 };
 
-export default CreateJob;
+export default EditJob;
