@@ -42,7 +42,7 @@ const Sidebar = () => {
           <ul id="accordion-menu">
 
             {/* =====================
-                COMMON DASHBOARD
+              COMMON DASHBOARD
             ====================== */}
             <li>
               <Link
@@ -56,7 +56,7 @@ const Sidebar = () => {
             </li>
 
             {/* =====================
-                ADMIN MENUS
+              ADMIN MENUS
             ====================== */}
             {isAdmin && (
               <>
@@ -72,7 +72,23 @@ const Sidebar = () => {
                   >
                     <li><Link to="/create-job" onClick={handleCloseMenu}>Create Job</Link></li>
                     <li><Link to="/job-list" onClick={handleCloseMenu}>Job Listings</Link></li>
-                    <li><Link to="/categories" onClick={handleCloseMenu}>Job Categories</Link></li>
+                  </ul>
+                </li>
+                
+                {/* ------------------------------------------- */}
+                {/* NEW DEDICATED CATEGORY DROPDOWN */}
+                {/* ------------------------------------------- */}
+                <li className="dropdown">
+                  <a href="#!" className="dropdown-toggle" onClick={() => toggleMenu("categories")}>
+                    <span className="micon dw dw-menu" /> {/* Using a menu icon */}
+                    <span className="mtext">Categories</span>
+                  </a>
+                  <ul
+                    className="submenu"
+                    style={{ display: openMenu === "categories" ? "block" : "none" }}
+                  >
+                    <li><Link to="/manage-categories" onClick={handleCloseMenu}>Manage Categories</Link></li>
+                    <li><Link to="/add-cat" onClick={handleCloseMenu}>Create Category</Link></li>
                   </ul>
                 </li>
 
@@ -134,7 +150,7 @@ const Sidebar = () => {
             )}
 
             {/* =====================
-                EMPLOYER MENUS
+              EMPLOYER MENUS
             ====================== */}
             {isEmployer && (
               <>
@@ -169,7 +185,7 @@ const Sidebar = () => {
             )}
 
             {/* =====================
-                CANDIDATE MENUS
+              CANDIDATE MENUS
             ====================== */}
             {isCandidate && (
               <>
@@ -197,7 +213,7 @@ const Sidebar = () => {
             )}
 
             {/* =====================
-                COMMON MENUS FOR EMPLOYER & CANDIDATE
+              COMMON MENUS FOR EMPLOYER & CANDIDATE
             ====================== */}
             {(isEmployer || isCandidate) && (
               <>

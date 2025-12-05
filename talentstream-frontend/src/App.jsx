@@ -52,6 +52,7 @@ import PortalLayout from "./PortalLayout";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import CandidateDashboard from "./pages/CandidateDashboard";
 import EditUser from './pages/user/EditUser';
+import EditCategory from './pages/category/EditCategory';
 
 
 // ===============================================
@@ -116,6 +117,8 @@ const App = () => {
                     <Route path="/manage-user" element={<ManageUser />} />
                     <Route path="/edit-user/:id" element={<EditUser />} />
                     <Route path="/add-cat" element={<CreateCategory />} />
+                    <Route path="/manage-categories" element={<ManageCategory />} />
+                    <Route path="/edit-category/:id" element={<EditCategory />} />
                     <Route path="/manage-cat" element={<ManageCategory />} />
                     <Route path="/job-list" element={<JobList />} />
                     <Route path="/create-job" element={<CreateJob />} />

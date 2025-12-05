@@ -1,143 +1,141 @@
-import React from 'react';
-import Navbar from '../../component/Navbar';
-import Sidebar from '../../component/Sidebar';
-import Footer from '../../component/Footer';
+import React, { useEffect, useState } from "react";
+import { API_URL, getToken } from "../../services/auth";
+import { useNavigate, Link } from "react-router-dom";
+import Master from './../Master';
+
+const CATEGORY_API = "/categories";
+
 const ManageCategory = () => {
+    const navigate = useNavigate();
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [deleteError, setDeleteError] = useState(null);
+
+    // --- Fetch All Categories ---
+    const fetchCategories = async () => {
+        setLoading(true);
+        setError(null);
+        const token = getToken();
+
+        const res = await fetch(`${API_URL}${CATEGORY_API}`, {
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            setError(data.message || "Failed to fetch categories");
+            setLoading(false);
+            return;
+        }
+
+        // Controller returns { categories: [...] }
+        setCategories(data.categories);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    // --- Delete Handler ---
+    const handleDelete = async (categoryId) => {
+        if (!window.confirm("Are you sure you want to delete this category?")) {
+            return;
+        }
+
+        setDeleteError(null);
+        const token = getToken();
+
+        const res = await fetch(`${API_URL}${CATEGORY_API}/${categoryId}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            setDeleteError(data.message || "Failed to delete category.");
+            return;
+        }
+
+        // Remove the deleted category from the state
+        setCategories(prev => prev.filter(c => c.id !== categoryId));
+    };
+
+    if (loading) return <p>Loading categories...</p>;
+
     return (
-        <div>
-        <div>
-      {/* <!-- Site wrapper --> */}
-      <div className="wrapper">
-        {/* Navbar */}
-        <Navbar />
-        {/* /.navbar */}
-        {/* Main Sidebar Container */}
-        <Sidebar />
-        {/* Content Wrapper. Contains page content */}
-        <div className="content-wrapper">
-          {/* Content Header (Page header) */}
-          <section className="content-header">
-            <div className="container-fluid">
-              <div className="row mb-2">
-                <div className="col-sm-6">
-                  <ol className="breadcrumb float-sm-right">
-                    <li className="breadcrumb-item">
-                      <a href="#">Home</a>
-                    </li>
-                    <li className="breadcrumb-item active">Manage Category</li>
-                  </ol>
-                </div>
-              </div>
-            </div>
-            {/* /.container-fluid */}
-          </section>
-          {/* Main content */}
-          <section className="content">
-            {/* Default box */}
-            <div className="card">
-              <div className="card-body">
-                <div className="row">
-                  <div className="col-12">
-                    <div className="card">
-                      <div className="card-header">
-                        <h3 className="card-title">Manage Category</h3>
-                        <div className="card-tools">
-                          <div
-                            className="input-group input-group-sm"
-                            style={{ width: 150 }}
-                          >
-                            <input
-                              type="text"
-                              name="table_search"
-                              className="form-control float-right"
-                              placeholder="Search"
-                            />
-                            <div className="input-group-append">
-                              <button type="submit" className="btn btn-default">
-                                <i className="fas fa-search" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      {/* /.card-header */}
-                      <div className="card-body table-responsive p-0">
-                        <table className="table table-hover text-nowrap">
-                          <thead>
-                            <tr>
-                              <th>ID</th>
-                              <th>Category Name</th>
-                              <th>note</th>
-                              <th>Status</th>
+        <Master>
+            <h2>Manage Categories</h2>
+
+            {error && <div className="alert alert-danger">{error}</div>}
+            {deleteError && <div className="alert alert-warning">{deleteError}</div>}
+
+            <Link to="/create-category" className="btn btn-success mb-3">
+                Create New Category
+            </Link>
+
+            <table className="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Active</th>
+                        <th>Sort Order</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {categories.length > 0 ? (
+                        categories.map((c) => (
+                            <tr key={c.id}>
+                                <td>{c.id}</td>
+                                <td>
+                                    {c.image_path ? (
+                                        <img 
+                                            src={`${API_URL}/storage/${c.image_path}`} 
+                                            alt={c.name} 
+                                            style={{width: '50px', height: '50px', objectFit: 'cover'}} 
+                                        />
+                                    ) : (
+                                        "No Image"
+                                    )}
+                                </td>
+                                <td>{c.name}</td>
+                                <td>{c.is_active ? 'Yes' : 'No'}</td>
+                                <td>{c.sort_order}</td>
+                                <td>
+                                    <Link 
+                                        to={`/edit-category/${c.id}`} 
+                                        className="btn btn-sm btn-info me-2"
+                                    >
+                                        Edit
+                                    </Link>
+                                    <button 
+                                        onClick={() => handleDelete(c.id)}
+                                        className="btn btn-sm btn-danger"
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
                             </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>183</td>
-                              <td>John Doe</td>
-                              <td>11-7-2014</td>
-                              <td>
-                               <button>Insart</button>
-                               <button>update</button>
-                               <button>delete</button>
-                              </td>
-                              
-                            </tr>
-                            <tr>
-                              <td>219</td>
-                              <td>Alexander Pierce</td>
-                              <td>11-7-2014</td>
-                               <td>
-                               <button>Insart</button>
-                               <button>update</button>
-                               <button>delete</button>
-                              </td>
-                             
-                            </tr>
-                            <tr>
-                              <td>657</td>
-                              <td>Bob Doe</td>
-                              <td>11-7-2014</td>
-                              
-                              <td>
-                               <button>Insart</button>
-                               <button>update</button>
-                               <button>delete</button>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>175</td>
-                              <td>Mike Doe</td>
-                              <td>11-7-2014</td>
-                              <td>
-                               <button>Insart</button>
-                               <button>update</button>
-                               <button>delete</button>
-                              </td>
-                              
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      {/* /.card-body */}
-                    </div>
-                    {/* /.card */}
-                  </div>
-                </div>
-              </div>
-              {/* /.card-body */}
-            </div>
-            {/* /.card */}
-          </section>
-          {/* /.content */}
-        </div>
-        {/* /.content-wrapper */}
-        <Footer />
-        {/* /.control-sidebar */}
-      </div>
-      {/* ./wrapper */}
-    </div>
-        </div>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="6" className="text-center">No categories found.</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </Master>
     );
 };
 
