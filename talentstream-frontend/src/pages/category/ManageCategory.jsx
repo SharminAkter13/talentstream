@@ -3,7 +3,7 @@ import { API_URL, getToken } from "../../services/auth";
 import { useNavigate, Link } from "react-router-dom";
 import Master from './../Master';
 
-const CATEGORY_API = "/categories";
+const CATEGORY_API = "/admin/categories";
 
 const ManageCategory = () => {
     const navigate = useNavigate();
@@ -18,6 +18,7 @@ const ManageCategory = () => {
         setError(null);
         const token = getToken();
 
+        // Using fetch
         const res = await fetch(`${API_URL}${CATEGORY_API}`, {
             headers: {
                 Accept: "application/json",
@@ -51,6 +52,7 @@ const ManageCategory = () => {
         setDeleteError(null);
         const token = getToken();
 
+        // Using fetch
         const res = await fetch(`${API_URL}${CATEGORY_API}/${categoryId}`, {
             method: "DELETE",
             headers: {
@@ -67,6 +69,12 @@ const ManageCategory = () => {
 
         // Remove the deleted category from the state
         setCategories(prev => prev.filter(c => c.id !== categoryId));
+    };
+
+    // Helper function to get the base asset URL (removes '/api' if present)
+    const getAssetBaseUrl = (apiUrl) => {
+        // This splits the URL at the first occurrence of '/api' and takes the first part (the root)
+        return apiUrl.split('/api')[0];
     };
 
     if (loading) return <p>Loading categories...</p>;
@@ -101,7 +109,8 @@ const ManageCategory = () => {
                                 <td>
                                     {c.image_path ? (
                                         <img 
-                                            src={`${API_URL}/storage/${c.image_path}`} 
+                                            // 🖼️ FIX APPLIED HERE: Use getAssetBaseUrl to correct the image path
+                                            src={`${getAssetBaseUrl(API_URL)}/storage/${c.image_path}`} 
                                             alt={c.name} 
                                             style={{width: '50px', height: '50px', objectFit: 'cover'}} 
                                         />

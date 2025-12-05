@@ -3,7 +3,7 @@ import { API_URL, getToken } from "../../services/auth";
 import { useNavigate } from "react-router-dom";
 import Master from './../Master';
 
-const CATEGORY_API = "/categories";
+const CATEGORY_API = "/admin/categories";
 
 const CreateCategory = () => {
   const navigate = useNavigate();

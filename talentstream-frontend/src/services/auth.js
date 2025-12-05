@@ -4,7 +4,7 @@ import axios from "axios";
 //  API BASE URL
 // ================================
 export const API_URL = "http://localhost:8000/api";
-
+export const ASSET_URL = "http://localhost/talentstream/talentstream-backend/public";
 // ================================
 // TOKEN + USER HELPERS
 // ================================

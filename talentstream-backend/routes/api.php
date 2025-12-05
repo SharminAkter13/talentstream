@@ -108,7 +108,7 @@ Route::middleware(['api.auth'])->group(function () {
 Route::middleware(['api.auth', 'role:1'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
 
-    Route::resource('categories', CategoryController::class)->except(['show']);
+    Route::resource('categories', CategoryController::class);
     Route::resource('users', UserController::class)->except(['show']);
     Route::post('users/{user}/approve', [UserController::class, 'approve']);
     Route::resource('resumes', ResumeController::class);
