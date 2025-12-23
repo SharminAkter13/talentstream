@@ -38,15 +38,15 @@ use App\Http\Controllers\{
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes (No Authentication Required)
+| Public Routes
 |--------------------------------------------------------------------------
 */
 
-// Auth
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+// Authentication
+Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
-// Public portal data
+// Public Portal Data
 Route::get('/', [PortalController::class, 'index']);
 Route::get('/browse-jobs', [BrowseJobController::class, 'index']);
 Route::get('/browse-categories', [BrowseCategoryController::class, 'index']);
@@ -55,10 +55,11 @@ Route::get('/companies/{company}/details', [CompanyController::class, 'getCompan
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes (API Token Required)
+| Authenticated Routes (Protected by ApiAuth)
 |--------------------------------------------------------------------------
 */
 
+// Uses your custom 'api.auth' middleware
 Route::middleware(['api.auth'])->group(function () {
 
     // Core Auth & Profile
@@ -84,7 +85,7 @@ Route::middleware(['api.auth'])->group(function () {
     });
 
     // Job Alerts
-    Route::resource('job_alerts', JobAlertController::class)->except(['show']);
+    Route::apiResource('job_alerts', JobAlertController::class)->except(['show']);
     Route::get('/portal-job-alerts', [PortalJobAlertsController::class, 'index']);
 
     // Job Bookmarks
@@ -100,7 +101,7 @@ Route::middleware(['api.auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Role-Based Routes (API Auth + Role)
+| Role-Based Routes (Protected by ApiAuth + CheckRole)
 |--------------------------------------------------------------------------
 */
 
@@ -108,17 +109,17 @@ Route::middleware(['api.auth'])->group(function () {
 Route::middleware(['api.auth', 'role:1'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
 
-    Route::resource('categories', CategoryController::class);
-    Route::resource('users', UserController::class)->except(['show']);
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('users', UserController::class)->except(['show']);
     Route::post('users/{user}/approve', [UserController::class, 'approve']);
-    Route::resource('resumes', ResumeController::class);
-    Route::resource('jobs', JobController::class);
-    Route::resource('candidates', CandidateController::class)->except(['show']);
-    Route::resource('employers', EmployerController::class)->except(['show']);
-    Route::resource('companies', CompanyController::class)->except(['show']);
-    Route::resource('job_locations', JobLocationController::class);
-    Route::resource('packages', PackageController::class);
-    Route::resource('employer_packages', EmployerPackageController::class);
+    Route::apiResource('resumes', ResumeController::class);
+    Route::apiResource('jobs', JobController::class);
+    Route::apiResource('candidates', CandidateController::class)->except(['show']);
+    Route::apiResource('employers', EmployerController::class)->except(['show']);
+    Route::apiResource('companies', CompanyController::class);
+    Route::apiResource('job_locations', JobLocationController::class);
+    Route::apiResource('packages', PackageController::class);
+    Route::apiResource('employer_packages', EmployerPackageController::class);
 
     Route::get('/job-views', [JobViewController::class, 'index']);
 });
@@ -127,10 +128,8 @@ Route::middleware(['api.auth', 'role:1'])->prefix('admin')->group(function () {
 Route::middleware(['api.auth', 'role:2'])->prefix('employer')->group(function () {
     Route::get('/dashboard', [EmployerDashboardController::class, 'dashboard']);
 
-    Route::get('/post-job', [PortalJobController::class, 'create']);
     Route::post('/post-job', [PortalJobController::class, 'store']);
     Route::get('/manage-jobs', [PortalJobController::class, 'index']);
-
     Route::get('/job/{jobId}/applications', [EmployerManageJobController::class, 'viewApplications']);
 
     Route::get('/browse-resumes', [EmployerResumeController::class, 'index']);
@@ -141,13 +140,11 @@ Route::middleware(['api.auth', 'role:2'])->prefix('employer')->group(function ()
 Route::middleware(['api.auth', 'role:3'])->prefix('candidate')->group(function () {
     Route::get('/dashboard', [CandidateDashboardController::class, 'dashboard']);
 
-    Route::get('/resume/create', [ResumePortalController::class, 'create']);
     Route::post('/resume/store', [ResumePortalController::class, 'store']);
     Route::get('/manage-resumes', [PortalResumeController::class, 'index']);
 
     Route::get('/manage-applications', [CandidateManageApplicationController::class, 'index']);
     Route::get('/applications', [ApplicationController::class, 'index']);
     Route::get('/applications/{id}', [ApplicationController::class, 'show']);
-    Route::get('/applications/create/{jobId}', [ApplicationController::class, 'create']);
     Route::post('/jobs/{job}/apply', [ApplicationController::class, 'store']);
 });

@@ -3,7 +3,7 @@ import axios from "axios";
 // ================================
 //  API BASE URL
 // ================================
-export const API_URL = "http://localhost:8000/api";
+export const API_URL = "http://127.0.0.1:8000/api";
 export const ASSET_URL = "http://localhost/talentstream/talentstream-backend/public";
 // ================================
 // TOKEN + USER HELPERS
@@ -62,11 +62,22 @@ export const loginUser = async (credentials) => {
 // ================================
 // LOGOUT
 // ================================
-export const logoutUser = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-};
+// export const logoutUser = () => {
+//     localStorage.removeItem("token");
+//     localStorage.removeItem("user");
+// };
 
+export const logoutUser = async () => {
+    try {
+        await api.post("/logout"); // Tells Laravel to set api_token to null
+    } catch (err) {
+        console.error("Backend logout failed", err);
+    } finally {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login"; // Redirect user
+    }
+};
 // ================================
 // FETCH USER FROM BACKEND (AUTH)
 // ================================
@@ -109,6 +120,8 @@ export const getMessages = async (otherUserId) => {
     return [];
   }
 };
+
+
 
 
 export default api;

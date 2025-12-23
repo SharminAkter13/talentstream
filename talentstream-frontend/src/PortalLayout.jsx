@@ -5,7 +5,6 @@ import PortalFooter from './portalComponent/PortalFooter';
 
 const PortalLayout = () => {
   return (
-    // The React Fragment (<>...</>) ensures a single parent element is returned.
     <> 
       {/* 1. Navbar (Header) */}
       <PortalNavbar />
