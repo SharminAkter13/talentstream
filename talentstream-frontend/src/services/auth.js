@@ -69,7 +69,7 @@ export const loginUser = async (credentials) => {
 
 export const logoutUser = async () => {
     try {
-        await api.post("/logout"); // Tells Laravel to set api_token to null
+        await api.post("/logout"); 
     } catch (err) {
         console.error("Backend logout failed", err);
     } finally {
@@ -120,8 +120,46 @@ export const getMessages = async (otherUserId) => {
     return [];
   }
 };
+// ================================
+// HOME PAGE DATA FETCHING
+// ================================
+
+// Fetch all categories with job counts
+export const getCategories = async () => {
+    try {
+        const res = await api.get("/browse-categories");
+        // Since the controller returns the array directly now:
+        return res.data || []; 
+    } catch (err) {
+        console.error("Home data load error", err);
+        return [];
+    }
+};
+// Fetch latest 6 jobs
+export const getLatestJobs = async () => {
+    const res = await api.get("/latest-jobs");
+    return res.data;
+};
 
 
+// auth.js or api.js
 
+export const getEmployerJobs = async () => {
+    const res = await api.get("/employer/manage-jobs");
+    return res.data;
+};
+
+export const postJob = async (formData) => {
+    // Note: Use 'multipart/form-data' if you are uploading an image
+    const res = await api.post("/employer/post-job", formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data;
+};
+
+export const deleteJob = async (jobId) => {
+    const res = await api.delete(`/employer/job/${jobId}`);
+    return res.data;
+};
 
 export default api;

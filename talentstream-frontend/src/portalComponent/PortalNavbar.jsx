@@ -83,7 +83,7 @@ const PortalNavbar = () => {
               </button>
 
               <Link to="/" className="navbar-brand" onClick={closeNav}>
-                <img src="/assets/img/logo.png" alt="Company Logo" />
+                <img src="/portal-assets//assets/img/logo.png" alt="Company Logo" />
               </Link>
             </div>
 

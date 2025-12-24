@@ -15,7 +15,7 @@ const PortalFooter = () => {
                 <div className="col-lg-3 col-md-3 col-xs-12">
                   <div className="widget">
                     <div className="footer-logo">
-                      <img src="assets/img/logo-footer.png" alt="Company Logo" />
+                      <img src="/portal-assets/assets/img/logo-footer.png" alt="Company Logo" />
                     </div>
                     <div className="textwidget">
                       <p>

@@ -52,7 +52,13 @@ Route::get('/browse-jobs', [BrowseJobController::class, 'index']);
 Route::get('/browse-categories', [BrowseCategoryController::class, 'index']);
 Route::get('/jobs/{job}', [JobController::class, 'show']);
 Route::get('/companies/{company}/details', [CompanyController::class, 'getCompanyDetails']);
-
+Route::middleware(['api.auth', 'role:2'])->prefix('employer')->group(function () {
+    Route::get('/manage-jobs', [PortalJobController::class, 'index']);
+    Route::get('/job-form-data', [PortalJobController::class, 'getFormData']);
+    Route::post('/post-job', [PortalJobController::class, 'store']);
+    Route::delete('/job/{job}', [PortalJobController::class, 'destroy']);
+    Route::get('/latest-jobs', [PortalJobController::class, 'latestJobs']);
+});
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes (Protected by ApiAuth)
@@ -128,8 +134,8 @@ Route::middleware(['api.auth', 'role:1'])->prefix('admin')->group(function () {
 Route::middleware(['api.auth', 'role:2'])->prefix('employer')->group(function () {
     Route::get('/dashboard', [EmployerDashboardController::class, 'dashboard']);
 
-    Route::post('/post-job', [PortalJobController::class, 'store']);
-    Route::get('/manage-jobs', [PortalJobController::class, 'index']);
+    // Route::post('/post-job', [PortalJobController::class, 'store']);
+    // Route::get('/manage-jobs', [PortalJobController::class, 'index']);
     Route::get('/job/{jobId}/applications', [EmployerManageJobController::class, 'viewApplications']);
 
     Route::get('/browse-resumes', [EmployerResumeController::class, 'index']);

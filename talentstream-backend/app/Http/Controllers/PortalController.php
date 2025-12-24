@@ -69,4 +69,5 @@ class PortalController extends BaseController
 
         abort(404);
     }
+    
 }
