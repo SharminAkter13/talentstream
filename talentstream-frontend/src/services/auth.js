@@ -128,7 +128,6 @@ export const getMessages = async (otherUserId) => {
 export const getCategories = async () => {
     try {
         const res = await api.get("/browse-categories");
-        // Since the controller returns the array directly now:
         return res.data || []; 
     } catch (err) {
         console.error("Home data load error", err);
@@ -137,7 +136,7 @@ export const getCategories = async () => {
 };
 // Fetch latest 6 jobs
 export const getLatestJobs = async () => {
-    const res = await api.get("/latest-jobs");
+    const res = await api.get("/browse-jobs");
     return res.data;
 };
 

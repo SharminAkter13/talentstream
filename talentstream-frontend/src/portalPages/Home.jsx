@@ -4,7 +4,7 @@ import {
   getCategories,
   getLatestJobs,
   ASSET_URL,
-} from "../services/auth"; // Adjust path as needed
+} from "../services/auth"; 
 
 import HeroSection from "./../portalComponent/HeroSection";
 
