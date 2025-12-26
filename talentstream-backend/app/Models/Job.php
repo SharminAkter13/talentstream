@@ -16,6 +16,10 @@ class Job extends Model
     protected $casts = [
         'closing_date' => 'date',
     ];
+    public function scopeActive(Builder $query)
+    {
+        return $query->where('status', 'active');
+    }
 
     // Relations
     public function category()

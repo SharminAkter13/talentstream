@@ -12,6 +12,10 @@ class Category extends Model
     'sort_order', 
    
 ];
+public function scopeActive(Builder $query)
+    {
+        return $query->where('status', 'active'); // or where('is_active', true)
+    }
 
     public function jobs()
     {
