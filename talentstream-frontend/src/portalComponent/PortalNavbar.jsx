@@ -51,7 +51,7 @@ const PortalNavbar = () => {
       case 1: return "/admin/dashboard";
       case 2: return "/employer/dashboard";
       case 3: return "/candidate/dashboard";
-      default: return "/my-account";
+      default: return "/login";
     }
   };
 
@@ -62,7 +62,7 @@ const PortalNavbar = () => {
     setUserRole(null);
     closeNav();
     // Optionally redirect user after logout
-    window.location.href = "/my-account";
+    window.location.href = "/login";
   };
 
   return (
@@ -159,7 +159,7 @@ const PortalNavbar = () => {
                 {!isAuthenticated ? (
                   // GUEST → SHOW SIGN IN
                   <li className="nav-item">
-                    <Link className="nav-link" to="/my-account" onClick={closeNav}>Sign In</Link>
+                    <Link className="nav-link" to="/login" onClick={closeNav}>Sign In</Link>
                   </li>
                 ) : (
                   // AUTHENTICATED USER → MY ACCOUNT DROPDOWN

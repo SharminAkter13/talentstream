@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  getCategories,
-  getLatestJobs,
+  getHomePortalData,
   ASSET_URL,
 } from "../services/auth"; 
 
@@ -13,27 +12,26 @@ const Home = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-   // Inside Home.jsx useEffect
-const loadHomeData = async () => {
-  try {
-    const [catRes, jobRes, ] = await Promise.all([
-      getCategories(), // This returns { categories: [...] }
-      getLatestJobs(),
-    ]);
-    
-    // Fix: Access the .categories property from the response
-    setCategories(catRes.categories || []); 
-    setJobs(jobRes || []);
-  } catch (err) {
-    console.error("Home data load error", err);
-  } finally {
-    setLoading(false);
-  }
-};
-    loadHomeData();
-  }, []);
+useEffect(() => {
+  const loadHomeData = async () => {
+    try {
+      // Import and use the new combined function
+      const response = await getHomePortalData();
+      
+      // PortalController returns { success: true, categories: [], jobs: [] }
+      setCategories(response.categories || []); 
+      setJobs(response.jobs || []);
 
+    } catch (err) {
+      console.error("Home data load error", err);
+      setCategories([]);
+      setJobs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  loadHomeData();
+}, []);
   if (loading) return <div className="loader">Loading...</div>;
 
   return (

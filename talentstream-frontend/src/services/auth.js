@@ -161,4 +161,14 @@ export const deleteJob = async (jobId) => {
     return res.data;
 };
 
+// Add this new function to auth.js
+export const getHomePortalData = async () => {
+    try {
+        const res = await api.get("/portal-data"); 
+        return res.data;
+    } catch (err) {
+        console.error("Home data fetch error", err);
+        return { categories: [], jobs: [] };
+    }
+};
 export default api;

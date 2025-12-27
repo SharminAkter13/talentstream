@@ -61,16 +61,16 @@ import EditCategory from './pages/category/EditCategory';
 const ProtectedRoute = ({ role }) => {
     const location = useLocation();
 
-    const onLoginPage = location.pathname === "/my-account";
+    const onLoginPage = location.pathname === "/login";
 
     // NOT LOGGED IN → only redirect if NOT already on login page
     if (!isLoggedIn()) {
-        return onLoginPage ? <Outlet /> : <Navigate to="/my-account" replace />;
+        return onLoginPage ? <Outlet /> : <Navigate to="/login" replace />;
     }
 
     // LOGGED IN but wrong role → redirect ONLY if not already on correct dashboard
     if (role && !hasRole(role)) {
-        return onLoginPage ? <Outlet /> : <Navigate to="/my-account" replace />;
+        return onLoginPage ? <Outlet /> : <Navigate to="/login" replace />;
     }
 
     return <Outlet />;
@@ -106,7 +106,7 @@ const App = () => {
                 </Route>
 
                 {/* AUTH */}
-                <Route path="/my-account" element={<MyAccount />} />
+                <Route path="/login" element={<MyAccount />} />
                 <Route path="/logout" element={<Logout />} />
 
                 {/* ADMIN */}

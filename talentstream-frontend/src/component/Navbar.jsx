@@ -133,7 +133,7 @@ const Navbar = () => {
               <span className="user-name">{user.name}</span>
             </a>
             <div className="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
-              <Link to="/my-account" className="dropdown-item">
+              <Link to="/login" className="dropdown-item">
                 <NavIcon className="bi bi-key" /> <span style={{ marginLeft: 17 }}>My Account</span>
               </Link>
               <Link to="/logout" className="dropdown-item">

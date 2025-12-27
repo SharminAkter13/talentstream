@@ -22,6 +22,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/', [PortalController::class, 'index']);
+Route::get('/portal-data', [PortalController::class, 'index']);
 Route::get('/browse-jobs', [BrowseJobController::class, 'index']);
 Route::get('/browse-categories', [BrowseCategoryController::class, 'index']);
 Route::get('/jobs/{job}', [JobController::class, 'show']);
