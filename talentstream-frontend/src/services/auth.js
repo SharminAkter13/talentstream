@@ -171,4 +171,33 @@ export const getHomePortalData = async () => {
         return { categories: [], jobs: [] };
     }
 };
-export default api;
+
+
+// Fetch categories, locations, and job types for the dropdowns
+// Fetch categories, locations, and job types for the dropdowns
+export const getJobFormData = async () => {
+    try {
+        const user = getCurrentUser();
+        // Determine prefix based on role (1=Admin, 2=Employer)
+        const prefix = user?.role_id === 1 ? 'admin' : 'employer';
+        
+        // Use the /create endpoint specifically for metadata
+        const res = await api.get(`/${prefix}/jobs/create`); 
+        return res.data; 
+    } catch (err) {
+        console.error("Error fetching dropdown data:", err);
+        return { categories: [], locations: [], types: [] };
+    }
+};
+
+// Store the job (Multipart for the cover_image)
+export const storeJob = async (formData) => {
+    const user = getCurrentUser();
+    const prefix = user?.role_id === 1 ? 'admin' : 'employer';
+
+    // Employer endpoint is /api/employer/jobs
+    const res = await api.post(`/${prefix}/jobs`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+};export default api;

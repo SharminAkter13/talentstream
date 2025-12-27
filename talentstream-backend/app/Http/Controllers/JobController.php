@@ -30,32 +30,36 @@ class JobController extends BaseController
     /* ============================
         LIST ALL JOBS (index page)
     ============================ */
-    public function index()
-    {
-        $user = Auth::user();
+    public function index(Request $request)
+{
+    $user = Auth::user();
+    $query = Job::with(['category', 'jobLocation', 'jobType', 'employer']);
 
-        $jobsQuery = Job::with(['category', 'jobLocation', 'jobType', 'employer'])
-                        ->orderBy('created_at', 'desc');
-
-        // Only show jobs relevant to the user role
-        if ($user->role !== 'admin') {
-            $employerId = $user->employer->id ?? null;
-
-            if ($employerId) {
-                $jobsQuery->where('employer_id', $employerId);
-            } else {
-                return response()->json(['message' => 'Unauthorized or no employer profile linked.'], 403);
-            }
-        }
-
-        $jobs = $jobsQuery->paginate(15);
-
+    // Admin (Role 1) sees everything
+    if ($user->role_id === 1) {
         return response()->json([
-            'jobs' => $jobs,
-            'message' => 'Jobs retrieved successfully.'
+            'jobs' => $query->orderBy('created_at', 'desc')->paginate(15),
+            'message' => 'All jobs retrieved for admin.'
         ]);
     }
 
+    // Employer (Role 2) sees only their jobs
+    if ($user->role_id === 2) {
+        $employer = $user->employer;
+        if (!$employer) {
+            return response()->json(['message' => 'Employer profile not found.'], 404);
+        }
+
+        return response()->json([
+            'jobs' => $query->where('employer_id', $employer->id)
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(15),
+            'message' => 'Your jobs retrieved successfully.'
+        ]);
+    }
+
+    return response()->json(['message' => 'Unauthorized access.'], 403);
+}
     /* ============================
         SHOW SINGLE JOB
     ============================ */

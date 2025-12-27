@@ -1,339 +1,210 @@
-
-import React, { useEffect, useState } from "react";
-import { API_URL, getToken } from "../../services/auth";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Master from './../Master';
-
-const JOB_API = "/jobs";
+import { getJobFormData, storeJob } from "../../services/auth";
+import Swal from "sweetalert2";
+import Master from "../Master";
 
 const CreateJob = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    
+    // Data for Dropdowns
+    const [formOptions, setFormOptions] = useState({
+        categories: [],
+        locations: [],
+        types: [],
+    });
 
-  const [form, setForm] = useState({
-    user_email: "",
-    title: "",
-    category_id: "",
-    job_type_id: "",
-    job_location_id: "",
-    company_name: "",
-    website: "",
-    tagline: "",
-    tags: "",
-    description: "",
-    application_email: "",
-    application_url: "",
-    closing_date: "",
-    status: "active",
-  });
+    // Form State (Matching Model $fillable)
+    const [formData, setFormData] = useState({
+        title: "",
+        category_id: "",
+        job_location_id: "",
+        job_type_id: "",
+        description: "",
+        application_email: "",
+        application_url: "",
+        closing_date: "",
+        tagline: "",
+        tags: "",
+        status: "active",
+    });
 
-  const [coverImage, setCoverImage] = useState(null);
-  const [lookups, setLookups] = useState({
-    categories: [],
-    types: [],
-    locations: [],
-  });
+    const [coverImage, setCoverImage] = useState(null);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+    // Load Dropdowns on Mount
+ useEffect(() => {
+    const fetchOptions = async () => {
+        try {
+            const data = await getJobFormData();
+            setFormOptions({
+                categories: data.categories || [],
+                locations: data.locations || [],
+                types: data.types || [],
+            });
+        } catch (err) {
+            console.error("Error loading form data", err);
+        }
+    };
+    fetchOptions();
+}, []);
 
-  useEffect(() => {
-    const fetchCreateData = async () => {
-      const token = getToken();
-
-      const res = await fetch(`${API_URL}${JOB_API}/create`, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Failed to load form data");
-        setLoading(false);
-        return;
-      }
-
-      setLookups({
-        categories: data.categories,
-        types: data.types,
-        locations: data.locations,
-      });
-
-      setForm((prev) => ({
-        ...prev,
-        user_email: data.user?.email || "",
-        company_name: data.company?.name || "",
-        website: data.company?.website || "",
-      }));
-
-      setLoading(false);
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    fetchCreateData();
-  }, []);
+    const handleFileChange = (e) => {
+        setCoverImage(e.target.files[0]);
+    };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
 
-  const handleFile = (e) => {
-    setCoverImage(e.target.files[0]);
-  };
+        const submissionData = new FormData();
+        Object.keys(formData).forEach((key) => {
+            submissionData.append(key, formData[key]);
+        });
+        if (coverImage) {
+            submissionData.append("cover_image", coverImage);
+        }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError(null);
+        try {
+            await storeJob(submissionData);
+            Swal.fire("Success", "Job posted successfully!", "success");
+            navigate("/job-list");
+        } catch (error) {
+            const msg = error.response?.data?.message || "Something went wrong";
+            Swal.fire("Error", msg, "error");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    const token = getToken();
+    return (
+        <Master>
+            <div className="pd-20 card-box mb-30">
+                <div className="clearfix mb-20">
+                    <div className="pull-left">
+                        <h4 className="text-blue h4">Create New Job Listing</h4>
+                        <p>Only authorized employers can post listings.</p>
+                    </div>
+                </div>
 
-    const formData = new FormData();
-    Object.entries(form).forEach(([key, val]) => {
-      formData.append(key, val);
-    });
+                <form onSubmit={handleSubmit}>
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div className="form-group">
+                                <label>Job Title <span className="text-danger">*</span></label>
+                                <input name="title" type="text" className="form-control" onChange={handleChange} required />
+                            </div>
+                        </div>
+                    </div>
 
-    if (coverImage) {
-      formData.append("cover_image", coverImage);
-    }
+                    <div className="row">
+                        <div className="col-md-4">
+                            <div className="form-group">
+                                <label>Category <span className="text-danger">*</span></label>
+                                <select name="category_id" className="form-control" onChange={handleChange} required>
+                                    <option value="">Select Category</option>
+                                    {formOptions.categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="col-md-4">
+                            <div className="form-group">
+                                <label>Location <span className="text-danger">*</span></label>
+                                <select name="job_location_id" className="form-control" onChange={handleChange} required>
+                                    <option value="">Select Location</option>
+                                    {formOptions.locations.map(loc => (
+                                        <option key={loc.id} value={loc.id}>{loc.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="col-md-4">
+                            <div className="form-group">
+                                <label>Job Type <span className="text-danger">*</span></label>
+                                <select name="job_type_id" className="form-control" onChange={handleChange} required>
+                                    <option value="">Select Type</option>
+                                    {formOptions.types.map(type => (
+                                        <option key={type.id} value={type.id}>{type.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-    const res = await fetch(`${API_URL}${JOB_API}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-      body: formData,
-    });
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="form-group">
+                                <label>Tagline</label>
+                                <input name="tagline" type="text" className="form-control" onChange={handleChange} placeholder="Brief catchphrase" />
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="form-group">
+                                <label>Tags</label>
+                                <input name="tags" type="text" className="form-control" onChange={handleChange} placeholder="Laravel, Remote, Fulltime" />
+                            </div>
+                        </div>
+                    </div>
 
-    const data = await res.json();
+                    <div className="form-group">
+                        <label>Job Description <span className="text-danger">*</span></label>
+                        <textarea name="description" className="form-control" rows="5" onChange={handleChange} required></textarea>
+                    </div>
 
-    if (!res.ok) {
-      setError(
-        data.errors
-          ? Object.values(data.errors).flat().join(" | ")
-          : data.message
-      );
-      setSubmitting(false);
-      return;
-    }
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="form-group">
+                                <label>Application Email</label>
+                                <input name="application_email" type="email" className="form-control" onChange={handleChange} />
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="form-group">
+                                <label>Application URL</label>
+                                <input name="application_url" type="url" className="form-control" onChange={handleChange} />
+                            </div>
+                        </div>
+                    </div>
 
-    navigate("/manage-jobs");
-  };
+                    <div className="row">
+                        <div className="col-md-4">
+                            <div className="form-group">
+                                <label>Closing Date</label>
+                                <input name="closing_date" type="date" className="form-control" onChange={handleChange} />
+                            </div>
+                        </div>
+                        <div className="col-md-4">
+                            <div className="form-group">
+                                <label>Status</label>
+                                <select name="status" className="form-control" onChange={handleChange}>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="col-md-4">
+                            <div className="form-group">
+                                <label>Cover Image</label>
+                                <input type="file" className="form-control" onChange={handleFileChange} accept="image/*" />
+                            </div>
+                        </div>
+                    </div>
 
-  if (loading) return <p>Loading...</p>;
-
-  return (
-    <Master>
-      <h2>Create Job</h2>
-
-      {error && <div className="alert alert-danger">{error}</div>}
-
-      <form onSubmit={handleSubmit}>
-
-        <div className="mb-3">
-          <label className="fw-bold">Employer Email</label>
-          <input
-            type="email"
-            name="user_email"
-            className="form-control"
-            value={form.user_email}
-            readOnly
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Job Title</label>
-          <input
-            type="text"
-            name="title"
-            className="form-control"
-            value={form.title}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Category</label>
-          <select
-            name="category_id"
-            className="form-control"
-            value={form.category_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Category</option>
-            {lookups.categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Job Type</label>
-          <select
-            name="job_type_id"
-            className="form-control"
-            value={form.job_type_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Job Type</option>
-            {lookups.types.map((t) => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Location</label>
-          <select
-            name="job_location_id"
-            className="form-control"
-            value={form.job_location_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Location</option>
-            {lookups.locations.map((l) => (
-              <option key={l.id} value={l.id}>{l.city}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Company Name</label>
-          <input
-            type="text"
-            name="company_name"
-            className="form-control"
-            value={form.company_name}
-            readOnly
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Company Website</label>
-          <input
-            type="text"
-            name="website"
-            className="form-control"
-            value={form.website}
-            readOnly
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Tagline</label>
-          <input
-            type="text"
-            name="tagline"
-            className="form-control"
-            value={form.tagline}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Tags</label>
-          <input
-            type="text"
-            name="tags"
-            className="form-control"
-            value={form.tags}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Description</label>
-          <textarea
-            name="description"
-            className="form-control"
-            rows="5"
-            value={form.description}
-            onChange={handleChange}
-            required
-          ></textarea>
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Application Email</label>
-          <input
-            type="email"
-            name="application_email"
-            className="form-control"
-            value={form.application_email}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Application URL</label>
-          <input
-            type="url"
-            name="application_url"
-            className="form-control"
-            value={form.application_url}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Closing Date</label>
-          <input
-            type="date"
-            name="closing_date"
-            className="form-control"
-            value={form.closing_date}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Status</label>
-          <select
-            name="status"
-            className="form-control"
-            value={form.status}
-            onChange={handleChange}
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">Cover Image</label>
-          <input
-            type="file"
-            className="form-control"
-            onChange={handleFile}
-          />
-        </div>
-
-        <button className="btn btn-success" disabled={submitting}>
-          {submitting ? "Posting..." : "Create Job"}
-        </button>
-
-        <button
-          type="button"
-          className="btn btn-secondary ms-2"
-          onClick={() => navigate("/manage-jobs")}
-        >
-          Cancel
-        </button>
-
-      </form>
-    </Master>
-  );
+                    <div className="form-group mt-3">
+                        <button type="submit" className="btn btn-primary" disabled={loading}>
+                            {loading ? "Processing..." : "Create Job Listing"}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </Master>
+    );
 };
 
 export default CreateJob;

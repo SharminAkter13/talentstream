@@ -19,7 +19,7 @@ use App\Http\Controllers\{
 // PUBLIC ROUTES
 // -------------------------
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::get('/', [PortalController::class, 'index']);
 Route::get('/portal-data', [PortalController::class, 'index']);
@@ -78,7 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('users', UserController::class)->except(['show']);
         Route::post('users/{user}/approve', [UserController::class, 'approve']);
         Route::apiResource('resumes', ResumeController::class);
-        Route::apiResource('jobs', JobController::class);
+        Route::apiResource('jobs', JobController::class)->except(['store']);
         Route::apiResource('candidates', CandidateController::class)->except(['show']);
         Route::apiResource('employers', EmployerController::class)->except(['show']);
         Route::apiResource('companies', CompanyController::class);
@@ -92,6 +92,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:2')->prefix('employer')->group(function () {
         Route::get('/dashboard', [EmployerDashboardController::class, 'dashboard']);
         Route::get('/job/{jobId}/applications', [EmployerManageJobController::class, 'viewApplications']);
+         Route::apiResource('jobs', JobController::class);
+         Route::get('jobs/create', [JobController::class, 'create']);
+    Route::get('jobs/{id}/edit', [JobController::class, 'edit']);
         Route::get('/browse-resumes', [EmployerResumeController::class, 'index']);
         Route::get('/browse-resumes/{id}', [EmployerResumeController::class, 'show']);
         Route::get('/manage-jobs', [PortalJobController::class, 'index']);

@@ -121,7 +121,6 @@ const App = () => {
                     <Route path="/edit-category/:id" element={<EditCategory />} />
                     <Route path="/manage-cat" element={<ManageCategory />} />
                     <Route path="/job-list" element={<JobList />} />
-                    <Route path="/create-job" element={<CreateJob />} />
                     <Route path="/manage-application-admin" element={<ManageApplications />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/skills" element={<Skills />} />
@@ -132,6 +131,9 @@ const App = () => {
                 {/* EMPLOYER */}
                 <Route element={<ProtectedRoute role={2} />}>
                     <Route path="/employer/dashboard" element={<EmployerDashboard />} />
+                    <Route path="/create-job" element={<CreateJob />} />
+                    <Route path="/manage-job" element={<ManageJob />} />
+                    <Route path="/manage-application" element={<ManageApplicationPortal />} />
                 </Route>
 
                 {/* CANDIDATE */}

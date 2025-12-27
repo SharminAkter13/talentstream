@@ -62,7 +62,6 @@ const Sidebar = () => {
                     <span className="mtext">Jobs</span>
                   </a>
                   <ul className="submenu" style={{ display: openMenu === "adminJobs" ? "block" : "none" }}>
-                    <li><Link to="/create-job" onClick={closeMenu}>Create Job</Link></li>
                     <li><Link to="/job-list" onClick={closeMenu}>Job Listings</Link></li>
                   </ul>
                 </li>
@@ -133,11 +132,13 @@ const Sidebar = () => {
                 <li className="dropdown">
                   <a href="#!" className="dropdown-toggle" onClick={() => toggleMenu("employerJobs")}>
                     <span className="micon dw dw-briefcase" />
-                    <span className="mtext">Jobs</span>
+                    <span className="mtext">Jobs Management</span>
                   </a>
                   <ul className="submenu" style={{ display: openMenu === "employerJobs" ? "block" : "none" }}>
-                    <li><Link to="/add-job" onClick={closeMenu}>Post Job</Link></li>
-                    <li><Link to="/manage-job" onClick={closeMenu}>Manage Jobs</Link></li>
+                    {/* Only Employer sees "Post a New Job" */}
+                    <li><Link to="/create-job" onClick={closeMenu}>Post a New Job</Link></li>
+                    {/* Employer sees "My Jobs" which calls /api/employer/jobs */}
+                    <li><Link to="/job-list" onClick={closeMenu}>My Job Listings</Link></li>
                   </ul>
                 </li>
 
