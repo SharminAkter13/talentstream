@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "d4e6b7d4-1f22-4a72-a813-0c9f7e912345",
-    "name": "TalentStream API - Corrected Full Match",
+    "name": "TalentStream API (Laravel 12 – Final)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
 
@@ -12,9 +12,8 @@
 
   "item": [
 
- 
     {
-      "name": "1. PUBLIC ROUTES",
+      "name": "AUTH",
       "item": [
         {
           "name": "Register",
@@ -27,11 +26,10 @@
             "url": "{{base_url}}/register",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"User\",\n  \"email\": \"test@email.com\",\n  \"password\": \"password\",\n  \"password_confirmation\": \"password\",\n  \"role_id\": 3\n}"
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@email.com\",\n  \"password\": \"password\",\n  \"password_confirmation\": \"password\",\n  \"role_id\": 3\n}"
             }
           }
         },
-
         {
           "name": "Login",
           "event": [
@@ -40,9 +38,7 @@
               "script": {
                 "exec": [
                   "var json = pm.response.json();",
-                  "if (json.token) {",
-                  "  pm.collectionVariables.set('token', json.token);",
-                  "}"
+                  "if (json.token) pm.collectionVariables.set('token', json.token);"
                 ]
               }
             }
@@ -59,286 +55,116 @@
               "raw": "{\n  \"email\": \"test@email.com\",\n  \"password\": \"password\"\n}"
             }
           }
-        },
-
-        { "name": "Portal Index", "request": { "method": "GET", "url": "{{base_url}}/" } },
-        { "name": "Browse Jobs", "request": { "method": "GET", "url": "{{base_url}}/browse-jobs" } },
-        { "name": "Browse Categories", "request": { "method": "GET", "url": "{{base_url}}/browse-categories" } },
-        { "name": "Job Details", "request": { "method": "GET", "url": "{{base_url}}/jobs/1" } },
-        { "name": "Company Details", "request": { "method": "GET", "url": "{{base_url}}/companies/1/details" } }
+        }
       ]
     },
 
-   
     {
-      "name": "2. PROTECTED (Shared)",
+      "name": "PUBLIC",
       "item": [
+        { "name": "Browse Jobs", "request": { "method": "GET", "url": "{{base_url}}/browse-jobs" } },
+        { "name": "Browse Categories", "request": { "method": "GET", "url": "{{base_url}}/browse-categories" } },
+        { "name": "Job Details", "request": { "method": "GET", "url": "{{base_url}}/jobs/1" } }
+      ]
+    },
 
+    {
+      "name": "NOTIFICATIONS",
+      "item": [
         {
-          "name": "User Profile",
+          "name": "List Notifications",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": "{{base_url}}/user"
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/notifications"
           }
         },
-
-       
         {
-          "name": "Notifications",
-          "item": [
-            {
-              "name": "List All",
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/notifications"
-              }
-            },
-            {
-              "name": "Mark Read",
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/notifications/1/read"
-              }
-            },
-            {
-              "name": "Mark All Read",
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/notifications/read-all"
-              }
-            },
-            {
-              "name": "Delete Notification",
-              "request": {
-                "method": "DELETE",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/notifications/1"
-              }
-            }
-          ]
-        },
-
-        {
-          "name": "Messaging (Chat)",
-          "item": [
-            {
-              "name": "List Conversations",
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/chat"
-              }
-            },
-            {
-              "name": "Get Contacts",
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/chat/contacts"
-              }
-            },
-            {
-              "name": "Get Messages",
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/chat/messages/2"
-              }
-            },
-            {
-              "name": "Send Message",
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" },
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/chat/send",
-                "body": { "mode": "raw", "raw": "{\"receiver_id\": 2, \"message\": \"Hello\"}" }
-              }
-            }
-          ]
-        },
-
-        {
-          "name": "Bookmarks & View Tracking",
-          "item": [
-            {
-              "name": "List Bookmarks",
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/bookmarks"
-              }
-            },
-            {
-              "name": "Add Bookmark",
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/bookmarks/1"
-              }
-            },
-            {
-              "name": "Track Job View",
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{token}}" },
-                  { "key": "Accept", "value": "application/json" }
-                ],
-                "url": "{{base_url}}/jobs/1/view"
-              }
-            }
-          ]
-        },
-
-        {
-          "name": "Logout",
+          "name": "Mark Read",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": "{{base_url}}/logout"
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/notifications/1/read"
           }
         }
       ]
     },
 
     {
-      "name": "3. ADMIN (Role 1)",
+      "name": "CHAT",
       "item": [
         {
-          "name": "Dashboard",
+          "name": "Get Contacts",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": "{{base_url}}/admin/dashboard"
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/chat/contacts"
           }
         },
-
         {
-          "name": "Approve User",
+          "name": "Get Messages",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/chat/messages/2"
+          }
+        },
+        {
+          "name": "Send Message",
           "request": {
             "method": "POST",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" }
+              { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": "{{base_url}}/admin/users/1/approve"
+            "url": "{{base_url}}/chat/send",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiver_id\": 2,\n  \"text\": \"Hello from Postman\"\n}"
+            }
           }
-        },
-
-        { "name": "Resource: Categories", "request": { "method": "GET", "header": [
-          { "key": "Authorization", "value": "Bearer {{token}}" },
-          { "key": "Accept", "value": "application/json" }
-        ], "url": "{{base_url}}/admin/categories" } },
-
-        { "name": "Resource: Jobs", "request": { "method": "GET", "header": [
-          { "key": "Authorization", "value": "Bearer {{token}}" },
-          { "key": "Accept", "value": "application/json" }
-        ], "url": "{{base_url}}/admin/jobs" } }
+        }
       ]
     },
 
     {
-      "name": "4. EMPLOYER (Role 2)",
+      "name": "EMPLOYER",
       "item": [
-
         {
           "name": "Dashboard",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{base_url}}/employer/dashboard"
           }
         },
-
         {
-          "name": "View Applications for Job",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": "{{base_url}}/employer/job/1/applications"
-          }
-        },
-
-        {
-          "name": "Dashboard Job Create (Full Example)",
+          "name": "Create Job (Dashboard)",
           "request": {
             "method": "POST",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" },
               { "key": "Content-Type", "value": "application/json" }
             ],
             "url": "{{base_url}}/employer/jobs",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Senior Laravel Developer\",\n  \"description\": \"Write clean code, build APIs, maintain system.\",\n  \"requirements\": \"5+ years experience, MySQL, Vue.js\",\n  \"salary\": \"50000\",\n  \"job_type\": \"Full-time\",\n  \"location\": \"Dhaka\",\n  \"experience\": \"3-5 years\",\n  \"category_id\": 1,\n  \"company_id\": 1\n}"
+              "raw": "{\n  \"title\": \"Laravel Developer\",\n  \"description\": \"Build APIs\",\n  \"salary\": \"5000\",\n  \"category_id\": 1\n}"
             }
           }
         },
-
         {
           "name": "Portal Job Post",
           "request": {
             "method": "POST",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": "{{base_url}}/employer/post-job",
+            "url": "{{base_url}}/employer/portal/jobs",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Portal Job Title\",\n  \"description\": \"Portal job description here...\"\n}"
+              "raw": "{\n  \"title\": \"Portal Job\",\n  \"description\": \"Posted from portal\"\n}"
             }
           }
         }
@@ -346,64 +172,33 @@
     },
 
     {
-      "name": "5. CANDIDATE (Role 3)",
+      "name": "CANDIDATE",
       "item": [
-
         {
           "name": "Dashboard",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{base_url}}/candidate/dashboard"
           }
         },
-
         {
-          "name": "Resume Upload (JSON)",
+          "name": "Upload Resume",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "url": "{{base_url}}/candidate/resume/store",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"resume_path\": \"resume.pdf\"\n}"
-            }
-          }
-        },
-
-        {
-          "name": "Resume Upload (Form-Data File)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": "{{base_url}}/candidate/resume/store",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/candidate/resume",
             "body": {
               "mode": "formdata",
-              "formdata": [
-                { "key": "resume", "type": "file", "src": "" }
-              ]
+              "formdata": [{ "key": "resume", "type": "file", "src": "" }]
             }
           }
         },
-
         {
-          "name": "Apply for Job",
+          "name": "Apply Job",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Accept", "value": "application/json" }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{base_url}}/candidate/jobs/1/apply"
           }
         }

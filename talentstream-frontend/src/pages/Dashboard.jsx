@@ -3,7 +3,7 @@ import Navbar from "../component/Navbar";
 import Sidebar from "../component/Sidebar";
 import Footer from "../component/Footer";
 import ReactApexChart from 'react-apexcharts';
-import axios from "axios";
+ import api from "../services/auth"; // or correct path
 
 class Dashboard extends Component {
   constructor(props) {
@@ -31,42 +31,29 @@ class Dashboard extends Component {
     this.fetchDashboardData();
   }
 
-  async fetchDashboardData() {
-    const token = localStorage.getItem("token"); // Get token from login
 
-    if (!token) {
-      this.setState({ error: "No authentication token found", loading: false });
-      return;
-    }
+async fetchDashboardData() {
+  try {
+    const response = await api.get("/admin/dashboard");
 
-    try {
-      const response = await axios.get(
-        "http://127.0.0.1:8000/api/admin/dashboard",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json", // Ensure API returns JSON
-          },
-        }
-      );
+    const data = response.data;
 
-      const data = response.data;
-
-      this.setState({
-        dashboardData: {
-          metrics: data.metrics,
-          charts: data.charts,
-        },
-        loading: false,
-      });
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      // Handle Laravel API errors (unauthenticated, forbidden, etc.)
-      const errorMessage =
-        error.response?.data?.message || error.message || "Unknown error";
-      this.setState({ error: errorMessage, loading: false });
-    }
+    this.setState({
+      dashboardData: {
+        metrics: data.metrics,
+        charts: data.charts,
+      },
+      loading: false,
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    this.setState({
+      error: error.response?.data?.message || "Failed to load dashboard",
+      loading: false,
+    });
   }
+}
+
 
   // Chart Options
   getBarChartOptions = () => ({

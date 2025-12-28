@@ -15,98 +15,121 @@ use App\Http\Controllers\{
     BrowseJobController, PortalJobAlertsController, PortalResumeController
 };
 
-// -------------------------
-// PUBLIC ROUTES
-// -------------------------
+// ==============================
+// PUBLIC API (NO AUTH)
+// ==============================
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/', [PortalController::class, 'index']);
 Route::get('/portal-data', [PortalController::class, 'index']);
 Route::get('/browse-jobs', [BrowseJobController::class, 'index']);
 Route::get('/browse-categories', [BrowseCategoryController::class, 'index']);
 Route::get('/jobs/{job}', [JobController::class, 'show']);
 Route::get('/companies/{company}/details', [CompanyController::class, 'getCompanyDetails']);
 
-// -------------------------
-// PROTECTED ROUTES (Sanctum)
-// -------------------------
+// ==============================
+// AUTHENTICATED API
+// ==============================
 Route::middleware('auth:sanctum')->group(function () {
 
+    // Auth
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Profile
     Route::get('/profile', [ProfileController::class, 'index']);
 
-    // Notifications
-    Route::prefix('notifications')->group(function () {
-        Route::get('/', [NotificationController::class, 'index']);
-        Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
-        Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
-        Route::delete('/{id}', [NotificationController::class, 'destroy']);
-    });
+    // ======================
+    // NOTIFICATIONS (API)
+    // ======================
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 
-    // Messaging
-    Route::prefix('chat')->group(function () {
-        Route::get('/', [MessageController::class, 'index']);
-        Route::get('/contacts', [MessageController::class, 'getContacts']);
-        Route::get('/messages/{otherUserId}', [MessageController::class, 'getMessages']);
-        Route::post('/send', [MessageController::class, 'sendMessage']);
-        Route::post('/{conversation}/read', [MessageController::class, 'markAsRead']);
-    });
+    // ======================
+    // CHAT / MESSAGING (API)
+    // ======================
+    Route::get('/chat/contacts', [MessageController::class, 'getContacts']);
+    Route::get('/chat/messages/{otherUserId}', [MessageController::class, 'getMessages']);
+    Route::post('/chat/send', [MessageController::class, 'sendMessage']);
 
-    // Job Alerts
-    Route::apiResource('job_alerts', JobAlertController::class)->except(['show']);
+    // ======================
+    // JOB ALERTS
+    // ======================
+    Route::apiResource('job-alerts', JobAlertController::class)->except(['show']);
     Route::get('/portal-job-alerts', [PortalJobAlertsController::class, 'index']);
 
-    // Job Bookmarks
-    Route::prefix('bookmarks')->group(function () {
-        Route::get('/', [JobBookmarkController::class, 'index']);
-        Route::post('/{jobId}', [JobBookmarkController::class, 'store']);
-        Route::delete('/{id}', [JobBookmarkController::class, 'destroy']);
-    });
+    // ======================
+    // BOOKMARKS
+    // ======================
+    Route::get('/bookmarks', [JobBookmarkController::class, 'index']);
+    Route::post('/bookmarks/{jobId}', [JobBookmarkController::class, 'store']);
+    Route::delete('/bookmarks/{id}', [JobBookmarkController::class, 'destroy']);
 
     // Job View Tracking
     Route::post('/jobs/{job}/view', [JobViewController::class, 'store']);
 
-    // -------------------------
-    // ROLE-BASED ROUTES
-    // -------------------------
-    // Admin Routes (role_id=1)
+    // ==================================================
+    // ADMIN (role_id = 1)
+    // ==================================================
     Route::middleware('role:1')->prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index']);
         Route::apiResource('categories', CategoryController::class);
         Route::apiResource('users', UserController::class)->except(['show']);
-        Route::post('users/{user}/approve', [UserController::class, 'approve']);
+        Route::post('/users/{user}/approve', [UserController::class, 'approve']);
         Route::apiResource('resumes', ResumeController::class);
         Route::apiResource('jobs', JobController::class)->except(['store']);
         Route::apiResource('candidates', CandidateController::class)->except(['show']);
         Route::apiResource('employers', EmployerController::class)->except(['show']);
         Route::apiResource('companies', CompanyController::class);
-        Route::apiResource('job_locations', JobLocationController::class);
+        Route::apiResource('job-locations', JobLocationController::class);
         Route::apiResource('packages', PackageController::class);
-        Route::apiResource('employer_packages', EmployerPackageController::class);
+        Route::apiResource('employer-packages', EmployerPackageController::class);
         Route::get('/job-views', [JobViewController::class, 'index']);
     });
 
-    // Employer Routes (role_id=2)
+    // ==================================================
+    // EMPLOYER (role_id = 2)
+    // ==================================================
     Route::middleware('role:2')->prefix('employer')->group(function () {
+
+        // Dashboard
         Route::get('/dashboard', [EmployerDashboardController::class, 'dashboard']);
+
+        // Employer Job CRUD (Dashboard)
+        Route::get('/jobs/create', [JobController::class, 'create']);
+        Route::get('/jobs/{job}/edit', [JobController::class, 'edit']);
+        Route::apiResource('jobs', JobController::class);
+
+        // Applications
         Route::get('/job/{jobId}/applications', [EmployerManageJobController::class, 'viewApplications']);
-         Route::apiResource('jobs', JobController::class);
-         Route::get('jobs/create', [JobController::class, 'create']);
-    Route::get('jobs/{id}/edit', [JobController::class, 'edit']);
+
+        // Resume browsing
         Route::get('/browse-resumes', [EmployerResumeController::class, 'index']);
         Route::get('/browse-resumes/{id}', [EmployerResumeController::class, 'show']);
-        Route::get('/manage-jobs', [PortalJobController::class, 'index']);
-        Route::post('/post-job', [PortalJobController::class, 'store']);
-        Route::delete('/job/{job}', [PortalJobController::class, 'destroy']);
+
+        // ======================
+        // PORTAL JOB POSTING
+        // (Separate from dashboard CRUD)
+        // ======================
+        Route::get('/portal/jobs', [PortalJobController::class, 'index']);
+        Route::post('/portal/jobs', [PortalJobController::class, 'store']);
+        Route::delete('/portal/jobs/{job}', [PortalJobController::class, 'destroy']);
     });
 
-    // Candidate Routes (role_id=3)
+    // ==================================================
+    // CANDIDATE (role_id = 3)
+    // ==================================================
     Route::middleware('role:3')->prefix('candidate')->group(function () {
+
         Route::get('/dashboard', [CandidateDashboardController::class, 'dashboard']);
-        Route::post('/resume/store', [ResumePortalController::class, 'store']);
+
+        // Resume
+        Route::post('/resume', [ResumePortalController::class, 'store']);
         Route::get('/manage-resumes', [PortalResumeController::class, 'index']);
+
+        // Applications
         Route::get('/manage-applications', [CandidateManageApplicationController::class, 'index']);
         Route::get('/applications', [ApplicationController::class, 'index']);
         Route::get('/applications/{id}', [ApplicationController::class, 'show']);

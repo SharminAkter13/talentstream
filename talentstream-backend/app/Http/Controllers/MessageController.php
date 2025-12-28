@@ -7,108 +7,93 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class MessageController extends BaseController
+class MessageController extends Controller
 {
-    use AuthorizesRequests;
-
-    public function __construct()
-    {
-        // All messaging features require an authenticated user
-        $this->middleware('auth');
-    }
-
-    /**
-     * Display the messaging application index view.
-     */
-    public function index()
-    {
-        // This view typically loads the frontend component (e.g., a Vue/React component)
-        return view('pages.messages.index');
-    }
-
     /**
      * Fetch chat contacts based on user role.
-     * Candidate (role_id 2) only sees Employers (role_id 3).
-     * Employer (role_id 3) only sees Candidates (role_id 2).
      */
     public function getContacts()
     {
         $user = Auth::user();
 
+        if (!$user) {
+            return response()->json([], 200);
+        }
+
         $contacts = User::where('id', '!=', $user->id)
-            // Filter contacts based on user role
-            ->when($user->role_id == 2, fn($q) => $q->where('role_id', 3)) // Candidate sees Employer
-            ->when($user->role_id == 3, fn($q) => $q->where('role_id', 2)) // Employer sees Candidate
+            ->when($user->role_id == 2, fn ($q) => $q->where('role_id', 3)) // Employer → Candidate
+            ->when($user->role_id == 3, fn ($q) => $q->where('role_id', 2)) // Candidate → Employer
             ->select('id', 'name', 'role_id')
             ->get();
 
-        // Add unread messages count for each contact
         foreach ($contacts as $contact) {
-            // Find the conversation between the current user and this contact
             $conversation = Conversation::where(function ($q) use ($user, $contact) {
-                $q->where('user_one', $user->id)->where('user_two', $contact->id);
+                $q->where('user_one', $user->id)
+                  ->where('user_two', $contact->id);
             })->orWhere(function ($q) use ($user, $contact) {
-                $q->where('user_one', $contact->id)->where('user_two', $user->id);
+                $q->where('user_one', $contact->id)
+                  ->where('user_two', $user->id);
             })->first();
 
-            $contact->unread_count = 0;
-
-            if ($conversation) {
-                // Count unread messages sent by the contact (not the current user)
-                $contact->unread_count = Message::where('conversation_id', $conversation->id)
+            $contact->unread_count = $conversation
+                ? Message::where('conversation_id', $conversation->id)
                     ->where('sender_id', '!=', $user->id)
                     ->where('is_read', false)
-                    ->count();
-            }
+                    ->count()
+                : 0;
         }
 
         return response()->json($contacts);
     }
 
     /**
-     * Retrieve all messages for a conversation between two users.
+     * Retrieve messages between authenticated user and another user.
      */
     public function getMessages($otherUserId)
     {
         $currentUserId = Auth::id();
 
-        // Find existing conversation between two users (order agnostic)
-        $conversation = Conversation::where(function ($q) use ($currentUserId, $otherUserId) {
-                $q->where('user_one', $currentUserId)
-                    ->where('user_two', $otherUserId);
-            })
-            ->orWhere(function ($q) use ($currentUserId, $otherUserId) {
-                $q->where('user_one', $otherUserId)
-                    ->where('user_two', $currentUserId);
-            })
-            ->first();
-
-        $messages = [];
-        $conversationId = null;
-
-        if ($conversation) {
-            $conversationId = $conversation->id;
-            // Eager load sender name for displaying the message source
-            $messages = $conversation->messages()
-                ->with('sender:id,name')
-                ->orderBy('created_at', 'asc')
-                ->get();
-
-            // Mark all received messages as read when viewing the conversation
-            $this->markAsRead($conversation);
+        if (!$currentUserId) {
+            return response()->json([
+                'conversation_id' => null,
+                'messages' => [],
+            ]);
         }
 
+        $conversation = Conversation::where(function ($q) use ($currentUserId, $otherUserId) {
+            $q->where('user_one', $currentUserId)
+              ->where('user_two', $otherUserId);
+        })->orWhere(function ($q) use ($currentUserId, $otherUserId) {
+            $q->where('user_one', $otherUserId)
+              ->where('user_two', $currentUserId);
+        })->first();
+
+        if (!$conversation) {
+            return response()->json([
+                'conversation_id' => null,
+                'messages' => [],
+            ]);
+        }
+
+        $messages = $conversation->messages()
+            ->with('sender:id,name')
+            ->orderBy('created_at')
+            ->get();
+
+        // Mark received messages as read
+        Message::where('conversation_id', $conversation->id)
+            ->where('sender_id', '!=', $currentUserId)
+            ->update(['is_read' => true]);
+
         return response()->json([
-            'conversation_id' => $conversationId,
+            'conversation_id' => $conversation->id,
             'messages' => $messages,
         ]);
     }
 
     /**
-     * Send a new message and create a conversation if needed.
+     * Send a new message.
      */
     public function sendMessage(Request $request)
     {
@@ -118,55 +103,39 @@ class MessageController extends BaseController
         ]);
 
         $currentUserId = Auth::id();
-        $receiverId = $request->receiver_id;
-        $text = $request->text;
 
-        // Find or create conversation (order agnostic logic)
-        $conversation = Conversation::where(function ($q) use ($currentUserId, $receiverId) {
-                $q->where('user_one', $currentUserId)
-                    ->where('user_two', $receiverId);
-            })
-            ->orWhere(function ($q) use ($currentUserId, $receiverId) {
-                $q->where('user_one', $receiverId)
-                    ->where('user_two', $currentUserId);
-            })
-            ->first();
+        if (!$currentUserId) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $conversation = Conversation::where(function ($q) use ($currentUserId, $request) {
+            $q->where('user_one', $currentUserId)
+              ->where('user_two', $request->receiver_id);
+        })->orWhere(function ($q) use ($currentUserId, $request) {
+            $q->where('user_one', $request->receiver_id)
+              ->where('user_two', $currentUserId);
+        })->first();
 
         if (!$conversation) {
-            // If conversation doesn't exist, create it. Sort IDs to maintain consistency.
-            $ids = [$currentUserId, $receiverId];
+            $ids = [$currentUserId, $request->receiver_id];
             sort($ids);
+
             $conversation = Conversation::create([
                 'user_one' => $ids[0],
                 'user_two' => $ids[1],
             ]);
         }
 
-        // Create and store message
         $message = Message::create([
             'conversation_id' => $conversation->id,
             'sender_id' => $currentUserId,
-            'message' => $text,
+            'message' => $request->text,
             'is_read' => false,
         ]);
 
         return response()->json([
             'status' => 'success',
-            // Load sender relationship for the frontend to immediately display the message
             'message' => $message->load('sender:id,name'),
         ]);
-    }
-
-    /**
-     * Marks all messages in a conversation sent by the other party as read.
-     */
-    protected function markAsRead(Conversation $conversation)
-    {
-        Message::where('conversation_id', $conversation->id)
-            ->where('sender_id', '!=', Auth::id()) // Only mark messages sent by the other user
-            ->update(['is_read' => true]);
-
-        // Note: This method is called internally by getMessages, but is public for potential API use
-        return response()->json(['status' => 'success']);
     }
 }

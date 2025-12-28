@@ -1,10 +1,11 @@
 import axios from "axios";
 
 // ================================
-//  API BASE URL
+// API BASE URL
 // ================================
 export const API_URL = "http://127.0.0.1:8000/api";
 export const ASSET_URL = "http://localhost/talentstream/talentstream-backend/public";
+
 // ================================
 // TOKEN + USER HELPERS
 // ================================
@@ -52,7 +53,7 @@ export const loginUser = async (credentials) => {
 
     const { token, user } = res.data;
 
-    // Save token + user
+    // Save token + user to local storage
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
 
@@ -62,22 +63,18 @@ export const loginUser = async (credentials) => {
 // ================================
 // LOGOUT
 // ================================
-// export const logoutUser = () => {
-//     localStorage.removeItem("token");
-//     localStorage.removeItem("user");
-// };
-
 export const logoutUser = async () => {
     try {
-        await api.post("/logout"); 
+        await api.post("/logout"); // Log out user from backend
     } catch (err) {
         console.error("Backend logout failed", err);
     } finally {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/login"; // Redirect user
+        localStorage.removeItem("token"); // Clear token from localStorage
+        localStorage.removeItem("user"); // Clear user data from localStorage
+        window.location.href = "/login"; // Redirect to login page
     }
 };
+
 // ================================
 // FETCH USER FROM BACKEND (AUTH)
 // ================================
@@ -87,10 +84,9 @@ export const getUserInfo = async () => {
         return res.data;
     } catch (err) {
         console.error("User fetch error:", err);
-        
-        // If token invalid → force logout
-        logoutUser();
 
+        // If token is invalid → force logout
+        logoutUser();
         return null;
     }
 };
@@ -112,46 +108,45 @@ export const getNotifications = async () => {
 // FETCH MESSAGES
 // ================================
 export const getMessages = async (otherUserId) => {
-  try {
-    const response = await api.get(`/chat/messages/${otherUserId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Message fetch error:", error);
-    return [];
-  }
+    try {
+        const response = await api.get(`/chat/messages/${otherUserId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Message fetch error:", error);
+        return [];
+    }
 };
+
 // ================================
 // HOME PAGE DATA FETCHING
 // ================================
-
-// Fetch all categories with job counts
 export const getCategories = async () => {
     try {
         const res = await api.get("/browse-categories");
-        return res.data || []; 
+        return res.data || [];
     } catch (err) {
         console.error("Home data load error", err);
         return [];
     }
 };
+
 // Fetch latest 6 jobs
 export const getLatestJobs = async () => {
     const res = await api.get("/browse-jobs");
     return res.data;
 };
 
-
-// auth.js or api.js
-
+// ================================
+// EMPLOYER JOB CRUD
+// ================================
 export const getEmployerJobs = async () => {
     const res = await api.get("/employer/manage-jobs");
     return res.data;
 };
 
 export const postJob = async (formData) => {
-    // Note: Use 'multipart/form-data' if you are uploading an image
     const res = await api.post("/employer/post-job", formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { "Content-Type": "multipart/form-data" }
     });
     return res.data;
 };
@@ -161,10 +156,41 @@ export const deleteJob = async (jobId) => {
     return res.data;
 };
 
-// Add this new function to auth.js
+// ================================
+// JOB FORM DATA
+// ================================
+export const getJobFormData = async () => {
+    try {
+        const user = getCurrentUser();
+        const prefix = user?.role_id === 1 ? "admin" : "employer";
+        
+        const res = await api.get(`/${prefix}/jobs/create`);
+        return res.data;
+    } catch (err) {
+        console.error("Error fetching dropdown data:", err);
+        return { categories: [], locations: [], types: [] };
+    }
+};
+
+// ================================
+// STORE JOB (Multipart for cover_image)
+// ================================
+export const storeJob = async (formData) => {
+    const user = getCurrentUser();
+    const prefix = user?.role_id === 1 ? "admin" : "employer";
+
+    const res = await api.post(`/${prefix}/jobs`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+};
+
+// ================================
+// HOME PAGE DATA (Additional)
+// ================================
 export const getHomePortalData = async () => {
     try {
-        const res = await api.get("/portal-data"); 
+        const res = await api.get("/portal-data");
         return res.data;
     } catch (err) {
         console.error("Home data fetch error", err);
@@ -172,32 +198,4 @@ export const getHomePortalData = async () => {
     }
 };
 
-
-// Fetch categories, locations, and job types for the dropdowns
-// Fetch categories, locations, and job types for the dropdowns
-export const getJobFormData = async () => {
-    try {
-        const user = getCurrentUser();
-        // Determine prefix based on role (1=Admin, 2=Employer)
-        const prefix = user?.role_id === 1 ? 'admin' : 'employer';
-        
-        // Use the /create endpoint specifically for metadata
-        const res = await api.get(`/${prefix}/jobs/create`); 
-        return res.data; 
-    } catch (err) {
-        console.error("Error fetching dropdown data:", err);
-        return { categories: [], locations: [], types: [] };
-    }
-};
-
-// Store the job (Multipart for the cover_image)
-export const storeJob = async (formData) => {
-    const user = getCurrentUser();
-    const prefix = user?.role_id === 1 ? 'admin' : 'employer';
-
-    // Employer endpoint is /api/employer/jobs
-    const res = await api.post(`/${prefix}/jobs`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
-    return res.data;
-};export default api;
+export default api;
