@@ -6,60 +6,60 @@ use App\Models\Job;
 use App\Models\Category;
 use App\Models\JobLocation;
 use App\Models\JobType;
+use App\Models\Employer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // Make sure this is included
 
-/**
- * @mixin \Illuminate\Routing\Controller
- */
-class JobController extends BaseController
+class JobController extends Controller
 {
-    use AuthorizesRequests;
+    use AuthorizesRequests; // Make sure the use statement is included to access the middleware
 
+    /**
+     * JobController constructor
+     */
     public function __construct()
     {
         // Protect all routes with sanctum authentication
-        $this->middleware('auth:sanctum');
-
-        $this->middleware('role:employer,admin')->except(['index', 'show']);
+        $this->middleware('auth:sanctum');  // Use middleware correctly
+        $this->middleware('role:employer,admin')->except(['index', 'show']);  // Assign role-based middleware
     }
 
     /* ============================
         LIST ALL JOBS (index page)
     ============================ */
     public function index(Request $request)
-{
-    $user = Auth::user();
-    $query = Job::with(['category', 'jobLocation', 'jobType', 'employer']);
+    {
+        $user = Auth::user();
+        $query = Job::with(['category', 'jobLocation', 'jobType', 'employer']);
 
-    // Admin (Role 1) sees everything
-    if ($user->role_id === 1) {
-        return response()->json([
-            'jobs' => $query->orderBy('created_at', 'desc')->paginate(15),
-            'message' => 'All jobs retrieved for admin.'
-        ]);
-    }
-
-    // Employer (Role 2) sees only their jobs
-    if ($user->role_id === 2) {
-        $employer = $user->employer;
-        if (!$employer) {
-            return response()->json(['message' => 'Employer profile not found.'], 404);
+        // Admin (Role 1) sees everything
+        if ($user->role_id === 1) {
+            return response()->json([
+                'jobs' => $query->orderBy('created_at', 'desc')->paginate(15),
+                'message' => 'All jobs retrieved for admin.'
+            ]);
         }
 
-        return response()->json([
-            'jobs' => $query->where('employer_id', $employer->id)
-                            ->orderBy('created_at', 'desc')
-                            ->paginate(15),
-            'message' => 'Your jobs retrieved successfully.'
-        ]);
+        // Employer (Role 2) sees only their jobs
+        if ($user->role_id === 2) {
+            $employer = $user->employer;
+            if (!$employer) {
+                return response()->json(['message' => 'Employer profile not found.'], 404);
+            }
+
+            return response()->json([
+                'jobs' => $query->where('employer_id', $employer->id)
+                                ->orderBy('created_at', 'desc')
+                                ->paginate(15),
+                'message' => 'Your jobs retrieved successfully.'
+            ]);
+        }
+
+        return response()->json(['message' => 'Unauthorized access.'], 403);
     }
 
-    return response()->json(['message' => 'Unauthorized access.'], 403);
-}
     /* ============================
         SHOW SINGLE JOB
     ============================ */
@@ -68,31 +68,8 @@ class JobController extends BaseController
         // Use findOrFail and load all necessary relations
         $job = Job::with(['category', 'jobLocation', 'jobType', 'employer'])->findOrFail($id);
 
-        // Fetch related jobs (same category, different ID)
-        $relatedJobs = Job::with(['category', 'jobLocation'])
-            ->where('category_id', $job->category_id)
-            ->where('id', '!=', $job->id)
-            ->limit(5)
-            ->get();
-
-        // Fetch featured jobs (active status, latest 3)
-        $featuredJobs = Job::with(['category', 'jobLocation'])
-            ->where('status', 'active')
-            ->orderBy('created_at', 'desc')
-            ->limit(3)
-            ->get();
-
-        // Fetch gallery jobs (random 6)
-        $galleryJobs = Job::with(['category', 'jobLocation'])
-            ->inRandomOrder()
-            ->limit(6)
-            ->get();
-
         return response()->json([
             'job' => $job,
-            'relatedJobs' => $relatedJobs,
-            'featuredJobs' => $featuredJobs,
-            'galleryJobs' => $galleryJobs,
             'message' => 'Job details retrieved successfully.'
         ]);
     }
@@ -109,13 +86,10 @@ class JobController extends BaseController
             return response()->json(['message' => 'You must have an employer profile to post a job.'], 403);
         }
 
-        $company = $employer->company ?? null;
-
         return response()->json([
             'categories' => Category::all(),
             'locations' => JobLocation::all(),
             'types' => JobType::all(),
-            'company' => $company, 
             'message' => 'Job creation form data retrieved.'
         ]);
     }
@@ -149,8 +123,6 @@ class JobController extends BaseController
             'cover_image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        $company = $employer->company ?? null;
-
         // Handle cover image upload using Storage facade
         $cover_image = null;
         if ($request->hasFile('cover_image')) {
@@ -161,9 +133,8 @@ class JobController extends BaseController
         $job = Job::create([
             'user_email'        => $user->email,
             'employer_id'       => $employer->id,
-            'company_id'        => $company->id ?? null,
-            'company_name'      => $company->name ?? $request->company_name, 
-            'website'           => $company->website ?? $request->website,   
+            'company_name'      => $employer->company->name ?? $request->company_name, 
+            'website'           => $employer->company->website ?? $request->website,   
             'title'             => $data['title'],
             'category_id'       => $data['category_id'],
             'job_location_id'   => $data['job_location_id'],
@@ -197,13 +168,11 @@ class JobController extends BaseController
             return response()->json(['message' => 'Unauthorized action.'], 403);
         }
 
-        $company = $user->employer->company ?? null; 
         return response()->json([
             'job' => $job,
             'categories' => Category::all(),
             'locations' => JobLocation::all(),
             'types' => JobType::all(),
-            'company' => $company,
             'message' => 'Job data for editing retrieved.'
         ]);
     }
@@ -238,20 +207,15 @@ class JobController extends BaseController
             'cover_image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        $employer = $user->employer ?? null;
-        $company = $employer->company ?? null;
+        $cover_image = $job->cover_image; 
 
         // Handle cover image upload 
-        $cover_image = $job->cover_image; 
-        
         if ($request->hasFile('cover_image')) {
-            // New file uploaded:
-            
             // 1. Delete old image if it exists
             if ($job->cover_image) {
                 Storage::disk('public')->delete($job->cover_image); 
             }
-            
+
             // 2. Upload new file
             $path = $request->file('cover_image')->store('uploads/jobs', 'public');
             $cover_image = $path;
@@ -270,8 +234,6 @@ class JobController extends BaseController
             'tagline'           => $data['tagline'] ?? $job->tagline,
             'cover_image'       => $cover_image,
             'status'            => $data['status'] ?? $job->status,
-            'company_name'      => $company->name ?? $request->company_name ?? $job->company_name,
-            'website'           => $company->website ?? $request->website ?? $job->website,
         ]);
 
         return response()->json([

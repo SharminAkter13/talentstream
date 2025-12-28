@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getJobFormData, storeJob } from "../../services/auth";
+import { getJobFormData, storeJob } from "../../services/auth"; // Update path if necessary
 import Swal from "sweetalert2";
 import Master from "../Master";
 
 const CreateJob = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    
+
     // Data for Dropdowns
     const [formOptions, setFormOptions] = useState({
         categories: [],
@@ -33,21 +33,21 @@ const CreateJob = () => {
     const [coverImage, setCoverImage] = useState(null);
 
     // Load Dropdowns on Mount
- useEffect(() => {
-    const fetchOptions = async () => {
-        try {
-            const data = await getJobFormData();
-            setFormOptions({
-                categories: data.categories || [],
-                locations: data.locations || [],
-                types: data.types || [],
-            });
-        } catch (err) {
-            console.error("Error loading form data", err);
-        }
-    };
-    fetchOptions();
-}, []);
+    useEffect(() => {
+        const fetchOptions = async () => {
+            try {
+                const data = await getJobFormData();
+                setFormOptions({
+                    categories: data.categories || [],
+                    locations: data.locations || [],
+                    types: data.types || [],
+                });
+            } catch (err) {
+                console.error("Error loading form data", err);
+            }
+        };
+        fetchOptions();
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -137,63 +137,14 @@ const CreateJob = () => {
                         </div>
                     </div>
 
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label>Tagline</label>
-                                <input name="tagline" type="text" className="form-control" onChange={handleChange} placeholder="Brief catchphrase" />
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label>Tags</label>
-                                <input name="tags" type="text" className="form-control" onChange={handleChange} placeholder="Laravel, Remote, Fulltime" />
-                            </div>
-                        </div>
-                    </div>
-
                     <div className="form-group">
                         <label>Job Description <span className="text-danger">*</span></label>
                         <textarea name="description" className="form-control" rows="5" onChange={handleChange} required></textarea>
                     </div>
 
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label>Application Email</label>
-                                <input name="application_email" type="email" className="form-control" onChange={handleChange} />
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label>Application URL</label>
-                                <input name="application_url" type="url" className="form-control" onChange={handleChange} />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="row">
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label>Closing Date</label>
-                                <input name="closing_date" type="date" className="form-control" onChange={handleChange} />
-                            </div>
-                        </div>
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label>Status</label>
-                                <select name="status" className="form-control" onChange={handleChange}>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label>Cover Image</label>
-                                <input type="file" className="form-control" onChange={handleFileChange} accept="image/*" />
-                            </div>
-                        </div>
+                    <div className="form-group">
+                        <label>Cover Image</label>
+                        <input type="file" className="form-control" onChange={handleFileChange} accept="image/*" />
                     </div>
 
                     <div className="form-group mt-3">

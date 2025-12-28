@@ -3,7 +3,7 @@ import Navbar from "../component/Navbar";
 import Sidebar from "../component/Sidebar";
 import Footer from "../component/Footer";
 import ReactApexChart from 'react-apexcharts';
- import api from "../services/auth"; // or correct path
+import api from "../services/auth"; 
 
 class Dashboard extends Component {
   constructor(props) {
@@ -12,12 +12,7 @@ class Dashboard extends Component {
       loading: true,
       error: null,
       dashboardData: {
-        metrics: {
-          total_jobs: 0,
-          total_applications: 0,
-          total_candidates: 0,
-          total_companies: 0,
-        },
+        metrics: { total_jobs: 0, total_applications: 0, total_candidates: 0, total_companies: 0 },
         charts: {
           barChart: { labels: [], data: [] },
           pieChart: { labels: [], data: [], colors: [] },
@@ -31,153 +26,123 @@ class Dashboard extends Component {
     this.fetchDashboardData();
   }
 
-
-async fetchDashboardData() {
-  try {
-    const response = await api.get("/admin/dashboard");
-
-    const data = response.data;
-
-    this.setState({
-      dashboardData: {
-        metrics: data.metrics,
-        charts: data.charts,
-      },
-      loading: false,
-    });
-  } catch (error) {
-    console.error("Error fetching dashboard data:", error);
-    this.setState({
-      error: error.response?.data?.message || "Failed to load dashboard",
-      loading: false,
-    });
+  async fetchDashboardData() {
+    try {
+      // Connects to the index() method in AdminDashboardController.php
+      const response = await api.get("/admin/dashboard");
+      this.setState({
+        dashboardData: {
+          metrics: response.data.metrics,
+          charts: response.data.charts,
+        },
+        loading: false,
+      });
+    } catch (error) {
+      this.setState({
+        error: error.response?.data?.message || "Failed to load admin data",
+        loading: false,
+      });
+    }
   }
-}
 
-
-  // Chart Options
+  // Chart configurations mapping to your Controller's JSON output
   getBarChartOptions = () => ({
     chart: { type: 'bar' },
-    plotOptions: { bar: { horizontal: false, columnWidth: '55%' } },
-    dataLabels: { enabled: false },
     xaxis: { categories: this.state.dashboardData.charts.barChart.labels },
-    title: { text: 'Applications Per Month' },
+    title: { text: 'Applications Per Month', align: 'center' },
+    colors: ['#007bff']
   });
 
   getPieChartOptions = () => ({
     chart: { type: 'pie' },
     labels: this.state.dashboardData.charts.pieChart.labels,
-    colors: this.state.dashboardData.charts.pieChart.colors,
     legend: { position: 'bottom' },
-    title: { text: 'Top Candidate Skills' },
+    title: { text: 'Top Candidate Skills', align: 'center' },
   });
 
   getLineChartOptions = () => ({
     chart: { type: 'line' },
-    dataLabels: { enabled: false },
     stroke: { curve: 'smooth' },
     xaxis: { categories: this.state.dashboardData.charts.lineChart.labels },
-    title: { text: 'Job Postings Trend' },
+    title: { text: 'Job Postings Trend (Weekly)', align: 'center' },
   });
 
   render() {
     const { loading, error, dashboardData } = this.state;
-    const metrics = dashboardData.metrics;
+    const { metrics } = dashboardData;
 
-    if (loading) {
-      return (
-        <div className="main-container text-center pt-5">
-          <h2>Loading Dashboard Data...</h2>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="main-container text-center pt-5">
-          <h2 style={{ color: "red" }}>Error: {error}</h2>
-        </div>
-      );
-    }
+    if (loading) return <div className="text-center p-5"><h3>Loading Admin Panel...</h3></div>;
 
     return (
-      <div>
+      <div className="wrapper">
         <Navbar />
         <Sidebar />
         <div className="main-container">
-          <div className="pd-ltr-20 xs-pd-20-10">
-            <div className="min-height-200px">
-              <div className="pd-20 bg-white border-radius-4 box-shadow mb-30">
-                <main className="flex-grow-1 p-4 bg-light">
-                  <div className="container">
-                    <h1 className="text-center mb-4">Dashboard Overview</h1>
+          <div className="pd-ltr-20">
+            <div className="pd-20 bg-white border-radius-4 box-shadow mb-30">
+              <h2 className="text-center mb-4">Admin System Overview</h2>
 
-                    {/* Metric Cards */}
-                    <div className="row mb-4">
-                      <div className="col-md-3 mb-3">
-                        <div className="card text-white bg-primary h-100">
-                          <div className="card-body">
-                            <h5 className="card-title">Total Jobs</h5>
-                            <p className="card-text display-6">{metrics.total_jobs}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-3 mb-3">
-                        <div className="card text-white bg-success h-100">
-                          <div className="card-body">
-                            <h5 className="card-title">Total Applications</h5>
-                            <p className="card-text display-6">{metrics.total_applications}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-3 mb-3">
-                        <div className="card text-white bg-warning h-100">
-                          <div className="card-body">
-                            <h5 className="card-title">Total Candidates</h5>
-                            <p className="card-text display-6">{metrics.total_candidates}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-3 mb-3">
-                        <div className="card text-white bg-danger h-100">
-                          <div className="card-body">
-                            <h5 className="card-title">Total Companies</h5>
-                            <p className="card-text display-6">{metrics.total_companies}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Charts */}
-                    <div className="row">
-                      <div className="col-md-6 mb-4">
-                        <ReactApexChart
-                          options={this.getBarChartOptions()}
-                          series={[{ name: 'Applications', data: dashboardData.charts.barChart.data }]}
-                          type="bar"
-                          height={300}
-                        />
-                      </div>
-                      <div className="col-md-6 mb-4">
-                        <ReactApexChart
-                          options={this.getPieChartOptions()}
-                          series={dashboardData.charts.pieChart.data}
-                          type="pie"
-                          height={300}
-                        />
-                      </div>
-                      <div className="col-md-12 mb-4">
-                        <ReactApexChart
-                          options={this.getLineChartOptions()}
-                          series={[{ name: 'Jobs Posted', data: dashboardData.charts.lineChart.data }]}
-                          type="line"
-                          height={350}
-                        />
-                      </div>
+              {/* Dynamic Metric Cards from AdminDashboardController */}
+              <div className="row mb-4">
+                <div className="col-md-3">
+                  <div className="card text-white bg-primary mb-3">
+                    <div className="card-body">
+                      <h6>Total Jobs</h6>
+                      <h3>{metrics.total_jobs}</h3>
                     </div>
                   </div>
-                </main>
+                </div>
+                <div className="col-md-3">
+                  <div className="card text-white bg-success mb-3">
+                    <div className="card-body">
+                      <h6>Total Applications</h6>
+                      <h3>{metrics.total_applications}</h3>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="card text-white bg-warning mb-3">
+                    <div className="card-body">
+                      <h6>Total Candidates</h6>
+                      <h3>{metrics.total_candidates}</h3>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="card text-white bg-danger mb-3">
+                    <div className="card-body">
+                      <h6>Total Companies</h6>
+                      <h3>{metrics.total_companies}</h3>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* Charts Section */}
+              <div className="row">
+                <div className="col-md-6 mb-4">
+                  <ReactApexChart 
+                    options={this.getBarChartOptions()} 
+                    series={[{ name: 'Apps', data: dashboardData.charts.barChart.data }]} 
+                    type="bar" height={300} 
+                  />
+                </div>
+                <div className="col-md-6 mb-4">
+                  <ReactApexChart 
+                    options={this.getPieChartOptions()} 
+                    series={dashboardData.charts.pieChart.data} 
+                    type="pie" height={300} 
+                  />
+                </div>
+                <div className="col-md-12">
+                  <ReactApexChart 
+                    options={this.getLineChartOptions()} 
+                    series={[{ name: 'Jobs', data: dashboardData.charts.lineChart.data }]} 
+                    type="line" height={300} 
+                  />
+                </div>
+              </div>
+
             </div>
           </div>
         </div>

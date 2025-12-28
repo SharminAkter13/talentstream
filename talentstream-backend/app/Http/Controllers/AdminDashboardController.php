@@ -89,20 +89,31 @@ class AdminDashboardController extends Controller
         ];
         // NOTE: For accurate weekly data, you might need a more complex query to fill in weeks with 0 posts.
 
-        return response()->json([
-            'message' => 'Admin Dashboard Data Fetched Successfully from DB',
-            'user' => $user, 
-            'metrics' => [
-                'total_jobs' => $total_jobs,
-                'total_applications' => $total_applications,
-                'total_candidates' => $total_candidates,
-                'total_companies' => $total_companies,
-            ],
-            'charts' => [
-                'barChart' => $applications_per_month,
-                'pieChart' => $top_candidate_skills,
-                'lineChart' => $job_postings_trend,
-            ],
-        ]);
-    }
+return response()->json([
+    'message' => 'Admin Dashboard Data Fetched Successfully',
+    'metrics' => [
+        'total_jobs' => $total_jobs,
+        'total_applications' => $total_applications,
+        'total_candidates' => $total_candidates,
+        'total_companies' => $total_companies,
+    ],
+    'charts' => [
+        'barChart' => [
+            // Use the formatted array you built in the for-loop
+            'labels' => $applications_per_month['labels'], 
+            'data'   => $applications_per_month['data']
+        ],
+        'pieChart' => [
+            // Use the pluck results from your $top_skills query
+            'labels' => $top_candidate_skills['labels'],
+            'data'   => $top_candidate_skills['data'],
+            'colors' => $top_candidate_skills['colors']
+        ],
+        'lineChart' => [
+            // Use the map/pluck results from your $weekly_jobs query
+            'labels' => $job_postings_trend['labels'],
+            'data'   => $job_postings_trend['data']
+        ]
+    ]
+]);    }
 }
