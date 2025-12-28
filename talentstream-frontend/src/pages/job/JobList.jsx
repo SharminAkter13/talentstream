@@ -1,105 +1,77 @@
-import React, { useEffect, useState } from "react";
-import { API_URL, getToken } from "../../services/auth";
-import { Link } from "react-router-dom";
-import Master from './../Master';
+import { useEffect, useState } from "react";
+import { getEmployerJobs, deleteJob } from "../../services/auth";
 
-const JOB_API = "/jobs";
 
-const JobList = () => {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function JobList() {
+    const [jobs, setJobs] = useState([]);
 
-  const fetchJobs = async () => {
-    const token = getToken();
+    const loadJobs = async () => {
+        const data = await getEmployerJobs();
+        setJobs(data);
+    };
 
-    const res = await fetch(`${API_URL}${JOB_API}`, {
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    useEffect(() => {
+        loadJobs();
+    }, []);
 
-    const data = await res.json();
-    setJobs(data.jobs || []);
-    setLoading(false);
-  };
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure?")) return;
 
-  useEffect(() => {
-    fetchJobs();
-  }, []);
+        await deleteJob(id);
+        loadJobs();
+        alert("Job deleted!");
+    };
 
-  const deleteJob = async (id) => {
-    if (!window.confirm("Delete this job?")) return;
+    return (
+        <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Manage Jobs</h2>
 
-    const token = getToken();
+            <a
+                href="/employer/jobs/create"
+                className="bg-blue-600 text-white px-4 py-2 rounded mb-4 inline-block"
+            >
+                + Post New Job
+            </a>
 
-    await fetch(`${API_URL}${JOB_API}/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    setJobs(jobs.filter((job) => job.id !== id));
-  };
-
-  if (loading) return <Master>Loading...</Master>;
-
-  return (
-    <Master>
-      <h2>Manage Jobs</h2>
-
-      <Link className="btn btn-primary mb-3" to="/create-job">
-        + Create Job
-      </Link>
-
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Company</th>
-            <th>Type</th>
-            <th>Location</th>
-            <th>Status</th>
-            <th width="200">Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {jobs.length === 0 && (
-            <tr>
-              <td colSpan="6" className="text-center">
-                No jobs found
-              </td>
-            </tr>
-          )}
-
-          {jobs.map((job) => (
-            <tr key={job.id}>
-              <td>{job.title}</td>
-              <td>{job.company_name}</td>
-              <td>{job.type?.name}</td>
-              <td>{job.location?.city}</td>
-              <td>{job.status}</td>
-
-              <td>
-                <Link to={`/jobs/${job.id}`} className="btn btn-info btn-sm me-2">
-                  View
-                </Link>
-                <Link to={`/jobs/${job.id}/edit`} className="btn btn-warning btn-sm me-2">
-                  Edit
-                </Link>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => deleteJob(job.id)}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Master>
-  );
+            <table className="w-full border">
+                <thead className="bg-gray-100">
+                    <tr>
+                        <th className="border p-2">Title</th>
+                        <th className="border p-2">Company</th>
+                        <th className="border p-2">Status</th>
+                        <th className="border p-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {jobs.map((job) => (
+                        <tr key={job.id}>
+                            <td className="border p-2">{job.title}</td>
+                            <td className="border p-2">{job.company_name}</td>
+                            <td className="border p-2">{job.status}</td>
+                            <td className="border p-2 space-x-2">
+                                <a
+                                    href={`/employer/jobs/${job.id}`}
+                                    className="text-blue-600"
+                                >
+                                    View
+                                </a>
+                                <a
+                                    href={`/employer/jobs/${job.id}/edit`}
+                                    className="text-green-600"
+                                >
+                                    Edit
+                                </a>
+                                <button
+                                    onClick={() => handleDelete(job.id)}
+                                    className="text-red-600"
+                                >
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 };
-
-export default JobList;

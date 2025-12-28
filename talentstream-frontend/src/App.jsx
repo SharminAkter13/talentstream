@@ -53,7 +53,7 @@ import EmployerDashboard from "./pages/EmployerDashboard";
 import CandidateDashboard from "./pages/CandidateDashboard";
 import EditUser from './pages/user/EditUser';
 import EditCategory from './pages/category/EditCategory';
-
+import ManageLocation from "./pages/locations/ManageLocation";
 
 // ===============================================
 // 🚀 FIXED PROTECTED ROUTE
@@ -126,6 +126,7 @@ const App = () => {
                     <Route path="/skills" element={<Skills />} />
                     <Route path="/interviews" element={<Interviews />} />
                     <Route path="/reports" element={<Reports />} />
+                    <Route path="/manage-location" element={<ManageLocation />} />
                 </Route>
 
                 {/* EMPLOYER */}

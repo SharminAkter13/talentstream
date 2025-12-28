@@ -139,10 +139,10 @@ export const getLatestJobs = async () => {
 // ================================
 // EMPLOYER JOB CRUD
 // ================================
-export const getEmployerJobs = async () => {
-    const res = await api.get("/employer/manage-jobs");
-    return res.data;
-};
+// export const getEmployerJobs = async () => {
+//     const res = await api.get("/employer/manage-jobs");
+//     return res.data;
+// };
 
 export const postJob = async (formData) => {
     const res = await api.post("/employer/post-job", formData, {
@@ -151,39 +151,39 @@ export const postJob = async (formData) => {
     return res.data;
 };
 
-export const deleteJob = async (jobId) => {
-    const res = await api.delete(`/employer/job/${jobId}`);
-    return res.data;
-};
+// export const deleteJob = async (jobId) => {
+//     const res = await api.delete(`/employer/job/${jobId}`);
+//     return res.data;
+// };
 
 // ================================
 // JOB FORM DATA
 // ================================
-export const getJobFormData = async () => {
-    try {
-        const user = getCurrentUser();
-        const prefix = user?.role_id === 1 ? "admin" : "employer";
+// export const getJobFormData = async () => {
+//     try {
+//         const user = getCurrentUser();
+//         const prefix = user?.role_id === 1 ? "admin" : "employer";
         
-        const res = await api.get(`/${prefix}/jobs/create`);
-        return res.data;
-    } catch (err) {
-        console.error("Error fetching dropdown data:", err);
-        return { categories: [], locations: [], types: [] };
-    }
-};
+//         const res = await api.get(`/${prefix}/jobs/create`);
+//         return res.data;
+//     } catch (err) {
+//         console.error("Error fetching dropdown data:", err);
+//         return { categories: [], locations: [], types: [] };
+//     }
+// };
 
 // ================================
 // STORE JOB (Multipart for cover_image)
 // ================================
-export const storeJob = async (formData) => {
-    const user = getCurrentUser();
-    const prefix = user?.role_id === 1 ? "admin" : "employer";
+// export const storeJob = async (formData) => {
+//     const user = getCurrentUser();
+//     const prefix = user?.role_id === 1 ? "admin" : "employer";
 
-    const res = await api.post(`/${prefix}/jobs`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
-    return res.data;
-};
+//     const res = await api.post(`/${prefix}/jobs`, formData, {
+//         headers: { "Content-Type": "multipart/form-data" },
+//     });
+//     return res.data;
+// };
 
 // ================================
 // HOME PAGE DATA (Additional)
@@ -196,6 +196,80 @@ export const getHomePortalData = async () => {
         console.error("Home data fetch error", err);
         return { categories: [], jobs: [] };
     }
+};
+
+/* ============================
+   EMPLOYER JOB CRUD API
+============================= */
+
+// Fetch employer jobs
+export const getEmployerJobs = async () => {
+    const res = await api.get("/employer/jobs");
+    return res.data.jobs;
+};
+
+// Fetch dropdown data (categories, locations, types)
+export const getJobFormData = async () => {
+    const res = await api.get("/employer/jobs/create");
+    return res.data;
+};
+
+// Store job (with image)
+export const storeJob = async (formData) => {
+    const res = await api.post("/employer/jobs", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+};
+
+// Fetch single job
+export const getSingleJob = async (id) => {
+    const res = await api.get(`/employer/jobs/${id}`);
+    return res.data;
+};
+
+// Update job
+export const updateJob = async (id, formData) => {
+    formData.append("_method", "PUT");
+    const res = await api.post(`/employer/jobs/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+};
+
+// Delete job
+export const deleteJob = async (id) => {
+    const res = await api.delete(`/employer/jobs/${id}`);
+    return res.data;
+};
+export const getLocations = async () => {
+    const res = await api.get("/admin/locations");
+    return res.data;
+};
+
+export const storeLocation = async (data) => {
+    const res = await api.post("/admin/locations", data);
+    return res.data;
+};
+
+export const deleteLocation = async (id) => {
+    const res = await api.delete(`/admin/locations/${id}`);
+    return res.data;
+};
+
+export const getSkills = async () => {
+    const res = await api.get("/admin/skills");
+    return res.data;
+};
+
+export const storeSkill = async (data) => {
+    const res = await api.post("/admin/skills", data);
+    return res.data;
+};
+
+export const deleteSkill = async (id) => {
+    const res = await api.delete(`/admin/skills/${id}`);
+    return res.data;
 };
 
 export default api;

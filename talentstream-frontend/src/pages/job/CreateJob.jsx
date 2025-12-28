@@ -1,161 +1,115 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { getJobFormData, storeJob } from "../../services/auth"; // Update path if necessary
-import Swal from "sweetalert2";
-import Master from "../Master";
+import { useEffect, useState } from "react";
+import { getJobFormData, storeJob } from "../../services/auth";
 
-const CreateJob = () => {
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-
-    // Data for Dropdowns
-    const [formOptions, setFormOptions] = useState({
+export default function JobCreate() {
+    const [formData, setFormData] = useState({
+        title: "",
+        company_name: "",
+        category_id: "",
+        job_location_id: "",
+        job_type_id: "",
+        description: "",
+        status: "active",
+    });
+    const [dropdowns, setDropdowns] = useState({
         categories: [],
         locations: [],
         types: [],
     });
 
-    // Form State (Matching Model $fillable)
-    const [formData, setFormData] = useState({
-        title: "",
-        category_id: "",
-        job_location_id: "",
-        job_type_id: "",
-        description: "",
-        application_email: "",
-        application_url: "",
-        closing_date: "",
-        tagline: "",
-        tags: "",
-        status: "active",
-    });
-
-    const [coverImage, setCoverImage] = useState(null);
-
-    // Load Dropdowns on Mount
     useEffect(() => {
-        const fetchOptions = async () => {
-            try {
-                const data = await getJobFormData();
-                setFormOptions({
-                    categories: data.categories || [],
-                    locations: data.locations || [],
-                    types: data.types || [],
-                });
-            } catch (err) {
-                console.error("Error loading form data", err);
-            }
-        };
-        fetchOptions();
+        getJobFormData().then(setDropdowns);
     }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleFileChange = (e) => {
-        setCoverImage(e.target.files[0]);
+    const handleFile = (e) => {
+        setFormData({ ...formData, cover_image: e.target.files[0] });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+        const fd = new FormData();
+        Object.keys(formData).forEach((key) => fd.append(key, formData[key]));
 
-        const submissionData = new FormData();
-        Object.keys(formData).forEach((key) => {
-            submissionData.append(key, formData[key]);
-        });
-        if (coverImage) {
-            submissionData.append("cover_image", coverImage);
-        }
-
-        try {
-            await storeJob(submissionData);
-            Swal.fire("Success", "Job posted successfully!", "success");
-            navigate("/job-list");
-        } catch (error) {
-            const msg = error.response?.data?.message || "Something went wrong";
-            Swal.fire("Error", msg, "error");
-        } finally {
-            setLoading(false);
-        }
+        await storeJob(fd);
+        alert("Job created!");
+        window.location.href = "/employer/jobs";
     };
 
     return (
-        <Master>
-            <div className="pd-20 card-box mb-30">
-                <div className="clearfix mb-20">
-                    <div className="pull-left">
-                        <h4 className="text-blue h4">Create New Job Listing</h4>
-                        <p>Only authorized employers can post listings.</p>
-                    </div>
-                </div>
+        <div className="p-6 max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold mb-4">Post New Job</h2>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="row">
-                        <div className="col-md-12">
-                            <div className="form-group">
-                                <label>Job Title <span className="text-danger">*</span></label>
-                                <input name="title" type="text" className="form-control" onChange={handleChange} required />
-                            </div>
-                        </div>
-                    </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                    name="title"
+                    placeholder="Job Title"
+                    className="border p-2 w-full"
+                    onChange={handleChange}
+                />
 
-                    <div className="row">
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label>Category <span className="text-danger">*</span></label>
-                                <select name="category_id" className="form-control" onChange={handleChange} required>
-                                    <option value="">Select Category</option>
-                                    {formOptions.categories.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label>Location <span className="text-danger">*</span></label>
-                                <select name="job_location_id" className="form-control" onChange={handleChange} required>
-                                    <option value="">Select Location</option>
-                                    {formOptions.locations.map(loc => (
-                                        <option key={loc.id} value={loc.id}>{loc.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label>Job Type <span className="text-danger">*</span></label>
-                                <select name="job_type_id" className="form-control" onChange={handleChange} required>
-                                    <option value="">Select Type</option>
-                                    {formOptions.types.map(type => (
-                                        <option key={type.id} value={type.id}>{type.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                <input
+                    name="company_name"
+                    placeholder="Company Name"
+                    className="border p-2 w-full"
+                    onChange={handleChange}
+                />
 
-                    <div className="form-group">
-                        <label>Job Description <span className="text-danger">*</span></label>
-                        <textarea name="description" className="form-control" rows="5" onChange={handleChange} required></textarea>
-                    </div>
+                <select
+                    name="category_id"
+                    className="border p-2 w-full"
+                    onChange={handleChange}
+                >
+                    <option value="">Select Category</option>
+                    {dropdowns.categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                            {c.name}
+                        </option>
+                    ))}
+                </select>
 
-                    <div className="form-group">
-                        <label>Cover Image</label>
-                        <input type="file" className="form-control" onChange={handleFileChange} accept="image/*" />
-                    </div>
+                <select
+                    name="job_location_id"
+                    className="border p-2 w-full"
+                    onChange={handleChange}
+                >
+                    <option value="">Select Location</option>
+                    {dropdowns.locations.map((l) => (
+                        <option key={l.id} value={l.id}>
+                            {l.name}
+                        </option>
+                    ))}
+                </select>
 
-                    <div className="form-group mt-3">
-                        <button type="submit" className="btn btn-primary" disabled={loading}>
-                            {loading ? "Processing..." : "Create Job Listing"}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </Master>
+                <select
+                    name="job_type_id"
+                    className="border p-2 w-full"
+                    onChange={handleChange}
+                >
+                    <option value="">Select Job Type</option>
+                    {dropdowns.types.map((t) => (
+                        <option key={t.id} value={t.id}>
+                            {t.name}
+                        </option>
+                    ))}
+                </select>
+
+                <textarea
+                    name="description"
+                    className="border p-2 w-full"
+                    placeholder="Job Description"
+                    onChange={handleChange}
+                />
+
+                <input type="file" onChange={handleFile} />
+
+                <button className="bg-blue-600 text-white px-4 py-2 rounded">
+                    Create Job
+                </button>
+            </form>
+        </div>
     );
-};
-
-export default CreateJob;
+}

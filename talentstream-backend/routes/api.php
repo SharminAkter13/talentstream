@@ -87,6 +87,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('packages', PackageController::class);
         Route::apiResource('employer-packages', EmployerPackageController::class);
         Route::get('/job-views', [JobViewController::class, 'index']);
+        Route::get('/skills', [JobSkillController::class, 'index']);
+        Route::post('/skills', [JobSkillController::class, 'store']);
+        Route::delete('/skills/{id}', [JobSkillController::class, 'destroy']);
     });
 
     // ==================================================
@@ -98,9 +101,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard', [EmployerDashboardController::class, 'dashboard']);
 
         // Employer Job CRUD (Dashboard)
-        Route::get('/jobs/create', [JobController::class, 'create']);
-        Route::get('/jobs/{job}/edit', [JobController::class, 'edit']);
-        Route::apiResource('jobs', JobController::class);
+        Route::get('jobs', [JobController::class, 'index']);
+        Route::get('jobs/create', [JobController::class, 'create']);
+        Route::post('jobs', [JobController::class, 'store']);
+        Route::get('jobs/{id}', [JobController::class, 'show']);
+        Route::post('jobs/{id}', [JobController::class, 'update']);   // because of multipart
+        Route::delete('jobs/{id}', [JobController::class, 'destroy']);
 
         // Applications
         Route::get('/job/{jobId}/applications', [EmployerManageJobController::class, 'viewApplications']);

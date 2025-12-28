@@ -4,83 +4,43 @@ namespace App\Http\Controllers;
 
 use App\Models\JobLocation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Routing\Controller as BaseController; // Import Laravel's base controller
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // Import necessary trait
+use Illuminate\Support\Facades\Validator;
 
-// Change inheritance to BaseController to ensure access to methods like middleware()
-class JobLocationController extends BaseController
+class JobLocationController extends Controller
 {
-    // Use the trait to get features like authorization checks
-    use AuthorizesRequests;
-
-    /**
-     * Require authentication for all actions.
-     */
-    public function __construct()
-    {
-        // This middleware call is now correctly resolved by BaseController inheritance
-        $this->middleware('auth');
-
-        // Optional: Restrict CUD operations to specific roles (e.g., admin)
-        // $this->middleware('can:manage-locations')->only(['create', 'store', 'edit', 'update', 'destroy']);
-    }
-
-    // List all job locations
     public function index()
     {
-        $locations = JobLocation::latest()->paginate(10);
-        return view('pages.job_locations.index', compact('locations'));
+        // Return all locations for dropdowns or management list
+        $locations = JobLocation::all();
+        return response()->json(['locations' => $locations]);
     }
 
-    // Show create form
-    public function create()
-    {
-        return view('pages.job_locations.create');
-    }
-
-    // Store new location
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'country' => 'required|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'city' => 'nullable|string|max:100',
+            'state'   => 'nullable|string|max:100',
+            'city'    => 'nullable|string|max:100',
             'address' => 'nullable|string',
             'postal_code' => 'nullable|string|max:20',
         ]);
 
-        JobLocation::create($request->all());
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
-        return redirect()->route('job_locations.index')->with('success', 'Job location added successfully.');
+        $location = JobLocation::create($request->all());
+
+        return response()->json([
+            'message' => 'Location added successfully',
+            'location' => $location
+        ], 201);
     }
 
-    // Show edit form
-    public function edit(JobLocation $jobLocation)
+    public function destroy($id)
     {
-        return view('pages.job_locations.edit', compact('jobLocation'));
-    }
-
-    // Update existing location
-    public function update(Request $request, JobLocation $jobLocation)
-    {
-        $request->validate([
-            'country' => 'required|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'city' => 'nullable|string|max:100',
-            'address' => 'nullable|string',
-            'postal_code' => 'nullable|string|max:20',
-        ]);
-
-        $jobLocation->update($request->all());
-
-        return redirect()->route('job_locations.index')->with('success', 'Job location updated successfully.');
-    }
-
-    // Delete location
-    public function destroy(JobLocation $jobLocation)
-    {
-        $jobLocation->delete();
-        return redirect()->route('job_locations.index')->with('success', 'Job location deleted successfully.');
+        $location = JobLocation::findOrFail($id);
+        $location->delete();
+        return response()->json(['message' => 'Location deleted successfully']);
     }
 }

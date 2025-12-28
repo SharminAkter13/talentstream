@@ -35,7 +35,7 @@ const Logout = () => {
             // --- 3. Redirect ---
             
             // Redirect the user to the login/register page
-            navigate('/my-account'); 
+            navigate('/login'); 
         };
 
         handleLogout();
