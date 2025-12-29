@@ -103,6 +103,7 @@ const App = () => {
                     <Route path="/manage-job" element={<ManageJob />} />
                     <Route path="/manage-application" element={<ManageApplicationPortal />} />
                     <Route path="/browse-resume" element={<BrowseResumes />} />
+                    <Route path="/jobs/:id" element={<JobDetails />} />
                 </Route>
 
                 {/* AUTH */}
@@ -137,6 +138,7 @@ const App = () => {
                     <Route path="/create-job" element={<CreateJob />} />
                     <Route path="/manage-job" element={<ManageJob />} />
                     <Route path="/manage-application" element={<ManageApplicationPortal />} />
+                    <Route path="/my-job-stats" element={<JobViewStats />} />
                 </Route>
 
                 {/* CANDIDATE */}
