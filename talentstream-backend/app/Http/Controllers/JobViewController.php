@@ -6,59 +6,58 @@ use App\Models\JobView;
 use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Routing\Controller as BaseController; // Ensure correct inheritance
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // Add AuthorizesRequests trait
+use Illuminate\Routing\Controller as BaseController;
 
 class JobViewController extends BaseController
 {
-    use AuthorizesRequests;
-
-    /**
-     * Require authentication for all actions.
-     * Restrict index (listing all views) to 'admin' role.
-     */
     public function __construct()
     {
-        // Require authentication to ensure Auth::user() is available in store()
-        $this->middleware('auth');
-
-        // Only admins (or authorized users) should see the full list of job views
-        $this->middleware('can:view-all-job-views')->only(['index']);
+        $this->middleware('auth:sanctum')->only(['index']);
     }
 
     /**
-     * Record a job view when a user lands on the job page.
-     * Uses Route Model Binding (Job $job).
+     * Track a view via API
      */
-    public function store(Job $job)
+    public function store(Request $request, $jobId)
     {
-        $user = Auth::user();
+        $job = Job::findOrFail($jobId);
+        $user = Auth::guard('sanctum')->user();
 
-        // Check if the user is authenticated and is not the employer who posted the job
-        // We only want to track views from external candidates/viewers, not the employer themselves.
-        if ($user && (!isset($job->employer_id) || $job->employer_id !== $user->id)) {
-             // Create or update the view record
+        // If user is logged in, track the view (ignore the employer who posted it)
+        if ($user && $job->employer_id !== ($user->employer->id ?? null)) {
             JobView::updateOrCreate(
                 [
                     'job_id' => $job->id,
-                    'user_id' => $user->id,
+                    'viewer_id' => $user->id, // Matching your SQL schema column 'viewer_id'
                 ],
                 [
                     'viewed_at' => now(),
                 ]
             );
+
+            return response()->json(['message' => 'View recorded']);
         }
-        // Fallback or if the user is not authenticated, still redirect to job show page
-        return redirect()->route('jobs.show', $job->id);
+
+        return response()->json(['message' => 'Anonymous view or Owner view - not tracked'], 200);
     }
 
     /**
-     * List all job views (typically for admin use).
+     * Admin/Employer View Stats
      */
     public function index()
     {
-        // Fetch views with related job and the user who viewed it (viewer)
-        $views = JobView::with(['job', 'viewer'])->latest()->paginate(25);
-        return view('pages.job_views.index', compact('views'));
+        $user = Auth::user();
+        $query = JobView::with(['job', 'viewer']);
+
+        // If employer, only show views for THEIR jobs
+        if ($user->role_id === 2) {
+            $employerId = $user->employer->id;
+            $query->whereHas('job', function($q) use ($employerId) {
+                $q->where('employer_id', $employerId);
+            });
+        }
+
+        $views = $query->latest()->paginate(20);
+        return response()->json(['job_views' => $views]);
     }
 }

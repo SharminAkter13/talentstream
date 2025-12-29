@@ -46,9 +46,9 @@ import AddJob from "./portalPages/employer/AddJob";
 import BrowseCategories from "./portalPages/candidate/BrowseCategories";
 import BrowseJobs from "./portalPages/candidate/BrowseJobs";
 import PrivacyPolicy from "./portalPages/PrivacyPolicy";
-
+import ManageJobType from "./pages/types/ManageJobType";
 import PortalLayout from "./PortalLayout";
-
+import ManageSkill from "./pages/skills/ManageSkill";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import CandidateDashboard from "./pages/CandidateDashboard";
 import EditUser from './pages/user/EditUser';
@@ -127,6 +127,8 @@ const App = () => {
                     <Route path="/interviews" element={<Interviews />} />
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/manage-location" element={<ManageLocation />} />
+                    <Route path="/manage-skill" element={<ManageSkill />} />
+                    <Route path="/manage-job-type" element={<ManageJobType />} />
                 </Route>
 
                 {/* EMPLOYER */}

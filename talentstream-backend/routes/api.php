@@ -26,7 +26,7 @@ Route::get('/browse-jobs', [BrowseJobController::class, 'index']);
 Route::get('/browse-categories', [BrowseCategoryController::class, 'index']);
 Route::get('/jobs/{job}', [JobController::class, 'show']);
 Route::get('/companies/{company}/details', [CompanyController::class, 'getCompanyDetails']);
-
+Route::post('/jobs/{id}/view', [JobViewController::class, 'store']);
 // ==============================
 // AUTHENTICATED API
 // ==============================
@@ -90,6 +90,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/skills', [JobSkillController::class, 'index']);
         Route::post('/skills', [JobSkillController::class, 'store']);
         Route::delete('/skills/{id}', [JobSkillController::class, 'destroy']);
+        Route::get('/job-types', [JobTypeController::class, 'index']);
+    Route::post('/job-types', [JobTypeController::class, 'store']);
+    Route::delete('/job-types/{id}', [JobTypeController::class, 'destroy']);
+
     });
 
     // ==================================================
@@ -114,6 +118,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Resume browsing
         Route::get('/browse-resumes', [EmployerResumeController::class, 'index']);
         Route::get('/browse-resumes/{id}', [EmployerResumeController::class, 'show']);
+        Route::get('/job-statistics/views', [JobViewController::class, 'index']);
 
         // ======================
         // PORTAL JOB POSTING

@@ -272,4 +272,34 @@ export const deleteSkill = async (id) => {
     return res.data;
 };
 
+export const getJobTypes = async () => {
+    const res = await api.get("/admin/job-types");
+    return res.data;
+};
+
+export const storeJobType = async (data) => {
+    const res = await api.post("/admin/job-types", data);
+    return res.data;
+};
+
+export const deleteJobType = async (id) => {
+    const res = await api.delete(`/admin/job-types/${id}`);
+    return res.data;
+};
+
+export const recordJobView = async (jobId) => {
+    try {
+        const res = await api.post(`/jobs/${jobId}/view`);
+        return res.data;
+    } catch (err) {
+        // Silently fail as this shouldn't break the user experience
+        console.error("Analytics Error:", err);
+    }
+};
+
+export const getJobViewStats = async () => {
+    const res = await api.get("/job-statistics/views");
+    return res.data;
+};
+
 export default api;
