@@ -54,6 +54,9 @@ import CandidateDashboard from "./pages/CandidateDashboard";
 import EditUser from './pages/user/EditUser';
 import EditCategory from './pages/category/EditCategory';
 import ManageLocation from "./pages/locations/ManageLocation";
+import JobDetails from './portalPages/job/JobDetails';
+import JobViewStats from './pages/job_view/JobViewStats';
+import CompanyCRUD from './pages/companies/CompanyCRUD';
 
 // ===============================================
 // 🚀 FIXED PROTECTED ROUTE
@@ -139,6 +142,8 @@ const App = () => {
                     <Route path="/manage-job" element={<ManageJob />} />
                     <Route path="/manage-application" element={<ManageApplicationPortal />} />
                     <Route path="/my-job-stats" element={<JobViewStats />} />
+                    <Route path="/manage-company" element={<CompanyCRUD />} />
+
                 </Route>
 
                 {/* CANDIDATE */}

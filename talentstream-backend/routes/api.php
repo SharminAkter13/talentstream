@@ -119,6 +119,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/browse-resumes', [EmployerResumeController::class, 'index']);
         Route::get('/browse-resumes/{id}', [EmployerResumeController::class, 'show']);
         Route::get('/job-statistics/views', [JobViewController::class, 'index']);
+        Route::apiResource('companies', CompanyController::class);
 
         // ======================
         // PORTAL JOB POSTING
@@ -137,8 +138,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard', [CandidateDashboardController::class, 'dashboard']);
 
         // Resume
-        Route::post('/resume', [ResumePortalController::class, 'store']);
-        Route::get('/manage-resumes', [PortalResumeController::class, 'index']);
+        // Route::post('/resume', [ResumePortalController::class, 'store']);
+        // Route::get('/manage-resumes', [PortalResumeController::class, 'index']);
+        Route::get('resumes', [ResumeController::class, 'index']);
+        Route::post('resumes', [ResumeController::class, 'store']);
+        Route::get('resumes/{resume}', [ResumeController::class, 'show']);
+        Route::post('resumes/{resume}', [ResumeController::class, 'update']); // PUT with files is difficult → use POST
+        Route::delete('resumes/{resume}', [ResumeController::class, 'destroy']);
 
         // Applications
         Route::get('/manage-applications', [CandidateManageApplicationController::class, 'index']);
