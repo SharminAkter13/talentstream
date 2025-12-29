@@ -57,6 +57,7 @@ import ManageLocation from "./pages/locations/ManageLocation";
 import JobDetails from './portalPages/job/JobDetails';
 import JobViewStats from './pages/job_view/JobViewStats';
 import CompanyCRUD from './pages/companies/CompanyCRUD';
+import ResumeList from './pages/resume/ResumeList';
 
 // ===============================================
 // 🚀 FIXED PROTECTED ROUTE
@@ -158,6 +159,13 @@ const App = () => {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/profile-setting" element={<ProfileSettings />} />
                     <Route path="/help" element={<Help />} />
+                     <Route path="/candidate-resume" element={<ResumeList />} />
+
+                    <Route path="/resume-create" element={<ResumeCreate />} />
+
+                    <Route path="/resume-edit/:id" element={<ResumeEdit />} />
+
+                    <Route path="/resume-view/:id" element={<ResumeView />} />
                 </Route>
 
             </Routes>
