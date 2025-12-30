@@ -12,8 +12,9 @@ use App\Http\Controllers\{
     ApplicationController, PortalJobController, ResumePortalController,
     EmployerResumeController, CandidateManageApplicationController,
     EmployerManageJobController, BrowseCategoryController,
-    BrowseJobController, PortalJobAlertsController, PortalResumeController
+    BrowseJobController, JobSkillController, JobTypeController, PortalJobAlertsController, PortalResumeController
 };
+use App\Http\Controllers\Employer\JobController as EmployerJobController;
 
 // ==============================
 // PUBLIC API (NO AUTH)

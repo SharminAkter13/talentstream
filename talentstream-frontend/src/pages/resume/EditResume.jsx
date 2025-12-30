@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import Master from "../../layout/Master";
+import Master from './../Master';
 
 import StepPersonal from "../../components/resume/steps/StepPersonal";
 import StepEducation from "../../components/resume/steps/StepEducation";

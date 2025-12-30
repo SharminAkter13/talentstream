@@ -46,3 +46,32 @@
   display: flex;
   align-items: center;
 }
+
+
+/* Force the toggler to show on mobile */
+@media (max-width: 991px) {
+  .navbar-toggler {
+    display: block !important;
+    background: #00BCD4; /* Matches your theme color */
+    color: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    z-index: 1001;
+  }
+
+  /* Force the menu to show when the 'show' class is present */
+  .navbar-collapse.collapse.show {
+    display: block !important;
+    background: #fff;
+    width: 100%;
+    position: absolute;
+    top: 60px; /* Adjust based on header height */
+    left: 0;
+    padding: 20px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+  }
+}

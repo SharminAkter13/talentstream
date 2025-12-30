@@ -58,6 +58,9 @@ import JobDetails from './portalPages/job/JobDetails';
 import JobViewStats from './pages/job_view/JobViewStats';
 import CompanyCRUD from './pages/companies/CompanyCRUD';
 import ResumeList from './pages/resume/ResumeList';
+import CreateResume from './pages/resume/CreateResumes';
+import ViewResume from './pages/resume/ViewResume';
+import EditResume from './pages/resume/EditResumes';
 
 // ===============================================
 // 🚀 FIXED PROTECTED ROUTE
@@ -161,11 +164,11 @@ const App = () => {
                     <Route path="/help" element={<Help />} />
                      <Route path="/candidate-resume" element={<ResumeList />} />
 
-                    <Route path="/resume-create" element={<ResumeCreate />} />
+                    <Route path="/resume-create" element={<CreateResume />} />
 
-                    <Route path="/resume-edit/:id" element={<ResumeEdit />} />
+                    <Route path="/resume-edit/:id" element={<EditResume />} />
 
-                    <Route path="/resume-view/:id" element={<ResumeView />} />
+                    <Route path="/resume-view/:id" element={<ViewResume />} />
                 </Route>
 
             </Routes>

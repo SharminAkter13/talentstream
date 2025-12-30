@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Master from "../../layout/Master";
+import Master from './../Master';
 import StepPersonal from "../../components/resume/steps/StepPersonal";
 import StepEducation from "../../components/resume/steps/StepEducation";
 import StepExperience from "../../components/resume/steps/StepExperience";

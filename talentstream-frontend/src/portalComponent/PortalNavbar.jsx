@@ -13,18 +13,14 @@ const PortalNavbar = () => {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  // Sync auth state with localStorage changes (including cross-tab)
+  // Sync auth state with localStorage changes
   useEffect(() => {
     const syncAuth = () => {
       setIsAuthenticated(isLoggedIn());
       setUserRole(getCurrentUser()?.role_id || null);
     };
 
-    // Listen for localStorage changes in other tabs
     window.addEventListener('storage', syncAuth);
-
-    // Optional: Poll localStorage changes in current tab every second
-    // to catch login/logout changes without page reload
     const interval = setInterval(syncAuth, 1000);
 
     return () => {
@@ -35,7 +31,10 @@ const PortalNavbar = () => {
 
   const navId = "main-navbar";
 
+  // Toggle the mobile menu
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
+
+  // Close menu when a link is clicked
   const closeNav = () => {
     setIsNavCollapsed(true);
     setOpenDropdown(null);
@@ -45,7 +44,6 @@ const PortalNavbar = () => {
     setOpenDropdown(openDropdown === name ? null : name);
   };
 
-  // Dashboard link based on user role
   const getDashboardLink = () => {
     switch (userRole) {
       case 1: return "/admin/dashboard";
@@ -55,13 +53,11 @@ const PortalNavbar = () => {
     }
   };
 
-  // Logout handler
   const handleLogout = () => {
     logoutUser();
     setIsAuthenticated(false);
     setUserRole(null);
     closeNav();
-    // Optionally redirect user after logout
     window.location.href = "/login";
   };
 
@@ -71,27 +67,32 @@ const PortalNavbar = () => {
         <div className="container">
           <div className="theme-header clearfix">
 
-            {/* BRAND / LOGO */}
+            {/* BRAND / LOGO & TOGGLER */}
             <div className="navbar-header">
               <button
                 className="navbar-toggler"
                 type="button"
                 onClick={handleNavCollapse}
+                aria-controls={navId}
                 aria-expanded={!isNavCollapsed}
+                aria-label="Toggle navigation"
               >
-                <span className="navbar-toggler-icon"></span>
+                {/* Line Icon for menu */}
+                <i className={isNavCollapsed ? "lni-menu" : "lni-close"}></i>
               </button>
 
               <Link to="/" className="navbar-brand" onClick={closeNav}>
-                <img src="/portal-assets//assets/img/logo.png" alt="Company Logo" />
+                <img src="/portal-assets/assets/img/logo.png" alt="Company Logo" />
               </Link>
             </div>
 
             {/* NAVBAR MENU */}
-            <div className={`${isNavCollapsed ? "collapse" : "show"} navbar-collapse`} id={navId}>
+            <div 
+              className={`collapse navbar-collapse ${!isNavCollapsed ? "show" : ""}`} 
+              id={navId}
+            >
               <ul className="navbar-nav ml-auto">
 
-                {/* HOME */}
                 <li className="nav-item">
                   <Link className="nav-link" to="/" onClick={closeNav}>Home</Link>
                 </li>
@@ -103,7 +104,6 @@ const PortalNavbar = () => {
                       onClick={(e) => { e.preventDefault(); toggleDropdown("candidate"); }}>
                       Services
                     </a>
-
                     <ul className={`dropdown-menu ${openDropdown === "candidate" ? "show" : ""}`}>
                       <li><Link className="dropdown-item" to="/browse-job" onClick={closeNav}>Browse Jobs</Link></li>
                       <li><Link className="dropdown-item" to="/browse-cat" onClick={closeNav}>Job Categories</Link></li>
@@ -120,7 +120,6 @@ const PortalNavbar = () => {
                       onClick={(e) => { e.preventDefault(); toggleDropdown("employer"); }}>
                       Services
                     </a>
-
                     <ul className={`dropdown-menu ${openDropdown === "employer" ? "show" : ""}`}>
                       <li><Link className="dropdown-item" to="/add-job" onClick={closeNav}>Post New Job</Link></li>
                       <li><Link className="dropdown-item" to="/manage-job" onClick={closeNav}>Manage Jobs</Link></li>
@@ -137,7 +136,6 @@ const PortalNavbar = () => {
                       onClick={(e) => { e.preventDefault(); toggleDropdown("explore"); }}>
                       Explore
                     </a>
-
                     <ul className={`dropdown-menu ${openDropdown === "explore" ? "show" : ""}`}>
                       <li><Link className="dropdown-item" to="/browse-job" onClick={closeNav}>Browse Jobs</Link></li>
                       <li><Link className="dropdown-item" to="/browse-resume" onClick={closeNav}>Browse Resumes</Link></li>
@@ -146,46 +144,37 @@ const PortalNavbar = () => {
                   </li>
                 )}
 
-                {/* STATIC LINKS */}
                 <li className="nav-item">
                   <Link className="nav-link" to="/about" onClick={closeNav}>About</Link>
                 </li>
-
                 <li className="nav-item">
                   <Link className="nav-link" to="/contact" onClick={closeNav}>Contact</Link>
                 </li>
 
                 {/* AUTH SECTION */}
                 {!isAuthenticated ? (
-                  // GUEST → SHOW SIGN IN
                   <li className="nav-item">
                     <Link className="nav-link" to="/login" onClick={closeNav}>Sign In</Link>
                   </li>
                 ) : (
-                  // AUTHENTICATED USER → MY ACCOUNT DROPDOWN
                   <li className={`nav-item dropdown ${openDropdown === "account" ? "show" : ""}`}>
                     <a href="#!" className="nav-link dropdown-toggle"
                       onClick={(e) => { e.preventDefault(); toggleDropdown("account"); }}>
                       My Account
                     </a>
-
                     <ul className={`dropdown-menu ${openDropdown === "account" ? "show" : ""}`}>
                       <li>
                         <Link className="dropdown-item" to={getDashboardLink()} onClick={closeNav}>
                           Dashboard
                         </Link>
                       </li>
-
                       <li>
-                        <button className="dropdown-item" onClick={handleLogout}>
-                          Logout
-                        </button>
+                        <button className="dropdown-item" onClick={handleLogout}>Logout</button>
                       </li>
                     </ul>
                   </li>
                 )}
 
-                {/* POST JOB BUTTON (Only Employer + Guests) */}
                 {(userRole === 2 || !isAuthenticated) && (
                   <li className="button-group p-2">
                     <Link to="/post-job" className="btn btn-common" onClick={closeNav}>
@@ -193,14 +182,10 @@ const PortalNavbar = () => {
                     </Link>
                   </li>
                 )}
-
               </ul>
             </div>
-
           </div>
         </div>
-
-        <div className="mobile-menu" data-logo="/assets/img/logo-mobile.png"></div>
       </nav>
     </header>
   );
