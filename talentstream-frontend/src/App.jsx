@@ -153,6 +153,7 @@ const App = () => {
                 {/* CANDIDATE */}
                 <Route element={<ProtectedRoute role={3} />}>
                     <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
+                    <Route path="/job-alerts" element={<JobAlerts />} />
                 </Route>
 
                 {/* SHARED AUTH ROUTES */}

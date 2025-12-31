@@ -127,6 +127,12 @@ const Sidebar = () => {
                     <span className="mtext">Browse Jobs</span>
                   </Link>
                 </li>
+                <li>
+      <Link to="/job-alerts" className="dropdown-toggle no-arrow" onClick={closeMenu}>
+        <span className="micon dw dw-notification" />
+        <span className="mtext">Job Alerts</span>
+      </Link>
+    </li>
               </>
             )}
 
