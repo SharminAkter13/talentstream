@@ -43,18 +43,22 @@ Route::middleware('auth:sanctum')->group(function () {
     // ======================
     // NOTIFICATIONS (API)
     // ======================
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+});
 
     // ======================
     // CHAT / MESSAGING (API)
     // ======================
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/chat/contacts', [MessageController::class, 'getContacts']);
     Route::get('/chat/messages/{otherUserId}', [MessageController::class, 'getMessages']);
     Route::post('/chat/send', [MessageController::class, 'sendMessage']);
-
+    Route::post('/chat/seen', [MessageController::class, 'markAsSeen']);
+});
     // ======================
     // JOB ALERTS
     // ======================
@@ -77,8 +81,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:1')->prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index']);
         Route::apiResource('categories', CategoryController::class);
-        Route::apiResource('users', UserController::class)->except(['show']);
         Route::post('/users/{user}/approve', [UserController::class, 'approve']);
+        Route::apiResource('users', UserController::class)->except(['show']);
         Route::apiResource('resumes', ResumeController::class);
         Route::apiResource('jobs', JobController::class)->except(['store']);
         Route::apiResource('candidates', CandidateController::class)->except(['show']);
