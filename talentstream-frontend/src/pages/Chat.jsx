@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Echo from 'laravel-echo';
 import axios from 'axios';
 import { getToken, getUserInfo } from '../services/auth'; // Ensure getUserInfo is available
-
+import Master from './Master';
 const Chat = ({ selectedContactId }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
@@ -98,6 +98,7 @@ const Chat = ({ selectedContactId }) => {
     const markSeenApi = (id) => axios.post('/api/chat/seen', { conversation_id: id });
 
     return (
+         <Master>
         <div className="chat-container card-box" style={{ display: 'flex', flexDirection: 'column', height: '500px' }}>
             <div className="chat-body customscroll" style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
                 {messages.map((m, i) => (
@@ -124,6 +125,7 @@ const Chat = ({ selectedContactId }) => {
                 <button className="btn btn-primary ml-2">Send</button>
             </form>
         </div>
+        </Master>
     );
 };
 
