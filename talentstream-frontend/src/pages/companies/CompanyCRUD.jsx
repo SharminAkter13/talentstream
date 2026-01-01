@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Master from "../Master";
+// import Master from './../Master';
 
 const API_URL = "http://127.0.0.1:8000/api/companies";
 
@@ -57,6 +59,7 @@ export default function CompanyCRUD() {
   };
 
   return (
+    <Master>
     <div className="container" style={{ padding: 20 }}>
       <h2>Company CRUD</h2>
 
@@ -126,5 +129,6 @@ export default function CompanyCRUD() {
         </tbody>
       </table>
     </div>
+    </Master>
   );
 }

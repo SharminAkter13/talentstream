@@ -17,6 +17,7 @@ const JobDetails = () => {
     if (!job) return <div>Loading...</div>;
 
     return (
+        
         <div className="job-container">
             <h1>{job.title}</h1>
             <p>{job.description}</p>
@@ -24,3 +25,4 @@ const JobDetails = () => {
         </div>
     );
 };
+export default JobDetails;
