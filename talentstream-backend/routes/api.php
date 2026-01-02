@@ -116,8 +116,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('jobs/{id}', [JobController::class, 'destroy']);
 
         // Applications
-        Route::get('/job/{jobId}/applications', [EmployerManageJobController::class, 'viewApplications']);
-
+        Route::get('/applications', [ApplicationController::class, 'index']);
+        Route::get('/applications/{id}', [ApplicationController::class, 'show']);
         // Resume browsing
         Route::get('/browse-resumes', [EmployerResumeController::class, 'index']);
         Route::get('/browse-resumes/{id}', [EmployerResumeController::class, 'show']);
@@ -150,7 +150,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('resumes/{resume}', [ResumeController::class, 'destroy']);
 
         // Applications
-        Route::get('/manage-applications', [CandidateManageApplicationController::class, 'index']);
         Route::get('/applications', [ApplicationController::class, 'index']);
         Route::get('/applications/{id}', [ApplicationController::class, 'show']);
         Route::post('/jobs/{job}/apply', [ApplicationController::class, 'store']);

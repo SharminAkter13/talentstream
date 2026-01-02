@@ -11,54 +11,33 @@ use Illuminate\Support\Facades\Storage;
 class ApplicationController extends Controller
 {
    
-    public function index()
-    {
-        $user = Auth::user();
-        $applications = collect(); // Initialize a collection
+public function index()
+{
+    $user = Auth::user();
 
-        // Admin: can see all applications
-        if ($user->role?->name === 'admin') {
-            $applications = Application::with(['job', 'candidate'])
-                ->latest()
-                ->paginate(10);
-        }
-        elseif ($user->role?->name === 'candidate') {
-            $candidate = $user->candidate;
-
-            if (!$candidate) {
-                // Changed to return JSON error
-                return response()->json(['error' => 'No candidate profile found.'], 404);
-            }
-
-            $applications = Application::with(['job', 'candidate'])
-                ->where('candidate_id', $candidate->id)
-                ->latest()
-                ->paginate(10);
-        }
-        // Employer: see applications for their jobs
-        elseif ($user->role?->name === 'employer') {
-            $employer = $user->employer;
-
-            if (!$employer) {
-                // Changed to return JSON error
-                return response()->json(['error' => 'No employer profile found.'], 404);
-            }
-
-            $applications = Application::with(['job', 'candidate'])
-                ->whereHas('job', fn($q) => $q->where('employer_id', $employer->id))
-                ->latest()
-                ->paginate(10);
-        }
-        // Anyone else — deny access
-        else {
-            // Changed to return JSON error (403 Forbidden)
-            return response()->json(['error' => 'Unauthorized access.'], 403);
-        }
+    // 1. Employer Logic (Role 2)
+    if ($user->role_id == 2) {
+        $employer = \App\Models\Employer::where('user_id', $user->id)->first();
         
-        // Final return for success path
-        return response()->json(['applications' => $applications]);
+        $applications = Application::with(['job', 'candidate.user'])
+            ->whereHas('job', function($q) use ($employer) {
+                $q->where('employer_id', $employer->id);
+            })
+            ->latest()
+            ->paginate(10);
+    } 
+    // 2. Candidate Logic (Role 3)
+    else {
+        $candidate = \App\Models\Candidate::where('user_id', $user->id)->first();
+
+        $applications = Application::with(['job.employer.user', 'candidate.user'])
+            ->where('candidate_id', $candidate->id)
+            ->latest()
+            ->paginate(10);
     }
 
+    return response()->json(['applications' => $applications]);
+}
     /**
      * Store a newly created application.
      */
@@ -111,28 +90,10 @@ class ApplicationController extends Controller
     /**
      * Display a specific application.
      */
-    public function show($id)
+public function show($id)
     {
-        $application = Application::with(['job', 'candidate'])->findOrFail($id);
-        $user = Auth::user();
-
-        // Candidate: can only see their own
-        if ($user->role?->name === 'candidate' && $application->candidate_id !== $user->candidate->id) {
-            abort(403, 'Unauthorized access.'); // Using abort is fine for a quick 403
-        }
-
-        // Employer: can only see applications for their jobs
-        if ($user->role?->name === 'employer') {
-            $employer = $user->employer;
-
-            if (!$employer || $application->job->employer_id !== $employer->id) {
-                abort(403, 'Unauthorized access.');
-            }
-        }
-
-        // Admin: full access — no restriction
-
-        // Changed to return JSON
+        // Load with nested user to get names
+        $application = Application::with(['job', 'candidate.user', 'employer.user'])->findOrFail($id);
         return response()->json(['application' => $application]);
     }
 }

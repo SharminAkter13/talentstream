@@ -20,42 +20,26 @@ class Application extends Model
         'cover_letter',
     ];
 
-    /**
-     * Get the Job that the application belongs to.
-     */
-    public function job(): BelongsTo
-    {
-        return $this->belongsTo(Job::class);
-    }
+// App\Models\Application.php
 
-
-    /**
-     * Get the Candidate (User) who submitted the application.
-     */
-    public function candidate()
-    {
-        // Assuming Candidate is a User with a specific role, or linked via a separate 'candidates' table.
-        // Based on your current relationship structure, we link Application -> candidate_id -> User.
-        return $this->belongsTo(User::class, 'candidate_id');
-    }
-
-    /**
-     * Get the Employer associated with the Job for this application.
-     * This uses a HasOneThrough relationship:
-     * 1. Looks through the Job model.
-     * 2. Finds the Employer model via the Job's employer_id.
-     */
-    public function employer()
-    {
-        // Path: Application -> Job -> Employer
-        // The employer is related to the application through the job.
-        return $this->hasOneThrough(
-            Employer::class,    // The final model we wish to access
-            Job::class,         // The intermediate model
-            'id',               // Foreign key on the intermediate table (jobs.id)
-            'id',               // Foreign key on the final table (employers.id) - assuming job.employer_id points to employers.id
-            'job_id',           // Local key on the applications table
-            'employer_id'       // Local key on the jobs table that links to the employer
-        );
-    }
+public function candidate() {
+    return $this->belongsTo(Candidate::class, 'candidate_id');
 }
+
+
+
+public function job() {
+    return $this->belongsTo(Job::class, 'job_id');
+} 
+
+public function employer()
+{
+    return $this->hasOneThrough(
+        Employer::class,    // The final model we want
+        Job::class,         // The intermediate model (the bridge)
+        'id',               // Foreign key on jobs table (jobs.id)
+        'id',               // Foreign key on employers table (employers.id)
+        'job_id',           // Local key on applications table
+        'employer_id'       // Local key on jobs table
+    );
+}}

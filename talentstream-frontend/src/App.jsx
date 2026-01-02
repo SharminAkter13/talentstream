@@ -177,8 +177,8 @@ const App = () => {
                     <Route path="/notification-detail/:id" element={<NotificationDetail />} />
                     <Route path="/application-view/:id" element={<ApplicationView />} />
                     {/* --- ADD THESE MESSAGING ROUTES --- */}
-<Route path="/messages" element={<Chat />} />
-    <Route path="/messages/:id" element={<Chat />} />
+                    <Route path="/messages" element={<Chat />} />
+                    <Route path="/messages/:id" element={<Chat />} />
                     </Route>
 
             </Routes>
