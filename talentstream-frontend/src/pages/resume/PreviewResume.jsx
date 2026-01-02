@@ -10,7 +10,7 @@ const PreviewResume = () => {
 
   useEffect(() => {
     const load = async () => {
-      const res = await axios.get(`http://127.0.0.1:8000/api/resumes/${id}`);
+      const res = await axios.get(`http://127.0.0.1:8000/api/candidate/resumes/${id}`);
       setResume(res.data);
     };
     load();

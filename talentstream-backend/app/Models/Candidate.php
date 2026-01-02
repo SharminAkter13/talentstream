@@ -17,4 +17,9 @@ class Candidate extends Model
     {
         return $this->hasMany(application::class);
     }
+
+    public function resume()
+    {
+        return $this->belongsTo(Resume::class);
+    }
 }

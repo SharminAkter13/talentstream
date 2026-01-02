@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('resumes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('candidate_id')->nullable();
             $table->string('name');
             $table->string('email');
             $table->string('profession_title')->nullable();
@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->string('cover_image')->nullable();
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('candidate_id')->references('id')->on('candidates')->onDelete('set null');
         });
     }
 

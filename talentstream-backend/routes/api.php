@@ -83,11 +83,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('categories', CategoryController::class);
         Route::post('/users/{user}/approve', [UserController::class, 'approve']);
         Route::apiResource('users', UserController::class)->except(['show']);
-        Route::apiResource('resumes', ResumeController::class);
         Route::apiResource('jobs', JobController::class)->except(['store']);
         Route::apiResource('candidates', CandidateController::class)->except(['show']);
         Route::apiResource('employers', EmployerController::class)->except(['show']);
-        Route::apiResource('companies', CompanyController::class);
         Route::apiResource('job-locations', JobLocationController::class);
         Route::apiResource('packages', PackageController::class);
         Route::apiResource('employer-packages', EmployerPackageController::class);

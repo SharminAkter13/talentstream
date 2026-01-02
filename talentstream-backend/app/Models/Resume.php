@@ -16,6 +16,10 @@ class Resume extends Model
         'user_id', 'name', 'email', 'profession_title', 'location',
         'web', 'pre_hour', 'age', 'cover_image'
     ];
+    public function candidate()
+    {
+        return $this->belongsTo(Candidate::class);
+    }
 
     public function educations()
     {

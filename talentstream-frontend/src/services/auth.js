@@ -301,5 +301,44 @@ export const getJobViewStats = async () => {
     const res = await api.get("/job-statistics/views");
     return res.data;
 };
+/* ============================
+   CANDIDATE RESUME API
+============================= */
+
+// Fetch all resumes for the logged-in candidate
+export const getCandidateResumes = async () => {
+    const res = await api.get("/candidate/resumes");
+    // Based on your ResumeController.php, data is wrapped in a 'data' key
+    return res.data.data; 
+};
+
+// Get a single resume by ID
+export const getResumeDetail = async (id) => {
+    const res = await api.get(`/candidate/resumes/${id}`);
+    return res.data;
+};
+
+// Store a new resume (Multipart for cover_image)
+export const storeResume = async (formData) => {
+    const res = await api.post("/candidate/resumes", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+};
+
+// Update an existing resume
+// We use POST with _method=POST or just POST because files don't work well with PUT in Laravel
+export const updateResume = async (id, formData) => {
+    const res = await api.post(`/candidate/resumes/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+};
+
+// Delete a resume
+export const deleteResume = async (id) => {
+    const res = await api.delete(`/candidate/resumes/${id}`);
+    return res.data;
+};
 
 export default api;

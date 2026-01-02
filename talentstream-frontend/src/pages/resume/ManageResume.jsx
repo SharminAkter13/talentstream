@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Master from './../Master';
 import axios from 'axios'; // Use Axios for cleaner requests
 
-const RESUME_API = "/admin/resumes";
+const RESUME_API = "/candidate/resumes";
 
 // Helper function to get the base asset URL (removes '/api' if present)
 const getAssetBaseUrl = (apiUrl) => {
