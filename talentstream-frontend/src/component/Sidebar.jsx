@@ -76,6 +76,20 @@ const Sidebar = () => {
                     <span className="mtext">All Job Listings</span>
                   </Link>
                 </li>
+                <li>
+                  <Link to="/manage-application-admin" className="dropdown-toggle no-arrow" onClick={closeMenu}>
+                    <span className="micon dw dw-file" />
+                    <span className="mtext">Applications</span>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link to="/reports" className="dropdown-toggle no-arrow" onClick={closeMenu}>
+                    <span className="micon dw dw-analytics-21" />
+                    <span className="mtext">Reports</span>
+                  </Link>
+                </li>
+
               </>
             )}
 
@@ -100,9 +114,9 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/manage-application" className="dropdown-toggle no-arrow" onClick={closeMenu}>
+                  <Link to="/employer/applications" className="dropdown-toggle no-arrow" onClick={closeMenu}>
                     <span className="micon dw dw-file" />
-                    <span className="mtext">Applications</span>
+                    <span className="mtext">Candidate Applications</span>
                   </Link>
                 </li>
               </>
@@ -128,15 +142,29 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li>
-      <Link to="/job-alerts" className="dropdown-toggle no-arrow" onClick={closeMenu}>
-        <span className="micon dw dw-notification" />
-        <span className="mtext">Job Alerts</span>
-      </Link>
-    </li>
+                  <Link to="/job-alerts" className="dropdown-toggle no-arrow" onClick={closeMenu}>
+                    <span className="micon dw dw-notification" />
+                    <span className="mtext">Job Alerts</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/candidate/applications" className="dropdown-toggle no-arrow" onClick={closeMenu}>
+                    <span className="micon dw dw-file" />
+                    <span className="mtext">My Applications</span>
+                  </Link>
+                </li>
+
               </>
             )}
 
             {/* ================= SHARED AUTH ROUTES ================= */}
+            <li>
+              <Link to="/messages" className="dropdown-toggle no-arrow" onClick={closeMenu}>
+                <span className="micon dw dw-chat" />
+                <span className="mtext">Messages</span>
+              </Link>
+            </li>
+
             <li>
               <Link to="/profile" className="dropdown-toggle no-arrow" onClick={closeMenu}>
                 <span className="micon dw dw-user" />

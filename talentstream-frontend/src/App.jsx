@@ -64,6 +64,9 @@ import EditResume from './pages/resume/EditResumes';
 import JobAlerts from './portalPages/candidate/JobAlerts';
 import NotificationDetail from './pages/NotificationDetail';
 import Chat from "./pages/Chat";
+import ApplicationView from './pages/application/ApplicationView';
+import ApplicationList from './pages/application/ApplicationList';
+import ApplyJobForm from './portalPages/ApplyJobForm';
 // ===============================================
 // 🚀 FIXED PROTECTED ROUTE
 // ===============================================
@@ -113,6 +116,7 @@ const App = () => {
                     <Route path="/manage-application" element={<ManageApplicationPortal />} />
                     <Route path="/browse-resume" element={<BrowseResumes />} />
                     <Route path="/jobs/:id" element={<JobDetails />} />
+                    <Route path="/apply-job/:job_id" element={<ApplyJobForm />} />
                 </Route>
 
                 {/* AUTH */}
@@ -149,7 +153,7 @@ const App = () => {
                     <Route path="/manage-application" element={<ManageApplicationPortal />} />
                     <Route path="/my-job-stats" element={<JobViewStats />} />
                     <Route path="/manage-company" element={<CompanyCRUD />} />
-
+                    <Route path="/employer/applications" element={<ApplicationList />} />
                 </Route>
 
                 {/* CANDIDATE */}
@@ -162,16 +166,16 @@ const App = () => {
                     <Route path="/resume-create" element={<CreateResume />} />
                     <Route path="/resume-edit/:id" element={<EditResume />} />
                     <Route path="/resume-view/:id" element={<ViewResume />} />
-
+                    <Route path="/candidate/applications" element={<ApplicationList />} />
                 </Route>
 
                 {/* SHARED AUTH ROUTES */}
                 <Route element={<ProtectedRoute />}>
-                    <Route path="/application" element={<Application />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/profile-setting" element={<ProfileSettings />} />
                     <Route path="/help" element={<Help />} />
                     <Route path="/notification-detail/:id" element={<NotificationDetail />} />
+                    <Route path="/application-view/:id" element={<ApplicationView />} />
                     {/* --- ADD THESE MESSAGING ROUTES --- */}
 <Route path="/messages" element={<Chat />} />
     <Route path="/messages/:id" element={<Chat />} />

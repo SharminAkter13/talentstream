@@ -25,7 +25,7 @@ export const hasRole = (roleId) => {
 // ================================
 // AXIOS INSTANCE (AUTO AUTH HEADER)
 // ================================
-const api = axios.create({
+export const api = axios.create({
     baseURL: API_URL,
     headers: {
         "Content-Type": "application/json",
