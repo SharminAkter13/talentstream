@@ -14,11 +14,7 @@ use Exception;
 
 class MessageController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:sanctum');
-    }
-
+    
     /**
      * Get list of contacts with last message and unread count
      */
