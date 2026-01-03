@@ -1,53 +1,50 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Echo from 'laravel-echo';
-import axios from 'axios';
-import { getToken, getUserInfo } from '../services/auth';
+import Pusher from 'pusher-js';
+import { api, getCurrentUser } from '../services/auth';
+
+window.Pusher = Pusher;
 
 const Chat = ({ selectedContactId }) => {
+    const [userId] = useState(() => getCurrentUser()?.id || null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const [conversationId, setConversationId] = useState(null);
-    const [userId, setUserId] = useState(null);
     const scrollRef = useRef();
 
-    // 1. Get Current User Info
-    useEffect(() => {
-        const initUser = async () => {
-            const user = await getUserInfo();
-            if (user) setUserId(user.id);
-        };
-        initUser();
-    }, []);
-
-    // 2. Fetch Messages when contact changes
+    // 1. Fetch Messages when contact changes
     useEffect(() => {
         if (selectedContactId) {
-            axios.get(`/api/chat/messages/${selectedContactId}`).then(res => {
-                setMessages(res.data.messages);
-                setConversationId(res.data.conversation_id);
-                if (res.data.conversation_id) {
-                    markSeenApi(res.data.conversation_id);
-                }
-            });
+            api.get(`/chat/messages/${selectedContactId}`)
+                .then(res => {
+                    setMessages(res.data.messages || []);
+                    setConversationId(res.data.conversation_id);
+                    if (res.data.conversation_id) {
+                        api.post('/chat/seen', { conversation_id: res.data.conversation_id });
+                    }
+                })
+                .catch(err => console.error("Could not load messages", err));
         }
     }, [selectedContactId]);
 
-    // 3. Setup Real-time Echo Listener
+    // 2. Real-time Setup
     useEffect(() => {
         if (!conversationId) return;
 
         const echo = new Echo({
-            broadcaster: 'reverb', 
+            broadcaster: 'reverb',
             key: import.meta.env.VITE_REVERB_APP_KEY,
             wsHost: import.meta.env.VITE_REVERB_HOST,
-            forceTLS: false,
+            wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+            wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+            forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
             enabledTransports: ['ws', 'wss'],
             authorizer: (channel) => ({
                 authorize: (socketId, callback) => {
-                    axios.post('/api/broadcasting/auth', {
+                    api.post('/broadcasting/auth', {
                         socket_id: socketId,
                         channel_name: channel.name
-                    }, { headers: { Authorization: `Bearer ${getToken()}` } })
+                    })
                     .then(res => callback(false, res.data))
                     .catch(err => callback(true, err));
                 }
@@ -57,75 +54,62 @@ const Chat = ({ selectedContactId }) => {
         const channel = echo.private(`chat.${conversationId}`);
         
         channel.listen('MessageSent', (e) => {
-            // Only add if it's not our own message (we add ours locally for speed)
             if (e.message.sender_id !== userId) {
                 setMessages(prev => [...prev, e.message]);
-                markSeenApi(conversationId);
+                api.post('/chat/seen', { conversation_id: conversationId });
             }
-        })
-        .listen('ChatSeen', () => {
+        }).listen('ChatSeen', () => {
             setMessages(prev => prev.map(m => ({ ...m, is_read: true })));
         });
 
         return () => echo.leave(`chat.${conversationId}`);
     }, [conversationId, userId]);
 
-    // 4. Auto-scroll to bottom
+    // 3. Auto-scroll
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
     const handleSend = async (e) => {
         e.preventDefault();
-        if (!newMessage.trim()) return;
+        if (!newMessage.trim() || !selectedContactId) return;
 
         try {
-            const res = await axios.post('/api/chat/send', {
+            const res = await api.post('/chat/send', {
                 receiver_id: selectedContactId,
                 text: newMessage
             });
-            // res.data.message contains the full message object from your PHP controller
             setMessages(prev => [...prev, res.data.message]);
             setNewMessage("");
         } catch (err) {
-            console.error("Failed to send message", err);
+            console.error("Send error", err);
         }
     };
 
-    const markSeenApi = (id) => axios.post('/api/chat/seen', { conversation_id: id });
-
     return (
-        <div className="chat-container bg-white" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            {/* Message List */}
-            <div className="chat-body customscroll" style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+        <div className="chat-window d-flex flex-column h-100 bg-white">
+            <div className="chat-body p-3 flex-grow-1 overflow-auto">
                 {messages.map((m, i) => (
                     <div key={i} className={`mb-3 d-flex flex-column ${m.sender_id === userId ? 'align-items-end' : 'align-items-start'}`}>
-                        <div 
-                            className={`p-2 px-3 rounded shadow-sm ${m.sender_id === userId ? 'bg-primary text-white' : 'bg-light text-dark'}`} 
-                            style={{ maxWidth: '75%', borderRadius: '15px' }}
-                        >
+                        <div className={`p-2 px-3 rounded shadow-sm ${m.sender_id === userId ? 'bg-primary text-white' : 'bg-light'}`} style={{ maxWidth: '80%', borderRadius: '18px' }}>
                             <p className="mb-0">{m.message}</p>
                         </div>
                         <small className="text-muted mt-1" style={{ fontSize: '10px' }}>
-                            {m.sender_id === userId && (
-                                <span>{m.is_read ? "✓✓ Seen" : "✓ Sent"}</span>
-                            )}
+                            {m.sender_id === userId && (m.is_read ? "✓✓ Seen" : "✓ Sent")}
                         </small>
                     </div>
                 ))}
                 <div ref={scrollRef} />
             </div>
 
-            {/* Input Area */}
-            <form onSubmit={handleSend} className="chat-footer d-flex p-3 border-top bg-light">
+            <form onSubmit={handleSend} className="p-3 border-top bg-light d-flex">
                 <input 
-                    className="form-control border-0 shadow-none" 
+                    className="form-control" 
                     value={newMessage} 
                     onChange={e => setNewMessage(e.target.value)} 
-                    placeholder="Type a message..."
-                    style={{ background: 'transparent' }}
+                    placeholder="Write a message..."
                 />
-                <button className="btn btn-primary ml-2 rounded-circle" style={{ width: '40px', height: '40px' }}>
+                <button type="submit" className="btn btn-primary ml-2">
                     <i className="fa fa-paper-plane"></i>
                 </button>
             </form>
@@ -133,4 +117,5 @@ const Chat = ({ selectedContactId }) => {
     );
 };
 
+// CRITICAL FIX: Add this line to solve the SyntaxError in ChatPage.jsx
 export default Chat;

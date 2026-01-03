@@ -20,7 +20,7 @@ use App\Http\Controllers\Employer\JobController as EmployerJobController;
 // PUBLIC API (NO AUTH)
 // ==============================
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::get('/portal-data', [PortalController::class, 'index']);
 Route::get('/browse-jobs', [BrowseJobController::class, 'index']);
@@ -54,12 +54,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // CHAT / MESSAGING (API)
     // ======================
 Route::middleware('auth:sanctum')->group(function () {
+    // Shared Chat Routes
     Route::get('/chat/contacts', [MessageController::class, 'getContacts']);
     Route::get('/chat/messages/{otherUserId}', [MessageController::class, 'getMessages']);
     Route::post('/chat/send', [MessageController::class, 'sendMessage']);
     Route::post('/chat/seen', [MessageController::class, 'markAsSeen']);
-});
-    // ======================
+});    // ======================
     // JOB ALERTS
     // ======================
     Route::apiResource('job-alerts', JobAlertController::class)->except(['show']);
