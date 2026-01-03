@@ -9,8 +9,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ChatSeen implements ShouldBroadcast
-{
+class ChatSeen implements \Illuminate\Contracts\Broadcasting\ShouldBroadcastNow{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $conversationId;
