@@ -63,10 +63,10 @@ import ViewResume from './pages/resume/ViewResume';
 import EditResume from './pages/resume/EditResumes';
 import JobAlerts from './portalPages/candidate/JobAlerts';
 import NotificationDetail from './pages/NotificationDetail';
-import Chat from "./pages/Chat";
 import ApplicationView from './pages/application/ApplicationView';
 import ApplicationList from './pages/application/ApplicationList';
 import ApplyJobForm from './portalPages/ApplyJobForm';
+import ChatPage from './pages/ChatPage';
 // ===============================================
 // 🚀 FIXED PROTECTED ROUTE
 // ===============================================
@@ -177,8 +177,8 @@ const App = () => {
                     <Route path="/notification-detail/:id" element={<NotificationDetail />} />
                     <Route path="/application-view/:id" element={<ApplicationView />} />
                     {/* --- ADD THESE MESSAGING ROUTES --- */}
-                    <Route path="/messages" element={<Chat />} />
-                    <Route path="/messages/:id" element={<Chat />} />
+                    <Route path="/messages" element={<ChatPage />} />
+                    <Route path="/messages/:id" element={<ChatPage />} />
                     </Route>
 
             </Routes>
