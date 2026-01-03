@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Master from './Master';
 import Chat from './Chat'; // This is your existing Chat component
-import { api } from '../services/auth'; // Ensure you use 'api'
+import { api, getToken, getCurrentUser } from '../services/auth'; 
 
 const ChatPage = () => {
     const [contacts, setContacts] = useState([]);
@@ -13,20 +13,19 @@ const ChatPage = () => {
     }, []);
 
 
+// Change this line at the top of the file
+
 const fetchContacts = async () => {
     try {
-        // Change 'axios.get' to 'api.get'
-        // Also ensure the path starts with /api/
-        const res = await api.get('/chat/contacts'); 
+        const res = await api.get('/chat/contacts');
+        console.log("Contacts API Response:", res.data); // Debugging line
         
-        // Handle different possible data structures from Laravel
-        const contactData = Array.isArray(res.data) ? res.data : (res.data.contacts || res.data.data || []);
-        
-        setContacts(contactData);
+        // Based on your controller, it returns a direct array of contacts
+        setContacts(res.data || []); 
         setLoading(false);
     } catch (err) {
         console.error("Error fetching contacts", err);
-        setContacts([]); 
+        setContacts([]);
         setLoading(false);
     }
 };

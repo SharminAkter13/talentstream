@@ -46,7 +46,6 @@ class User extends Authenticatable
         public function role() {
             return $this->belongsTo(Role::class);
             }
-            // App\Models\User.php
 
 public function employer() {
     return $this->hasOne(Employer::class);
