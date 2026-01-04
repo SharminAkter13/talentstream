@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 24, 2025 at 05:29 AM
+-- Generation Time: Jan 04, 2026 at 07:42 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,6 +40,13 @@ CREATE TABLE `applications` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `applications`
+--
+
+INSERT INTO `applications` (`id`, `job_id`, `candidate_id`, `employer_id`, `applied_date`, `status`, `resume_submitted`, `cover_letter`, `created_at`, `updated_at`) VALUES
+(3, 9, 1, 3, '2025-12-29 03:53:07', 'active', '2025-12-29 03:53:07', NULL, NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -51,6 +58,13 @@ CREATE TABLE `cache` (
   `value` mediumtext NOT NULL,
   `expiration` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('laravel-cache-boost.roster.scan', 'a:2:{s:6:\"roster\";O:21:\"Laravel\\Roster\\Roster\":3:{s:13:\"\0*\0approaches\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:0:{}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:11:\"\0*\0packages\";O:32:\"Laravel\\Roster\\PackageCollection\":2:{s:8:\"\0*\0items\";a:10:{i:0;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:5:\"^12.0\";s:10:\"\0*\0package\";E:37:\"Laravel\\Roster\\Enums\\Packages:LARAVEL\";s:14:\"\0*\0packageName\";s:17:\"laravel/framework\";s:10:\"\0*\0version\";s:7:\"12.39.0\";s:6:\"\0*\0dev\";b:0;}i:1;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:6:\"v0.3.7\";s:10:\"\0*\0package\";E:37:\"Laravel\\Roster\\Enums\\Packages:PROMPTS\";s:14:\"\0*\0packageName\";s:15:\"laravel/prompts\";s:10:\"\0*\0version\";s:5:\"0.3.7\";s:6:\"\0*\0dev\";b:0;}i:2;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:1:\"*\";s:10:\"\0*\0package\";E:36:\"Laravel\\Roster\\Enums\\Packages:REVERB\";s:14:\"\0*\0packageName\";s:14:\"laravel/reverb\";s:10:\"\0*\0version\";s:5:\"1.6.3\";s:6:\"\0*\0dev\";b:0;}i:3;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:4:\"^4.2\";s:10:\"\0*\0package\";E:37:\"Laravel\\Roster\\Enums\\Packages:SANCTUM\";s:14:\"\0*\0packageName\";s:15:\"laravel/sanctum\";s:10:\"\0*\0version\";s:5:\"4.2.1\";s:6:\"\0*\0dev\";b:0;}i:4;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:6:\"v0.3.4\";s:10:\"\0*\0package\";E:33:\"Laravel\\Roster\\Enums\\Packages:MCP\";s:14:\"\0*\0packageName\";s:11:\"laravel/mcp\";s:10:\"\0*\0version\";s:5:\"0.3.4\";s:6:\"\0*\0dev\";b:1;}i:5;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:5:\"^1.24\";s:10:\"\0*\0package\";E:34:\"Laravel\\Roster\\Enums\\Packages:PINT\";s:14:\"\0*\0packageName\";s:12:\"laravel/pint\";s:10:\"\0*\0version\";s:6:\"1.25.1\";s:6:\"\0*\0dev\";b:1;}i:6;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:5:\"^1.41\";s:10:\"\0*\0package\";E:34:\"Laravel\\Roster\\Enums\\Packages:SAIL\";s:14:\"\0*\0packageName\";s:12:\"laravel/sail\";s:10:\"\0*\0version\";s:6:\"1.48.1\";s:6:\"\0*\0dev\";b:1;}i:7;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:7:\"^11.5.3\";s:10:\"\0*\0package\";E:37:\"Laravel\\Roster\\Enums\\Packages:PHPUNIT\";s:14:\"\0*\0packageName\";s:15:\"phpunit/phpunit\";s:10:\"\0*\0version\";s:7:\"11.5.44\";s:6:\"\0*\0dev\";b:1;}i:8;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:10:\"\0*\0package\";E:34:\"Laravel\\Roster\\Enums\\Packages:ECHO\";s:14:\"\0*\0packageName\";s:12:\"laravel-echo\";s:10:\"\0*\0version\";s:5:\"2.2.7\";s:6:\"\0*\0dev\";b:0;}i:9;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:10:\"\0*\0package\";E:41:\"Laravel\\Roster\\Enums\\Packages:TAILWINDCSS\";s:14:\"\0*\0packageName\";s:11:\"tailwindcss\";s:10:\"\0*\0version\";s:6:\"4.1.18\";s:6:\"\0*\0dev\";b:1;}}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:21:\"\0*\0nodePackageManager\";E:43:\"Laravel\\Roster\\Enums\\NodePackageManager:NPM\";}s:9:\"timestamp\";i:1767467800;}', 1767554200);
 
 -- --------------------------------------------------------
 
@@ -81,6 +95,13 @@ CREATE TABLE `candidates` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `candidates`
+--
+
+INSERT INTO `candidates` (`id`, `user_id`, `name`, `resume`, `phone`, `address`, `created_at`, `updated_at`) VALUES
+(1, 3, 'Jane Candidate', NULL, '555-9999', '123 Talent Lane, New York', '2025-12-28 21:34:33', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -102,7 +123,8 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`id`, `name`, `image_path`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-(1, 'HRM', 'category_images/ZwoOgAgHNSTiZA26PWnleDNq5HiXT5mo2ClbpyYu.jpg', 1, 1, '2025-12-23 00:03:13', '2025-12-23 00:05:28');
+(1, 'HRM', 'category_images/ZwoOgAgHNSTiZA26PWnleDNq5HiXT5mo2ClbpyYu.jpg', 1, 1, '2025-12-23 00:03:13', '2025-12-23 00:05:28'),
+(2, 'Engineering', 'category_images/LoQcQRHbhjTmNNcaMsalJdeBcTeqo9qd53pDN0KO.jpg', 1, 2, '2025-12-23 22:42:49', '2025-12-23 22:44:48');
 
 -- --------------------------------------------------------
 
@@ -126,6 +148,14 @@ CREATE TABLE `companies` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `companies`
+--
+
+INSERT INTO `companies` (`id`, `name`, `industry`, `description`, `website`, `address`, `contact_email`, `contact_phone`, `logo`, `established_year`, `size`, `created_at`, `updated_at`) VALUES
+(2, 'TechNova Solutions', 'Software', 'Leading AI and Cloud solutions.', 'https://technova.com', NULL, 'hr@technova.com', '0132465245', NULL, 2001, '50-200', '2025-12-28 21:32:28', NULL),
+(3, 'Creative Pulse', 'Marketing', 'Digital marketing and branding agency.', 'https://creativepulse.io', NULL, 'jobs@creativepulse.io', '0145785444', NULL, 1999, '11-50', '2025-12-28 21:32:28', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -139,6 +169,14 @@ CREATE TABLE `conversations` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `conversations`
+--
+
+INSERT INTO `conversations` (`id`, `user_one`, `user_two`, `created_at`, `updated_at`) VALUES
+(1, 2, 3, '2026-01-03 22:09:01', '2026-01-03 22:09:01'),
+(2, 3, 4, '2026-01-03 22:47:32', '2026-01-03 22:47:32');
 
 -- --------------------------------------------------------
 
@@ -179,6 +217,13 @@ CREATE TABLE `employers` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `employers`
+--
+
+INSERT INTO `employers` (`id`, `user_id`, `company_id`, `name`, `company_name`, `website`, `phone`, `address`, `created_at`, `updated_at`) VALUES
+(3, 2, 2, 'John Employer', 'TechNova Solutions', NULL, '555-0101', NULL, '2025-12-28 21:34:33', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -194,6 +239,13 @@ CREATE TABLE `employer_packages` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `employer_packages`
+--
+
+INSERT INTO `employer_packages` (`id`, `employer_id`, `package_id`, `start_date`, `end_date`, `created_at`, `updated_at`) VALUES
+(3, 3, 1, '2026-01-04 12:22:42', '2026-01-04 12:22:42', '2026-01-04 06:22:42', '2026-01-04 06:22:42');
 
 -- --------------------------------------------------------
 
@@ -239,6 +291,16 @@ CREATE TABLE `jobs` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `jobs`
+--
+
+INSERT INTO `jobs` (`id`, `employer_id`, `company_id`, `category_id`, `job_type_id`, `job_skill_id`, `job_location_id`, `title`, `description`, `salary_min`, `salary_max`, `posted_date`, `application_deadline`, `num_vacancies`, `status`, `created_at`, `updated_at`) VALUES
+(9, 3, 2, 1, 1, 1, 1, 'Senior Backend Developer', 'Looking for a Laravel expert to lead our team.', 70000.00, 120000.00, '2025-12-29 03:43:06', '2026-02-01 00:00:00', 1, 'active', NULL, NULL),
+(10, 3, 3, 1, 2, 5, 2, 'Creative UI Designer', 'Designing beautiful interfaces for mobile apps.', 50000.00, 90000.00, '2025-12-29 03:43:06', '2026-01-15 00:00:00', 1, 'active', NULL, NULL),
+(11, 3, 2, 1, 1, 1, 1, 'Senior Backend Developer', 'Looking for a Laravel expert to lead our team.', 70000.00, 120000.00, '2025-12-29 03:43:06', '2026-02-01 00:00:00', 1, 'active', NULL, NULL),
+(12, 3, 3, 1, 2, 5, 2, 'Creative UI Designer', 'Designing beautiful interfaces for mobile apps.', 50000.00, 90000.00, '2025-12-29 03:43:06', '2026-01-15 00:00:00', 1, 'active', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -288,6 +350,14 @@ CREATE TABLE `job_locations` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `job_locations`
+--
+
+INSERT INTO `job_locations` (`id`, `country`, `state`, `city`, `address`, `postal_code`, `created_at`, `updated_at`) VALUES
+(1, 'USA', 'NY', 'New York', 'Manhattan Tech District', '10001', NULL, NULL),
+(2, 'Remote', 'N/A', 'Worldwide', 'Digital Nomad Friendly', '00000', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -300,6 +370,17 @@ CREATE TABLE `job_skills` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `job_skills`
+--
+
+INSERT INTO `job_skills` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(1, 'Laravel', NULL, NULL),
+(2, 'React', NULL, NULL),
+(3, 'MySQL', NULL, NULL),
+(4, 'Project Management', NULL, NULL),
+(5, 'UI/UX Design', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -315,6 +396,15 @@ CREATE TABLE `job_types` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `job_types`
+--
+
+INSERT INTO `job_types` (`id`, `name`, `description`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'Full-time', 'Standard 40-hour work week', 1, NULL, NULL),
+(2, 'Remote', 'Work from anywhere', 1, NULL, NULL),
+(3, 'Contract', 'Project-based employment', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -346,6 +436,16 @@ CREATE TABLE `messages` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `conversation_id`, `sender_id`, `message`, `is_read`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 'Hi Jane, we loved your resume. Are you available for a call?', 0, '2025-12-28 21:53:43', NULL),
+(12, 1, 3, 'Hi  I have sent my resume .', 0, '2026-01-03 22:29:03', '2026-01-03 22:29:03'),
+(14, 2, 3, 'i would like to talk to you about the job post you have publish', 0, '2026-01-03 22:47:32', '2026-01-03 22:47:32'),
+(16, 1, 3, 'Please review it and give me feedback', 0, '2026-01-04 00:05:02', '2026-01-04 00:05:02');
 
 -- --------------------------------------------------------
 
@@ -408,6 +508,13 @@ CREATE TABLE `notifications` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `user_id`, `type`, `message`, `is_read`, `created_at`, `updated_at`) VALUES
+(1, 3, 'application_status', 'Your application for Senior Backend Developer was viewed.', 0, '2025-12-28 21:53:43', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -423,6 +530,15 @@ CREATE TABLE `packages` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `packages`
+--
+
+INSERT INTO `packages` (`id`, `name`, `price`, `duration_days`, `features`, `created_at`, `updated_at`) VALUES
+(1, 'Basic Plan', 0.00, 30, 'Post up to 2 jobs', NULL, NULL),
+(2, 'Pro Plan', 49.99, 30, 'Post up to 20 jobs', NULL, NULL),
+(3, 'Enterprise', 199.99, 365, 'Unlimited job posts', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -454,6 +570,20 @@ CREATE TABLE `personal_access_tokens` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `personal_access_tokens`
+--
+
+INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
+(1, 'App\\Models\\User', 1, 'API Token', '686bbe967affbe04f5276eef53a5abb1cecbb7f591783e9c938b67b3a7afb0dd', '[\"*\"]', '2025-12-27 00:31:33', NULL, '2025-12-26 21:33:47', '2025-12-27 00:31:33'),
+(2, 'App\\Models\\User', 1, 'API Token', 'f0d617f1ec0cf44aaba09e491997c3b3b9df0294d3cdc7ca53fe525b93600e7c', '[\"*\"]', '2025-12-27 00:59:04', NULL, '2025-12-26 21:45:59', '2025-12-27 00:59:04'),
+(4, 'App\\Models\\User', 2, 'API Token', 'd62293696fa4034219ec51e8726cee14a8c84a00c877a9cde664ab3477d239b7', '[\"*\"]', '2025-12-30 00:30:02', NULL, '2025-12-26 22:10:32', '2025-12-30 00:30:02'),
+(5, 'App\\Models\\User', 2, 'API Token', '4ea67a75ea29deb9e530b28057479614184f3c4b0d7558872eeb93590e82d1a1', '[\"*\"]', NULL, NULL, '2025-12-27 01:05:43', '2025-12-27 01:05:43'),
+(6, 'App\\Models\\User', 2, 'API Token', '0cbfde5edd742815e5b6d9042a53d5dd36edf1490157e7111a3a22279d4f9097', '[\"*\"]', '2025-12-27 21:15:18', NULL, '2025-12-27 21:14:39', '2025-12-27 21:15:18'),
+(7, 'App\\Models\\User', 1, 'API Token', '5ae8f59c2e7477b45b50423f50e007e12cef95471ac907675bb31505948b6a1b', '[\"*\"]', '2025-12-28 00:37:13', NULL, '2025-12-27 21:36:13', '2025-12-28 00:37:13'),
+(8, 'App\\Models\\User', 3, 'API Token', '967213eaf5c1ef2f8a73ca418d758204f66ef7562bc2a598d6ef5d9e65b2d33c', '[\"*\"]', '2026-01-04 00:41:43', NULL, '2026-01-03 22:07:55', '2026-01-04 00:41:43'),
+(9, 'App\\Models\\User', 1, 'API Token', '867f8ccd5fe0c229d0a3d4cc7bb76e00f49b46af90d71653aeab27bed1f4de82', '[\"*\"]', '2026-01-04 00:41:58', NULL, '2026-01-04 00:34:03', '2026-01-04 00:41:58');
 
 -- --------------------------------------------------------
 
@@ -530,11 +660,16 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('aH24UsmOtbf9gRhp0YUzrsSLfm7vkGDuQGhtlirF', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoib1ZDOGNjNmd3Wk1idEVQNmJqRXBVZmt3NzZTa29JM3RKNXpRbGdzRyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766808565),
 ('bcSbvn7pamuxexWBD6frHN4ZvRtPxpvSFNpbvxej', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiMUdrZXBLTWJybXhENG9uY1UzUjRFMzhXVWtpV2luSmhmZG5xM2ZjayI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1765779007),
 ('DQiyV2T1VS1wUbntNoLtQyalMjelE6iAQXkLrQSI', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicUlKOFhkRThYa2cxb0g2YzRUTHZVaTFiTUl0SkFYNFA2WTBKZVEzRiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1764731891),
+('f11XO9E2wvGr2AgqbPcx72WMkFSIUgqnaWqZGK85', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWndUSFdwc254U3FuUTNKejZIWEVHYlljbDF6MG5rV3ZkRzZEaTF5RSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766803789),
+('F3Zca0guHJzKii5r94dHkLNEgfO8LyI6CJyPFluY', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUWZKQVo1TmFlWnpxbGtVRkh3NWFZTlE5bzhxQUN3cGJWWERpV2NJOCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766890865),
+('h7Ggor6hqCToME1gn0jp6GTnTA24rwyfIaAzbDp9', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoieHNXa2JnRms1YWZWdE5XZHRURjdCRGZnaUU4QVB0TVBCellwemJmdCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1767499503),
 ('heTxdLyKm8QCBtd12KNjxlEZAcyM6mptHV2GJQO7', NULL, '127.0.0.1', 'PostmanRuntime/7.51.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNFdqeFNOZ1ZBSlFuREY3UW9XREJkbjZUdFJSUnBQQ0x4ZW5ZT3RGbCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766464384),
 ('Mrir1asf2XcavkMhUEXemIgsOoIw2Lb1TBnJfxJt', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibGFwdUlMa0d2T2RoUTRPdWZudEJaQk13TG4yY3NSdktaR1NMU3NyeiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1764816938),
 ('oJoq4sxL66pQ7e07mfEI4nN7asNZgCsJnKSO3yQU', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiTXJjc244M2o5bHhERjAyT3psU0tOdjJoTXAxcG9zUWp5aW53QkY3UyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766463631),
+('pxhofHeimPyPnvnnNatL7Iwa33Lf1ahuqXcUyUeo', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoic3hKdVoyclBuNnp5cnNKMzB6NEpqOGRYd2gwQ2J0YzRiaVFaaHFvSCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766555849),
 ('ZxQ8UFntVuD31MK8Zw3mABV2a73M9edDAbMLLe0A', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibzRBUWVRTkNhVVB0TTRXZlFLNnZUV0c4OVA5SWlyTTMwTEJMcGJBNSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1764643142);
 
 -- --------------------------------------------------------
@@ -577,7 +712,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `role_id`, `name`, `email`, `email_verified_at`, `password`, `api_token`, `status`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Admin', 'admin@gmail.com', '2025-12-01 20:38:33', '$2y$12$lWHIVy85JaT1s7BSQf9fA.yIlooGrKt0wbYhCa7mPyzFTa2g1HmfW', 'FXe9Cs88pzw3m7I14xM2ZZ1o9CAbSQ3DIqNtzyfxSrcBqaNB1fhPF0spMnjC', 'active', NULL, '2025-12-01 20:38:33', '2025-12-22 23:28:09'),
+(1, 1, 'Admin', 'admin@gmail.com', '2025-12-01 20:38:33', '$2y$12$lWHIVy85JaT1s7BSQf9fA.yIlooGrKt0wbYhCa7mPyzFTa2g1HmfW', '2G8EYRmxyku9tGt6E2g2vlzO2EIyTNqPBifPDDxsldNECPysX9MT2DdxWNtL', 'active', NULL, '2025-12-01 20:38:33', '2025-12-23 22:41:00'),
 (2, 2, 'Employer', 'employer@gmail.com', '2025-12-01 20:38:33', '$2y$12$VzyJotDjJiiX6J2qZfBseuhroqTLws4F8h30nu9cj3g6abAcRvzFa', '2hBY9ih4fx2YH2wUzU6FqZHMHvjE5X0sSWRQsgWXOwFdnh3a7w8H8DkTkQE2', 'active', NULL, '2025-12-01 20:38:33', '2025-12-22 22:46:19'),
 (3, 3, 'Candidate', 'candidate@gmail.com', '2025-12-01 20:38:34', '$2y$12$aHgpKDIMu4/uewgvyv5wm.q3k5cOWk3FgtGU2qqvcaCAzqUxhMfV2', '3jZjg2es9nzA5MJ6C6Q3cInDj1FSK63zjgiyz9ID7Qf9aMV5eAEwIS0KoTia', 'active', NULL, '2025-12-01 20:38:34', '2025-12-22 22:46:37'),
 (4, 2, 'Ayaan', 'ayaan@gmail.com', NULL, '$2y$12$te.RX6nwNAlr8WfWj4sTvuK9Q9M6kuH7RYDou45roPV4h8wZQe6Iu', NULL, 'pending', NULL, '2025-12-22 23:29:32', '2025-12-22 23:29:32');
@@ -814,31 +949,31 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `applications`
 --
 ALTER TABLE `applications`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `candidates`
 --
 ALTER TABLE `candidates`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `companies`
 --
 ALTER TABLE `companies`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `conversations`
 --
 ALTER TABLE `conversations`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `educations`
@@ -850,13 +985,13 @@ ALTER TABLE `educations`
 -- AUTO_INCREMENT for table `employers`
 --
 ALTER TABLE `employers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `employer_packages`
 --
 ALTER TABLE `employer_packages`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `experiences`
@@ -868,7 +1003,7 @@ ALTER TABLE `experiences`
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `job_alerts`
@@ -886,19 +1021,19 @@ ALTER TABLE `job_bookmarks`
 -- AUTO_INCREMENT for table `job_locations`
 --
 ALTER TABLE `job_locations`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `job_skills`
 --
 ALTER TABLE `job_skills`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `job_types`
 --
 ALTER TABLE `job_types`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `job_views`
@@ -910,7 +1045,7 @@ ALTER TABLE `job_views`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -922,19 +1057,19 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `packages`
 --
 ALTER TABLE `packages`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `profiles`
