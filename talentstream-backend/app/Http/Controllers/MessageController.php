@@ -124,18 +124,17 @@ class MessageController extends Controller
             $receiverId = $request->receiver_id;
 
             // 1. Find or Create Conversation
-            $conversation = Conversation::where(function ($q) use ($currentUserId, $receiverId) {
-                $q->where('user_one', $currentUserId)->where('user_two', $receiverId);
-            })->orWhere(function ($q) use ($currentUserId, $receiverId) {
-                $q->where('user_one', $receiverId)->where('user_two', $currentUserId);
-            })->first();
+$conversation = Conversation::where(function ($q) use ($currentUserId, $receiverId) {
+    $q->where('user_one', $currentUserId)->where('user_two', $receiverId);
+})->orWhere(function ($q) use ($currentUserId, $receiverId) {
+    $q->where('user_one', $receiverId)->where('user_two', $currentUserId);
+})->first();
 
-            if (!$conversation) {
-                // Ensure user_one is always the smaller ID for consistency
-                $ids = [$currentUserId, $receiverId];
-                sort($ids);
-                $conversation = Conversation::create(['user_one' => $ids[0], 'user_two' => $ids[1]]);
-            }
+if (!$conversation) {
+    $ids = [$currentUserId, $receiverId];
+    sort($ids);
+    $conversation = Conversation::create(['user_one' => $ids[0], 'user_two' => $ids[1]]);
+}
 
             // 2. Save Message
             $message = Message::create([
@@ -180,4 +179,18 @@ class MessageController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    public function destroy($messageId)
+{
+    $message = Message::findOrFail($messageId);
+
+    // Optional: make sure user can only delete their own messages
+    if ($message->sender_id !== auth()->id()) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    $message->delete();
+
+    return response()->json(['success' => true]);
+}
+
 }

@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/chat/messages/{otherUserId}', [MessageController::class, 'getMessages']);
     Route::post('/chat/send', [MessageController::class, 'sendMessage']);
     Route::post('/chat/seen', [MessageController::class, 'markAsSeen']);
+     Route::delete('/chat/messages/{messageId}', [MessageController::class, 'destroy']);
 });    // ======================
     // JOB ALERTS
     // ======================

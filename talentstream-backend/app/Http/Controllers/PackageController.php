@@ -4,70 +4,64 @@ namespace App\Http\Controllers;
 
 use App\Models\Package;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller as BaseController; // Use BaseController
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // Use AuthorizesRequests
+use Illuminate\Routing\Controller as BaseController;
 
 class PackageController extends BaseController
 {
-    use AuthorizesRequests;
-
-    public function __construct()
-    {
-        // Typically, package management (CRUD) is restricted to Admins (role_id 1)
-        // Add middleware for authorization checks (e.g., 'can:manage-packages')
-        $this->middleware('auth');
-        $this->middleware('can:manage-packages')->except(['index', 'show']); // Assuming 'index' might be public or for all authenticated users
-    }
-
     /**
-     * Display a listing of the packages.
+     * Display a listing of packages as JSON for frontend.
      */
     public function index()
     {
-        $packages = Package::latest()->paginate(10);
-        return view('pages.packages.index', compact('packages'));
+        // Fetch all packages, latest first
+        $packages = Package::latest()->get();
+
+        // Return JSON response
+        return response()->json([
+            'success' => true,
+            'packages' => $packages,
+        ]);
     }
 
     /**
-     * Show the form for creating a new package.
-     */
-    public function create()
-    {
-        return view('pages.packages.create');
-    }
-
-    /**
-     * Store a newly created package in storage.
+     * Store a newly created package.
      */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:packages,name', // Added unique validation
-            'price' => 'required|numeric|min:0', // Price should be required and non-negative
-            'duration_days' => 'required|integer|min:1', // Duration should be required and positive
+            'name' => 'required|string|max:255|unique:packages,name',
+            'price' => 'required|numeric|min:0',
+            'duration_days' => 'required|integer|min:1',
             'features' => 'nullable|string',
         ]);
 
-        Package::create($request->all());
+        $package = Package::create($request->all());
 
-        return redirect()->route('packages.index')->with('success', 'Package created successfully.');
+        return response()->json([
+            'success' => true,
+            'package' => $package,
+            'message' => 'Package created successfully',
+        ]);
     }
 
     /**
-     * Show the form for editing the specified package.
+     * Show a single package as JSON.
      */
-    public function edit(Package $package)
+    public function show(Package $package)
     {
-        return view('pages.packages.edit', compact('package'));
+        return response()->json([
+            'success' => true,
+            'package' => $package,
+        ]);
     }
 
     /**
-     * Update the specified package in storage.
+     * Update a package.
      */
     public function update(Request $request, Package $package)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:packages,name,' . $package->id, // Added unique validation ignoring current ID
+            'name' => 'required|string|max:255|unique:packages,name,' . $package->id,
             'price' => 'required|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
             'features' => 'nullable|string',
@@ -75,19 +69,23 @@ class PackageController extends BaseController
 
         $package->update($request->all());
 
-        return redirect()->route('packages.index')->with('success', 'Package updated successfully.');
+        return response()->json([
+            'success' => true,
+            'package' => $package,
+            'message' => 'Package updated successfully',
+        ]);
     }
 
     /**
-     * Remove the specified package from storage.
+     * Delete a package.
      */
     public function destroy(Package $package)
     {
-        // Before deletion, you might want to check if any active subscriptions rely on this package
-        // For simplicity, we'll proceed with direct deletion.
-
         $package->delete();
 
-        return redirect()->route('packages.index')->with('success', 'Package deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Package deleted successfully',
+        ]);
     }
 }
