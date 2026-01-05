@@ -3,9 +3,9 @@ import axios from "axios";
 // ================================
 // API BASE URL
 // ================================
-export const API_URL = "http://127.0.0.1:8000/api";
-export const ASSET_URL = "http://localhost/talentstream/talentstream-backend/public";
-
+// Update these constants for production
+export const API_URL = "https://talenthunt-project.sharmin.online/api/api"; 
+export const ASSET_URL = "https://talenthunt-project.sharmin.online/api";
 // ================================
 // TOKEN + USER HELPERS
 // ================================
