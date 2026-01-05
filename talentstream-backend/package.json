@@ -15,7 +15,9 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "apexcharts": "^5.3.6",
         "laravel-echo": "^2.2.7",
-        "pusher-js": "^8.4.0"
+        "pusher-js": "^8.4.0",
+        "react-apexcharts": "^1.9.0"
     }
 }

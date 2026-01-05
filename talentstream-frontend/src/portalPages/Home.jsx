@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getHomePortalData, ASSET_URL } from "../services/auth";
+import { api, getHomePortalData, ASSET_URL } from "../services/auth";
 import HeroSection from "./../portalComponent/HeroSection";
 
 const Home = () => {
@@ -27,15 +27,19 @@ const Home = () => {
     loadHomeData();
   }, []);
 
-  // Load packages
+  // Load packages (fetch public API for packages)
+// In your Home.jsx file
+
 useEffect(() => {
   const fetchPackages = async () => {
     try {
-      const res = await api.get("/admin/packages"); // <-- use axios instance
-      setPackages(res.data.data || res.data || []); // depends if Laravel returns paginated or array
+      const res = await api.get("/packages"); 
+      // Ensure we extract the array correctly from the backend response
+      const packageData = res.data.data || res.data || [];
+      setPackages(packageData);
     } catch (err) {
       console.error("Error fetching packages", err);
-      setPackages([]);
+      setPackages([]); 
     } finally {
       setLoading(false);
     }
@@ -43,7 +47,6 @@ useEffect(() => {
 
   fetchPackages();
 }, []);
-
   if (loading) return <div className="loader">Loading...</div>;
 
   return (
@@ -111,7 +114,7 @@ useEffect(() => {
                   <div className={`icon bg-color-${(index % 8) + 1}`}>
                     {cat.image_path ? (
                       <img
-                        src={`${ASSET_URL}/storage/${cat.image_path}`}
+                        src={`${ASSET_URL}/storage/${cat.image_path}`}  // Ensure the path is correct
                         alt={cat.name}
                         style={{
                           width: "50px",
@@ -182,33 +185,37 @@ useEffect(() => {
             <h2 className="section-title">Pricing Plan</h2>
           </div>
           <div className="row g-4">
-            {packages.map((pkg) => (
-              <div className="col-lg-4 col-md-6 col-12" key={pkg.id}>
-                <div className={`pricing-table ${pkg.borderColorClass}`}>
-                  <div className="pricing-details">
-                    <div className="icon">
-                      <i className={pkg.iconClass}></i>
+            {packages.length > 0 ? (
+              packages.map((pkg) => (
+                <div className="col-lg-4 col-md-6 col-12" key={pkg.id}>
+                  <div className={`pricing-table ${pkg.borderColorClass}`}>
+                    <div className="pricing-details">
+                      <div className="icon">
+                        <i className={pkg.iconClass}></i>
+                      </div>
+                      <h2>{pkg.name}</h2>
+                      <ul>
+                        {pkg.features.map((feature, idx) => (
+                          <li key={idx}>{feature}</li>
+                        ))}
+                      </ul>
+                      <div className="price">
+                        <span>$</span>
+                        {pkg.price}
+                        <span>/Month</span>
+                      </div>
                     </div>
-                    <h2>{pkg.name}</h2>
-                    <ul>
-                      {pkg.features.map((feature, idx) => (
-                        <li key={idx}>{feature}</li>
-                      ))}
-                    </ul>
-                    <div className="price">
-                      <span>$</span>
-                      {pkg.price}
-                      <span>/Month</span>
+                    <div className="plan-button">
+                      <Link to={`/buy-package/${pkg.id}`} className="btn btn-border">
+                        Get Started
+                      </Link>
                     </div>
-                  </div>
-                  <div className="plan-button">
-                    <Link to={`/buy-package/${pkg.id}`} className="btn btn-border">
-                      Get Started
-                    </Link>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="col-12 text-center">No packages available.</div>
+            )}
           </div>
         </div>
       </section>

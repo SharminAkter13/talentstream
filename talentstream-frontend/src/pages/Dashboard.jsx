@@ -2,16 +2,44 @@ import React, { Component } from "react";
 import Navbar from "../component/Navbar";
 import Sidebar from "../component/Sidebar";
 import Footer from "../component/Footer";
-import ReactApexChart from 'react-apexcharts';
-import api from "../services/auth"; 
+import Chart from "react-apexcharts"; // Fixed import
+import api from "../services/auth";
 
+/* ---------------- CHART ERROR BOUNDARY ---------------- */
+class ChartErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    console.error("Chart Error:", error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="alert alert-warning text-center">
+          Chart failed to load
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+/* ---------------- DASHBOARD ---------------- */
 class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
       error: null,
-      dashboardData: null, // Start as null to detect when data arrives
+      dashboardData: null,
     };
   }
 
@@ -21,25 +49,19 @@ class Dashboard extends Component {
 
   async fetchDashboardData() {
     try {
-      // Log exactly what URL we are hitting
-      console.log("Fetching from: /admin/dashboard");
-      
       const response = await api.get("/admin/dashboard");
-      console.log("Full API Response:", response);
 
-      if (response.data) {
-        this.setState({
-          dashboardData: response.data,
-          loading: false,
-          error: null
-        });
-      } else {
-        throw new Error("Response success but no data found");
-      }
-    } catch (error) {
-      console.error("Dashboard API Error:", error);
       this.setState({
-        error: error.response?.data?.message || error.message || "Failed to connect to server",
+        dashboardData: response.data,
+        loading: false,
+        error: null,
+      });
+    } catch (error) {
+      this.setState({
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to connect to server",
         loading: false,
       });
     }
@@ -48,86 +70,171 @@ class Dashboard extends Component {
   render() {
     const { loading, error, dashboardData } = this.state;
 
-    // --- DEBUG HELPERS ---
-    if (loading) return <div className="p-5 text-center"><h3>Checking API Connection...</h3></div>;
-    
-    if (error) return (
-        <div className="alert alert-danger m-5">
-            <h4>Connection Error</h4>
-            <p>{error}</p>
-            <small>Check if your Laravel server is running at 127.0.0.1:8000</small>
+    if (loading) {
+      return (
+        <div className="p-5 text-center">
+          <h3>Loading Dashboard...</h3>
         </div>
-    );
+      );
+    }
 
-    // If we reach here, loading is false and error is null. 
-    // If dashboardData is still null, the API returned nothing.
-    if (!dashboardData) return <div className="alert alert-warning m-5">API returned empty data.</div>;
+    if (error) {
+      return (
+        <div className="alert alert-danger m-5">
+          <h4>Error</h4>
+          <p>{error}</p>
+        </div>
+      );
+    }
 
-    // Safely extract variables from the now-confirmed dashboardData
+    if (!dashboardData) {
+      return (
+        <div className="alert alert-warning m-5">
+          No dashboard data available
+        </div>
+      );
+    }
+
     const metrics = dashboardData.metrics || {};
     const charts = dashboardData.charts || {};
+
+    /* -------- SAFE VALIDATIONS -------- */
+    const validBar =
+      charts.barChart &&
+      charts.barChart.labels?.length &&
+      charts.barChart.data?.length;
+
+    const validPie =
+      charts.pieChart &&
+      charts.pieChart.labels?.length &&
+      charts.pieChart.data?.length &&
+      charts.pieChart.labels.length === charts.pieChart.data.length;
+
+    const validLine =
+      charts.lineChart &&
+      charts.lineChart.labels?.length &&
+      charts.lineChart.data?.length;
 
     return (
       <div className="wrapper">
         <Navbar />
         <Sidebar />
+
         <div className="main-container">
           <div className="pd-ltr-20">
             <div className="pd-20 bg-white border-radius-4 box-shadow mb-30">
-              <h2 className="text-center mb-4">Admin System Overview</h2>
+              <h2 className="text-center mb-4">Admin Dashboard</h2>
 
-              {/* Metrics */}
+              {/* ---------------- METRICS ---------------- */}
               <div className="row mb-4">
                 <div className="col-md-3">
-                  <div className="card text-white bg-primary mb-3 text-center">
+                  <div className="card bg-primary text-white text-center">
                     <div className="card-body">
                       <h6>Total Jobs</h6>
                       <h3>{metrics.total_jobs ?? 0}</h3>
                     </div>
                   </div>
                 </div>
+
                 <div className="col-md-3">
-                  <div className="card text-white bg-success mb-3 text-center">
+                  <div className="card bg-success text-white text-center">
                     <div className="card-body">
                       <h6>Total Applications</h6>
                       <h3>{metrics.total_applications ?? 0}</h3>
                     </div>
                   </div>
                 </div>
-                {/* ... other metric cards ... */}
+
+                <div className="col-md-3">
+                  <div className="card bg-warning text-white text-center">
+                    <div className="card-body">
+                      <h6>Total Candidates</h6>
+                      <h3>{metrics.total_candidates ?? 0}</h3>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-3">
+                  <div className="card bg-info text-white text-center">
+                    <div className="card-body">
+                      <h6>Total Companies</h6>
+                      <h3>{metrics.total_companies ?? 0}</h3>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Charts */}
+              {/* ---------------- CHARTS ---------------- */}
               <div className="row">
-                {charts.barChart && (
+
+                {validBar && (
                   <div className="col-md-6 mb-4">
-                    <ReactApexChart 
-                      options={{
-                        chart: { type: 'bar' },
-                        xaxis: { categories: charts.barChart.labels || [] }
-                      }} 
-                      series={[{ name: 'Apps', data: charts.barChart.data || [] }]} 
-                      type="bar" height={300} 
-                    />
+                    <ChartErrorBoundary>
+                      <Chart
+                        type="bar"
+                        height={300}
+                        series={[
+                          {
+                            name: "Applications",
+                            data: charts.barChart.data.map(Number),
+                          },
+                        ]}
+                        options={{
+                          chart: { type: "bar" },
+                          xaxis: {
+                            categories: charts.barChart.labels,
+                          },
+                        }}
+                      />
+                    </ChartErrorBoundary>
                   </div>
                 )}
-                
-                {charts.pieChart && (
+
+                {validPie && (
                   <div className="col-md-6 mb-4">
-                    <ReactApexChart 
-                      options={{
-                        chart: { type: 'pie' },
-                        labels: charts.pieChart.labels || []
-                      }} 
-                      series={charts.pieChart.data || []} 
-                      type="pie" height={300} 
-                    />
+                    <ChartErrorBoundary>
+                      <Chart
+                        type="pie"
+                        height={300}
+                        series={charts.pieChart.data.map(Number)}
+                        options={{
+                          chart: { type: "pie" },
+                          labels: charts.pieChart.labels,
+                          colors: charts.pieChart.colors,
+                        }}
+                      />
+                    </ChartErrorBoundary>
                   </div>
                 )}
+
+                {validLine && (
+                  <div className="col-md-12 mb-4">
+                    <ChartErrorBoundary>
+                      <Chart
+                        type="line"
+                        height={300}
+                        series={[
+                          {
+                            name: "Jobs Posted",
+                            data: charts.lineChart.data.map(Number),
+                          },
+                        ]}
+                        options={{
+                          chart: { type: "line" },
+                          xaxis: {
+                            categories: charts.lineChart.labels,
+                          },
+                        }}
+                      />
+                    </ChartErrorBoundary>
+                  </div>
+                )}
+
               </div>
             </div>
           </div>
         </div>
+
         <Footer />
       </div>
     );

@@ -12,9 +12,8 @@ use App\Http\Controllers\{
     ApplicationController, PortalJobController, ResumePortalController,
     EmployerResumeController, CandidateManageApplicationController,
     EmployerManageJobController, BrowseCategoryController,
-    BrowseJobController, JobSkillController, JobTypeController, PortalJobAlertsController, PortalResumeController
+    BrowseJobController, JobSkillController, JobTypeController, PortalJobAlertsController, PortalResumeController,PortalPackageController
 };
-use App\Http\Controllers\Employer\JobController as EmployerJobController;
 
 // ==============================
 // PUBLIC API (NO AUTH)
@@ -28,6 +27,9 @@ Route::get('/browse-categories', [BrowseCategoryController::class, 'index']);
 Route::get('/jobs/{job}', [JobController::class, 'show']);
 Route::get('/companies/{company}/details', [CompanyController::class, 'getCompanyDetails']);
 Route::post('/jobs/{id}/view', [JobViewController::class, 'store']);
+Route::get('/packages', [PortalPackageController::class, 'getAllPackages']);
+
+
 // ==============================
 // AUTHENTICATED API
 // ==============================
