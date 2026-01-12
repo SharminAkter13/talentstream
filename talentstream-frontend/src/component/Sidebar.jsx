@@ -22,8 +22,8 @@ const Sidebar = () => {
     <div className="left-side-bar">
       <div className="brand-logo">
         <Link to="/" onClick={closeMenu}>
-          <img src="/assets/admin/vendors/images/deskapp-logo.svg" alt="logo" className="dark-logo" />
-          <img src="/assets/admin/vendors/images/deskapp-logo-white.svg" alt="logo" className="light-logo" />
+          <img src="/portal-assets/assets/img/logosbg.png" alt="logo" className="dark-logo"  style={{ height: '40px', width: 'auto', objectFit: 'contain' }}  />
+          <img src="/portal-assets/assets/img/logosbg.png" alt="logo" className="light-logo"  style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />
         </Link>
       </div>
 

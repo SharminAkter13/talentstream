@@ -60,7 +60,7 @@ const Navbar = () => {
     }
   };
 
-  if (!user) return <div className="header">Loading...</div>; 
+  if (!user) return <div className="header">Please Wait</div>; 
 
   return (
     <div className="header">

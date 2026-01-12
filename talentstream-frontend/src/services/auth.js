@@ -3,9 +3,10 @@ import axios from "axios";
 // ================================
 // API BASE URL
 // ================================
-// Update these constants for production
+
 export const API_URL = "https://talenthunt-project.sharmin.online/api/api"; 
-export const ASSET_URL = "https://talenthunt-project.sharmin.online/api";
+export const ASSET_URL = "https://talenthunt-project.sharmin.online/api/storage";
+
 // ================================
 // TOKEN + USER HELPERS
 // ================================

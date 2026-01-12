@@ -4,25 +4,19 @@ import './Navbar.css';
 
 import { isLoggedIn, getCurrentUser, logoutUser } from "../services/auth";
 
-// =============================
-// NAVBAR COMPONENT
-// =============================
 const PortalNavbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(isLoggedIn());
   const [userRole, setUserRole] = useState(getCurrentUser()?.role_id || null);
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  // Sync auth state with localStorage changes
   useEffect(() => {
     const syncAuth = () => {
       setIsAuthenticated(isLoggedIn());
       setUserRole(getCurrentUser()?.role_id || null);
     };
-
     window.addEventListener('storage', syncAuth);
     const interval = setInterval(syncAuth, 1000);
-
     return () => {
       window.removeEventListener('storage', syncAuth);
       clearInterval(interval);
@@ -30,11 +24,7 @@ const PortalNavbar = () => {
   }, []);
 
   const navId = "main-navbar";
-
-  // Toggle the mobile menu
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
-
-  // Close menu when a link is clicked
   const closeNav = () => {
     setIsNavCollapsed(true);
     setOpenDropdown(null);
@@ -65,10 +55,9 @@ const PortalNavbar = () => {
     <header id="home">
       <nav className="navbar navbar-expand-lg fixed-top scrolling-navbar">
         <div className="container">
-          <div className="theme-header clearfix">
+          <div className="theme-header clearfix w-100 d-flex align-items-center justify-content-between">
 
-            {/* BRAND / LOGO & TOGGLER */}
-            <div className="navbar-header">
+            <div className="navbar-header d-flex align-items-center">
               <button
                 className="navbar-toggler"
                 type="button"
@@ -77,22 +66,27 @@ const PortalNavbar = () => {
                 aria-expanded={!isNavCollapsed}
                 aria-label="Toggle navigation"
               >
-                {/* Line Icon for menu */}
                 <i className={isNavCollapsed ? "lni-menu" : "lni-close"}></i>
               </button>
 
               <Link to="/" className="navbar-brand" onClick={closeNav}>
-                <img src="/portal-assets/assets/img/logo.png" alt="Company Logo" />
+                {/* FIX: Added style to constrain height. 
+                  Adjust 40px to 30px if you want it even smaller (icon size). 
+                */}
+                <img 
+                  src="/portal-assets/assets/img/logosbg.png" 
+                  alt="Company Logo" 
+                  style={{ height: '40px', width: 'auto', objectFit: 'contain' }} 
+                  className="img-fluid"
+                />
               </Link>
             </div>
 
-            {/* NAVBAR MENU */}
             <div 
               className={`collapse navbar-collapse ${!isNavCollapsed ? "show" : ""}`} 
               id={navId}
             >
               <ul className="navbar-nav ml-auto">
-
                 <li className="nav-item">
                   <Link className="nav-link" to="/" onClick={closeNav}>Home</Link>
                 </li>
@@ -129,7 +123,7 @@ const PortalNavbar = () => {
                   </li>
                 )}
 
-                {/* GUEST MENU (EXPLORE) */}
+                {/* GUEST MENU */}
                 {!isAuthenticated && (
                   <li className={`nav-item dropdown ${openDropdown === "explore" ? "show" : ""}`}>
                     <a href="#!" className="nav-link dropdown-toggle"
