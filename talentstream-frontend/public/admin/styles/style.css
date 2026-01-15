@@ -1303,10 +1303,8 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 	align-items: center;
 	justify-content: center;
 }
-.brand-logo{
-	width: 280px;
-	height: 70px;
-	border-bottom: 1px solid rgba(0,0,0,0.1);
+.brand-logo {
+  overflow: visible;   /* allow scaled logo to show */
 }
 .brand-logo a{
 	display: flex;
@@ -1339,11 +1337,14 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-.brand-logo a img,
-.brand-logo a .svg{
-	max-width: 180px;
-	display: block;
-	height: auto;
+/* Sidebar logo scaling */
+.brand-logo img {
+  height: 60px;        /* real layout size */
+  width: auto;
+  display: block;
+
+  transform: scale(2.4);   /* safe visual scaling */
+  transform-origin: left center;
 }
 .left-side-bar{
 	position: fixed;
@@ -3991,6 +3992,7 @@ body.IE .register-page-wrap .container{
 	color: #ebecef;
 	font-weight: 500;
 }
+
 /*==============================================================
 	Documentation End
 ==============================================================*/
