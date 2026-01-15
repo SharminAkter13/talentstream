@@ -20,12 +20,16 @@
 }
 
 .loader-logo img {
-    max-width: 100px; 
-    height: auto;
+  height: 80px;          /* base size */
+  width: auto;
+  object-fit: contain;
+
+  transform: scale(2.9);   /* visual size increase */
 }
 
+
 .loader-progress {
-    width: 200px; 
+    width: 250px; 
     height: 5px;
     background: #eee; 
     border-radius: 5px;
@@ -38,7 +42,7 @@
     display: block;
     height: 100%;
     width: 0%; 
-    background: #e91e63; 
+    background: #00bcd4; 
     transition: width 0.5s ease; 
 }
 /*

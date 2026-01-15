@@ -47,6 +47,16 @@
   align-items: center;
 }
 
+.navbar-logo {
+  height: 55px;            /* base height that keeps navbar stable */
+  width: auto;
+  object-fit: contain;
+
+  transform: scale(3.5);  /* visually increases size */
+  transform-origin: left center;
+}
+
+
 
 /* Force the toggler to show on mobile */
 @media (max-width: 991px) {
@@ -68,7 +78,7 @@
     background: #fff;
     width: 100%;
     position: absolute;
-    top: 60px; /* Adjust based on header height */
+    top: 60px;
     left: 0;
     padding: 20px;
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
