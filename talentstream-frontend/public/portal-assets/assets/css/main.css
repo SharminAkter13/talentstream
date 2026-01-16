@@ -933,7 +933,7 @@ button:focus {
    Hero Area
    ========================================================================== */
 .hero-area {
-  background: url(../img/bg/bg-intro.jpg) center center no-repeat;
+  background: url(../img/bg/hero.jpg) center center no-repeat;
   background-size: cover;
   overflow: hidden;
   color: #fff;
