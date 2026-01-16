@@ -1,74 +1,124 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const HeroSection = () => {
-    // NOTE: If you need to add state management or handlers for the search form, 
-    // you would add them here.
+    // State for dropdown data
+    const [categories, setCategories] = useState([]);
+    const [locations, setLocations] = useState([]);
+    
+    // State for form inputs
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedLocation, setSelectedLocation] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+
+    // Fetch dynamic data from your backend API
+    useEffect(() => {
+        // Replace these URLs with your actual Laravel API endpoints
+        const fetchDropdownData = async () => {
+            try {
+                const [catRes, locRes] = await Promise.all([
+                    fetch('http://your-api.com/api/categories'),
+                    fetch('http://your-api.com/api/locations')
+                ]);
+                const categoriesData = await catRes.json();
+                const locationsData = await locRes.json();
+                
+                setCategories(categoriesData);
+                setLocations(locationsData);
+            } catch (error) {
+                console.error("Error fetching dynamic data:", error);
+            }
+        };
+
+        fetchDropdownData();
+    }, []);
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        console.log("Searching for:", { searchQuery, selectedLocation, selectedCategory });
+        // Implement your search redirection or API call here
+    };
+
     return (
         <section className="hero-area">
-        <div className="container">
-            <div className="row space-100 justify-content-center">
-                <div className="col-lg-10 col-md-12 col-xs-12">
-                    <div className="contents">
-                        <h2 className="head-title">Find the job that fits your life</h2>
-                        <p>Aliquam vestibulum cursus felis. In iaculis iaculis sapien ac condimentum. Vestibulum congue posuere lacus, <br /> id tincidunt nisi porta sit amet. Suspendisse et sapien varius, pellentesque dui non.</p>
-                        <div className="job-search-form">
-                            {/* Search Form - Consider making this a separate component for cleaner code */}
-                            <form>
-                                <div className="row">
-                                    <div className="col-lg-5 col-md-6 col-xs-12">
-                                        <div className="form-group">
-                                            <input className="form-control" type="text" placeholder="Job Title or Company Name" />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-3 col-md-6 col-xs-12">
-                                        <div className="form-group">
-                                            <div className="search-category-container">
-                                                <label className="styled-select">
-                                                    <select>
-                                                        <option value="none">Locations</option>
-                                                        <option value="New York">New York</option>
-                                                        <option value="California">California</option>
-                                                        <option value="Washington">Washington</option>
-                                                        <option value="Birmingham">Birmingham</option>
-                                                        <option value="Chicago">Chicago</option>
-                                                        <option value="Phoenix">Phoenix</option>
-                                                    </select>
-                                                </label>
+            <div className="container">
+                <div className="row space-100 justify-content-center">
+                    <div className="col-lg-10 col-md-12 col-xs-12">
+                        <div className="contents">
+                            <h2 className="head-title">Find the job that fits your life</h2>
+                            <p>Browse through thousands of opportunities in your favorite industry.</p>
+                            <div className="job-search-form">
+                                <form onSubmit={handleSearch}>
+                                    <div className="row">
+                                        {/* Job Title / Keyword Input */}
+                                        <div className="col-lg-5 col-md-6 col-xs-12">
+                                            <div className="form-group">
+                                                <input 
+                                                    className="form-control" 
+                                                    type="text" 
+                                                    placeholder="Job Title or Company Name"
+                                                    value={searchQuery}
+                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                />
                                             </div>
-                                            <i className="lni-map-marker"></i>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-3 col-md-6 col-xs-12">
-                                        <div className="form-group">
-                                            <div className="search-category-container">
-                                                <label className="styled-select">
-                                                    <select>
-                                                        <option value="">All Categories</option>
-                                                        <option value="Finance">Finance</option>
-                                                        <option value="IT & Engineering">IT & Engineering</option>
-                                                        <option value="Education/Training">Education/Training</option>
-                                                        <option value="Art/Design">Art/Design</option>
-                                                        <option value="Sale/Markting">Sale/Markting</option>
-                                                        <option value="Healthcare">Healthcare</option>
-                                                        <option value="Science">Science</option>
-                                                        <option value="Food Services">Food Services</option>
-                                                    </select>
-                                                </label>
+
+                                        {/* Dynamic Locations Dropdown */}
+                                        <div className="col-lg-3 col-md-6 col-xs-12">
+                                            <div className="form-group">
+                                                <div className="search-category-container">
+                                                    <label className="styled-select">
+                                                        <select 
+                                                            value={selectedLocation} 
+                                                            onChange={(e) => setSelectedLocation(e.target.value)}
+                                                        >
+                                                            <option value="">All Locations</option>
+                                                            {locations.map(loc => (
+                                                                <option key={loc.id} value={loc.city}>
+                                                                    {loc.city}, {loc.state}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </label>
+                                                </div>
+                                                <i className="lni-map-marker"></i>
                                             </div>
-                                            <i className="lni-layers"></i>
+                                        </div>
+
+                                        {/* Dynamic Categories Dropdown */}
+                                        <div className="col-lg-3 col-md-6 col-xs-12">
+                                            <div className="form-group">
+                                                <div className="search-category-container">
+                                                    <label className="styled-select">
+                                                        <select 
+                                                            value={selectedCategory} 
+                                                            onChange={(e) => setSelectedCategory(e.target.value)}
+                                                        >
+                                                            <option value="">All Categories</option>
+                                                            {categories.map(cat => (
+                                                                <option key={cat.id} value={cat.id}>
+                                                                    {cat.name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </label>
+                                                </div>
+                                                <i className="lni-layers"></i>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-lg-1 col-md-6 col-xs-12">
+                                            <button type="submit" className="button">
+                                                <i className="lni-search"></i>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className="col-lg-1 col-md-6 col-xs-12">
-                                        <button type="submit" className="button"><i className="lni-search"></i></button>
-                                    </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
     );
 };
 
