@@ -8,25 +8,12 @@ use Illuminate\Database\Eloquent\Builder;
 class Job extends Model
 {
     // Fillable properties to allow mass assignment
-    protected $fillable = [
-        'user_email',
-        'employer_id',
-        'company_name',
-        'website',
-        'title',
-        'category_id',
-        'job_location_id',
-        'job_type_id',
-        'tags',
-        'description',
-        'application_email',
-        'application_url',
-        'closing_date',
-        'tagline',
-        'cover_image',
-        'status',
-    ];
-
+protected $fillable = [
+    'employer_id', 'company_id', 'category_id', 'job_type_id', 
+    'job_skill_id', 'job_location_id', 'title', 'description', 
+    'salary_min', 'salary_max', 'posted_date', 'application_deadline', 
+    'num_vacancies', 'status', 'cover_image', 'company_name'
+];
     // Casts properties to specific types
     protected $casts = [
         'closing_date' => 'date',

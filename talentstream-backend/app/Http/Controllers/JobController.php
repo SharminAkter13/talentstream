@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class JobController extends Controller
 {
-    // List logged-in employer's jobs
+    // List logged-in employer's jobs (For Dashboard Table)
     public function index(Request $request)
     {
         $jobs = Job::where('employer_id', $request->user()->id)
@@ -22,7 +22,7 @@ class JobController extends Controller
         return response()->json(['jobs' => $jobs]);
     }
 
-    // Dropdown data for create/edit job form
+    // Dropdown data (For both Portal and Dashboard Forms)
     public function create()
     {
         return response()->json([
@@ -32,37 +32,39 @@ class JobController extends Controller
         ]);
     }
 
-    // Store job
+    // Store job (POST /api/employer/jobs)
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title'             => 'required|string|max:255',
-            'company_name'      => 'required|string|max:255',
-            'category_id'       => 'required|integer',
-            'job_location_id'   => 'required|integer',
-            'job_type_id'       => 'required|integer',
-            'description'       => 'required|string',
-            'status'            => 'required|string|in:active,inactive',
-            'cover_image'       => 'nullable|image|max:2048'
-        ]);
+{
+    $validated = $request->validate([
+        'title'                => 'required|string|max:255',
+        'company_name'         => 'required|string',
+        'category_id'          => 'required|integer',
+        'job_location_id'      => 'required|integer',
+        'job_type_id'          => 'required|integer',
+        'job_skill_id'         => 'nullable|integer', // Added skill
+        'description'          => 'required|string',
+        'salary_min'           => 'nullable|numeric',
+        'salary_max'           => 'nullable|numeric',
+        'num_vacancies'        => 'nullable|integer',
+        'application_deadline' => 'nullable|date',
+        'status'               => 'required|string|in:active,inactive',
+        'cover_image'          => 'nullable|image|max:2048'
+    ]);
 
-        // Upload cover image
-        if ($request->hasFile('cover_image')) {
-            $validated['cover_image'] = $request->file('cover_image')->store('jobs', 'public');
-        }
-
-        $validated['employer_id'] = $request->user()->id;
-        $validated['user_email'] = $request->user()->email;
-
-        $job = Job::create($validated);
-
-        return response()->json([
-            'message' => 'Job created successfully',
-            'data' => $job
-        ], 201);
+    if ($request->hasFile('cover_image')) {
+        $validated['cover_image'] = $request->file('cover_image')->store('jobs', 'public');
     }
 
-    // Show job
+    // AUTO-FILL LOGIC
+    $validated['employer_id'] = $request->user()->id;
+    $validated['posted_date'] = now(); // Auto-fill current date
+
+    $job = Job::create($validated);
+
+    return response()->json(['message' => 'Job created successfully', 'data' => $job], 201);
+}
+
+    // Show single job (For Editing or Details)
     public function show($id)
     {
         $job = Job::with(['category', 'jobLocation', 'jobType'])
@@ -71,23 +73,26 @@ class JobController extends Controller
         return response()->json($job);
     }
 
-    // Update job
+    // Update job (POST /api/employer/jobs/{id})
     public function update(Request $request, $id)
     {
         $job = Job::findOrFail($id);
 
         $validated = $request->validate([
-            'title'             => 'sometimes|string|max:255',
-            'company_name'      => 'sometimes|string|max:255',
-            'category_id'       => 'sometimes|integer',
-            'job_location_id'   => 'sometimes|integer',
-            'job_type_id'       => 'sometimes|integer',
-            'description'       => 'sometimes|string',
-            'status'            => 'sometimes|string|in:active,inactive',
-            'cover_image'       => 'nullable|image|max:2048'
+            'title'                => 'sometimes|string|max:255',
+            'company_name'         => 'sometimes|string|max:255',
+            'category_id'          => 'sometimes|integer|exists:categories,id',
+            'job_location_id'      => 'sometimes|integer|exists:job_locations,id',
+            'job_type_id'          => 'sometimes|integer|exists:job_types,id',
+            'description'          => 'sometimes|string',
+            'salary_min'           => 'nullable|numeric',
+            'salary_max'           => 'nullable|numeric',
+            'num_vacancies'        => 'nullable|integer',
+            'application_deadline' => 'nullable|date',
+            'status'               => 'sometimes|string|in:active,inactive',
+            'cover_image'          => 'nullable|image|max:2048'
         ]);
 
-        // Update cover image
         if ($request->hasFile('cover_image')) {
             $validated['cover_image'] = $request->file('cover_image')->store('jobs', 'public');
         }
@@ -100,11 +105,9 @@ class JobController extends Controller
         ]);
     }
 
-    // Delete job
     public function destroy($id)
     {
         Job::findOrFail($id)->delete();
-
         return response()->json(['message' => 'Job deleted successfully']);
     }
 }

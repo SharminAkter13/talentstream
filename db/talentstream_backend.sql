@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 03, 2026 at 08:31 PM
+-- Generation Time: Jan 16, 2026 at 08:18 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -451,7 +451,7 @@ CREATE TABLE `messages` (
 --
 
 INSERT INTO `messages` (`id`, `conversation_id`, `sender_id`, `message`, `is_read`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 'Hi Jane, we loved your resume. Are you available for a call?', 0, '2025-12-28 21:53:43', NULL);
+(1, 1, 2, 'Hi Jane, we loved your resume. Are you available for a call?', 1, '2025-12-28 21:53:43', '2026-01-03 14:03:24');
 
 -- --------------------------------------------------------
 
@@ -585,7 +585,10 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (11, 'App\\Models\\User', 2, 'API Token', 'd57cadf21a1e2f0e0d8f3f8259f003e09b453717cd91caa1cd7f6a6b3f8ff9c4', '[\"*\"]', '2026-01-02 17:59:53', NULL, '2025-12-31 11:28:50', '2026-01-02 17:59:53'),
 (12, 'App\\Models\\User', 2, 'API Token', '3a18d91e0c7108fc6dec4b647c76fd273621c7babc68b5918eb396d4c4577b6a', '[\"*\"]', '2025-12-31 11:32:03', NULL, '2025-12-31 11:30:49', '2025-12-31 11:32:03'),
 (13, 'App\\Models\\User', 3, 'API Token', 'f1123746ec75aa245fba7af507176e9d20234dc1a83ca2dc3200ed1ce8bbd436', '[\"*\"]', NULL, NULL, '2025-12-31 11:32:58', '2025-12-31 11:32:58'),
-(14, 'App\\Models\\User', 3, 'API Token', 'd85a976b28ee08764b39ff17eb9cbba158cc11795461939592e26ea8174327d1', '[\"*\"]', '2026-01-03 13:29:23', NULL, '2026-01-02 02:02:16', '2026-01-03 13:29:23');
+(14, 'App\\Models\\User', 3, 'API Token', 'd85a976b28ee08764b39ff17eb9cbba158cc11795461939592e26ea8174327d1', '[\"*\"]', '2026-01-03 14:10:20', NULL, '2026-01-02 02:02:16', '2026-01-03 14:10:20'),
+(15, 'App\\Models\\User', 1, 'API Token', '734685847025d1b9e0c30fde53bee6eb55e9b35aa9eba3d7688e5bd595781e1e', '[\"*\"]', NULL, NULL, '2026-01-15 01:27:01', '2026-01-15 01:27:01'),
+(16, 'App\\Models\\User', 1, 'API Token', 'bb85730e1af49de12770ddef6a02f4375294fd801f83a4d693a5c7c310b0bd4c', '[\"*\"]', '2026-01-16 01:05:31', NULL, '2026-01-15 01:27:03', '2026-01-16 01:05:31'),
+(18, 'App\\Models\\User', 2, 'API Token', 'b89c56618ab78df15048b2154e2ec7002fa6d2ea57be2db285171f2b8b2d2f50', '[\"*\"]', '2026-01-16 01:12:46', NULL, '2026-01-16 01:10:46', '2026-01-16 01:12:46');
 
 -- --------------------------------------------------------
 
@@ -672,6 +675,7 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 ('1wRNntJAU9mOfVNNugn8Q27xvtl3HZzVcc5HNeD8', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoid0NFOTBYZGVhQkJPZFVQMGtESjhMclVMS3huMERhN2FRUXdhcENmayI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766729045),
 ('29lHLHvFUlj5nNdfy8YVuN9ySQZrjoxG3KQoLGcP', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVUpNRjhveXdCU3dLOENsbHFjbXdaUzV6N3pmbmJad2g1SUhKSDg1QSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766858703),
 ('8Sfj1Q4JS8DRV71K4FgqIQ8HrcEB3nJg9opBnDbM', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQnROSElsVUVuVnFNUmdOQ1BsSEZOT3hRNnZ2djR1azJXOWtVU05NaSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1767031208),
+('fzuMT4eTfo9Tj5QJYqFM4eyEyGUCxqemQbFzBVDc', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRE1BNld2dlpTSExTNUZzQzZsQk1LNWx0S1F1NWFvMEgwNkNWZkZsTiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1768459583),
 ('MJKADpePnNQsYqQj4iK5oacZ0syUxraLIS8TJ4f4', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiMVo1OHRuYjkxd0ZWWEpUaDk5eDNSUUQ2YjlEZHg2WHBuQWpsNlFoRCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1767465509),
 ('riAKjQ3ohEvDMSFJ7gGgzbgrQZfUewUbwCjvdRr5', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNFJoR1lSNnNyVUN0QTMzVURDSHo3MEN0MFU5bjVCNVpYR2duelZtTiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1767392130),
 ('yDvLmZhrAPndpN4XgNJF2djOzYClIY2zcaVxCc4D', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiMXJKNmJYV2R2b2VZOVkySWFkUzJQa1V4eXJ2UERxSnF4Ym5HclBmaCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1767340469),
@@ -1082,7 +1086,7 @@ ALTER TABLE `packages`
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `profiles`

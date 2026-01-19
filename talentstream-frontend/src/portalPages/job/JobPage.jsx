@@ -1,137 +1,138 @@
-import React from "react";
-import PortalFooter from './../../portalComponent/PortalFooter';
-import PortalNavbar from './../../portalComponent/PortalNavbar';
-
-const jobsData = [
-  {
-    title: "We need a web designer",
-    type: "Full-Time",
-    img: "portal-assets/assets/img/jobs/img-1.jpg",
-    category: "Art/Design",
-    location: "Cupertino, CA, USA",
-    rate: "60/Hour",
-  },
-  {
-    title: "Front-end developer needed",
-    type: "Full-Time",
-    img: "portal-assets/assets/img/jobs/img-2.jpg",
-    category: "Technologies",
-    location: "Cupertino, CA, USA",
-    rate: "60/Hour",
-  },
-  {
-    title: "Software Engineer",
-    type: "Part-Time",
-    img: "portal-assets/assets/img/jobs/img-3.jpg",
-    category: "Technologies",
-    location: "Cupertino, CA, USA",
-    rate: "60/Hour",
-  },
-  {
-    title: "Fullstack web developer needed",
-    type: "Full-Time",
-    img: "portal-assets/assets/img/jobs/img-4.jpg",
-    category: "Technologies",
-    location: "Cupertino, CA, USA",
-    rate: "60/Hour",
-  },
-];
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import PortalNavbar from "../../portalComponent/PortalNavbar";
+import PortalFooter from "../../portalComponent/PortalFooter";
 
 const JobPage = () => {
+  const [formData, setFormData] = useState({
+    title: "",
+    company_name: "", // Required by your Controller store method
+    category_id: "",
+    job_type_id: "",
+    job_location_id: "",
+    description: "",
+    salary_min: "",
+    salary_max: "",
+    num_vacancies: "",
+    application_deadline: "",
+    status: "active", // Required by Controller validation
+    cover_image: null,
+  });
+
+  const [options, setOptions] = useState({ categories: [], locations: [], types: [] });
+
+  // Fetch dropdown data from the EMPLOYER prefixed route
+  useEffect(() => {
+    const fetchDropdowns = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get("http://localhost:8000/api/employer/jobs/create", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setOptions(res.data);
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    };
+    fetchDropdowns();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData({ ...formData, [name]: files ? files[0] : value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    // Append all text fields and the image
+    Object.keys(formData).forEach(key => {
+      if (formData[key]) data.append(key, formData[key]);
+    });
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post("http://localhost:8000/api/employer/jobs", data, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data' 
+        }
+      });
+      alert("Job Posted Successfully!");
+    } catch (err) {
+      console.error("Submit error:", err.response?.data);
+    }
+  };
+
   return (
     <>
       <PortalNavbar />
-
-      {/* Page Header */}
-      <div
-        className="page-header"
-        style={{ background: "url(portal-assets/assets/img/banner1.jpg)" }}
-      >
-        <div className="container">
+      <div className="container mt-4 mb-5">
+        <h2>Post A Job</h2>
+        <form onSubmit={handleSubmit}>
           <div className="row">
-            <div className="col-md-12">
-              <div className="breadcrumb-wrapper">
-                <h2 className="product-title">Find Job</h2>
-                <ol className="breadcrumb">
-                  <li>
-                    <a href="#">
-                      <i className="ti-home"></i> Home
-                    </a>
-                  </li>
-                  <li className="current">Find Job</li>
-                </ol>
-              </div>
+            <div className="col-md-6 mb-3">
+              <label>Job Title</label>
+              <input type="text" name="title" className="form-control" onChange={handleChange} required />
+            </div>
+            <div className="col-md-6 mb-3">
+              <label>Company Name</label>
+              <input type="text" name="company_name" className="form-control" onChange={handleChange} required />
             </div>
           </div>
-        </div>
+
+          <div className="row">
+            <div className="col-md-4 mb-3">
+              <label>Category</label>
+              <select name="category_id" className="form-control" onChange={handleChange} required>
+                <option value="">Select Category</option>
+                {options.categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div className="col-md-4 mb-3">
+              <label>Location</label>
+              <select name="job_location_id" className="form-control" onChange={handleChange} required>
+                <option value="">Select Location</option>
+                {options.locations.map(l => <option key={l.id} value={l.id}>{l.city}</option>)}
+              </select>
+            </div>
+            <div className="col-md-4 mb-3">
+              <label>Job Type</label>
+              <select name="job_type_id" className="form-control" onChange={handleChange} required>
+                <option value="">Select Type</option>
+                {options.types.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-md-4 mb-3">
+              <label>Min Salary</label>
+              <input type="number" name="salary_min" className="form-control" onChange={handleChange} />
+            </div>
+            <div className="col-md-4 mb-3">
+              <label>Max Salary</label>
+              <input type="number" name="salary_max" className="form-control" onChange={handleChange} />
+            </div>
+            <div className="col-md-4 mb-3">
+              <label>Vacancies</label>
+              <input type="number" name="num_vacancies" className="form-control" onChange={handleChange} />
+            </div>
+          </div>
+
+          <div className="form-group mb-3">
+            <label>Description</label>
+            <textarea name="description" className="form-control" rows="5" onChange={handleChange} required></textarea>
+          </div>
+
+          <div className="form-group mb-3">
+            <label>Cover Image</label>
+            <input type="file" name="cover_image" className="form-control" onChange={handleChange} />
+          </div>
+
+          <button type="submit" className="btn btn-primary">Submit Job</button>
+        </form>
       </div>
-
-      {/* Find Job Section */}
-      <section className="find-job section">
-        <div className="container">
-          <h2 className="section-title">Find good a Job</h2>
-          <div className="row">
-            <div className="col-md-12">
-              {jobsData.map((job, index) => (
-                <div className="job-list" key={index}>
-                  <div className="thumb">
-                    <a href="job-details.html">
-                      <img src={job.img} alt={job.title} />
-                    </a>
-                  </div>
-                  <div className="job-list-content">
-                    <h4>
-                      <a href="job-details.html">{job.title}</a>
-                      <span className={job.type === "Full-Time" ? "full-time" : "part-time"}>
-                        {job.type}
-                      </span>
-                    </h4>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                      Illum quaerat aut veniam molestiae atque dolorum omnis
-                      temporibus consequuntur saepe...
-                    </p>
-                    <div className="job-tag d-flex justify-content-between">
-                      <div className="meta-tag">
-                        <span>
-                          <a href="browse-categories.html">
-                            <i className="ti-brush"></i> {job.category}
-                          </a>
-                        </span>
-                        <span><i className="ti-location-pin"></i>{job.location}</span>
-                        <span><i className="ti-time"></i>{job.rate}</span>
-                      </div>
-                      <div className="btn btn-common btn-rm">Apply Job</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="col-md-12 d-flex justify-content-between align-items-center mt-3">
-              <div className="showing">
-                <a href="#">Showing <span>6-10</span> Of 24 Jobs</a>
-              </div>
-              <ul className="pagination d-flex">
-                <li className="active">
-                  <a href="#" className="btn btn-common">
-                    <i className="ti-angle-left"></i> prev
-                  </a>
-                </li>
-                {[1, 2, 3, 4, 5].map((page) => (
-                  <li key={page}><a href="#">{page}</a></li>
-                ))}
-                <li className="active">
-                  <a href="#" className="btn btn-common">
-                    Next <i className="ti-angle-right"></i>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <PortalFooter />
     </>
   );

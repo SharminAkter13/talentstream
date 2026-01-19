@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 08, 2026 at 04:32 AM
+-- Generation Time: Jan 16, 2026 at 08:20 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -84,6 +84,14 @@ CREATE TABLE `approvals` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `approvals`
+--
+
+INSERT INTO `approvals` (`id`, `entity_type`, `entity_id`, `current_step`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
+(6, 'loan', 17, 1, 'Pending', 5, '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(7, 'loan', 18, 1, 'Pending', 5, '2026-01-10 03:15:49', '2026-01-10 03:15:49');
+
 -- --------------------------------------------------------
 
 --
@@ -117,6 +125,16 @@ CREATE TABLE `approval_steps` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `approval_steps`
+--
+
+INSERT INTO `approval_steps` (`id`, `approval_id`, `step_number`, `role_id`, `status`, `required`, `approved_at`, `created_at`, `updated_at`) VALUES
+(11, 6, 1, 2, 'Pending', 1, NULL, '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(12, 6, 2, 1, 'Pending', 1, NULL, '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(13, 7, 1, 2, 'Pending', 1, NULL, '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(14, 7, 2, 1, 'Pending', 1, NULL, '2026-01-10 03:15:49', '2026-01-10 03:15:49');
 
 -- --------------------------------------------------------
 
@@ -235,12 +253,43 @@ CREATE TABLE `installments` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `loan_id` bigint(20) UNSIGNED NOT NULL,
   `due_date` date NOT NULL,
-  `emi_amount` decimal(12,2) NOT NULL,
+  `amount_due` decimal(15,2) NOT NULL,
+  `emi_amount` decimal(12,2) DEFAULT NULL,
   `amount_paid` decimal(12,2) NOT NULL DEFAULT 0.00,
   `status` enum('Pending','Partial','Paid','Overdue') NOT NULL DEFAULT 'Pending',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `installments`
+--
+
+INSERT INTO `installments` (`id`, `loan_id`, `due_date`, `amount_due`, `emi_amount`, `amount_paid`, `status`, `created_at`, `updated_at`) VALUES
+(1, 17, '2026-02-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(2, 17, '2026-03-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(3, 17, '2026-04-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(4, 17, '2026-05-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(5, 17, '2026-06-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(6, 17, '2026-07-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(7, 17, '2026-08-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(8, 17, '2026-09-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(9, 17, '2026-10-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(10, 17, '2026-11-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(11, 17, '2026-12-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(12, 17, '2027-01-10', 458333.33, 458333.33, 0.00, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(13, 18, '2026-02-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(14, 18, '2026-03-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(15, 18, '2026-04-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(16, 18, '2026-05-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(17, 18, '2026-06-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(18, 18, '2026-07-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(19, 18, '2026-08-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(20, 18, '2026-09-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(21, 18, '2026-10-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(22, 18, '2026-11-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(23, 18, '2026-12-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49'),
+(24, 18, '2027-01-10', 366666.67, 366666.67, 0.00, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49');
 
 -- --------------------------------------------------------
 
@@ -352,6 +401,14 @@ CREATE TABLE `loans` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `loans`
+--
+
+INSERT INTO `loans` (`id`, `customer_id`, `branch_id`, `loan_type_id`, `principal_amount`, `interest_rate`, `emi_amount`, `total_payable`, `remaining_balance`, `issued_date`, `duration_months`, `status`, `created_at`, `updated_at`) VALUES
+(17, 1, 1, 1, 5000000.00, 10.00, 458333.33, 5500000.00, 5500000.00, '2026-01-10 00:00:00', 12, 'Pending', '2026-01-10 03:15:08', '2026-01-10 03:15:08'),
+(18, 1, 1, 1, 4000000.00, 10.00, 366666.67, 4400000.00, 4400000.00, '2026-01-10 00:00:00', 12, 'Pending', '2026-01-10 03:15:49', '2026-01-10 03:15:49');
+
 -- --------------------------------------------------------
 
 --
@@ -432,7 +489,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (22, '2025_12_09_223756_create_approval_actions_table', 1),
 (23, '2025_12_10_051919_create_kyc_forms_table', 1),
 (24, '2026_01_07_225755_add_emi_fields_to_loans_table', 2),
-(25, '2026_01_07_225930_update_installments_for_emi_system', 3);
+(25, '2026_01_07_225930_update_installments_for_emi_system', 3),
+(26, '2026_01_10_085512_add_amount_due_to_installments_table', 4);
 
 -- --------------------------------------------------------
 
@@ -472,8 +530,14 @@ CREATE TABLE `personal_access_tokens` (
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
 (1, 'App\\Models\\User', 1, 'banking-dashboard', '965d7b195159c48283f4733be512b61c35016c418d1a21df802d55956ca3e3f9', '[\"*\"]', '2025-12-17 14:54:30', NULL, '2025-12-17 14:14:30', '2025-12-17 14:54:30'),
 (2, 'App\\Models\\User', 1, 'banking-dashboard', '07f8667055d3cb3adead1d4c134664ad8f370c536a880b9c6cd2d104555f95d4', '[\"*\"]', '2025-12-23 18:52:22', NULL, '2025-12-23 17:33:59', '2025-12-23 18:52:22'),
-(3, 'App\\Models\\User', 1, 'banking-dashboard', '4e9cb4b30cafb5ab19aa1c4307f41ee78508d38046eda9042e4bfd60216bad6e', '[\"*\"]', '2026-01-07 21:04:31', NULL, '2026-01-06 13:01:34', '2026-01-07 21:04:31'),
-(4, 'App\\Models\\User', 5, 'banking-dashboard', 'a13e607c688c7996bd5ca3261e2752bb9b61cdc7d50dd3a9e4d18d7294a35fc0', '[\"*\"]', '2026-01-07 21:30:59', NULL, '2026-01-07 20:40:39', '2026-01-07 21:30:59');
+(3, 'App\\Models\\User', 1, 'banking-dashboard', '4e9cb4b30cafb5ab19aa1c4307f41ee78508d38046eda9042e4bfd60216bad6e', '[\"*\"]', '2026-01-10 03:36:57', NULL, '2026-01-06 13:01:34', '2026-01-10 03:36:57'),
+(4, 'App\\Models\\User', 5, 'banking-dashboard', 'a13e607c688c7996bd5ca3261e2752bb9b61cdc7d50dd3a9e4d18d7294a35fc0', '[\"*\"]', '2026-01-07 21:30:59', NULL, '2026-01-07 20:40:39', '2026-01-07 21:30:59'),
+(5, 'App\\Models\\User', 5, 'banking-dashboard', 'b672c90e0f6f22f44f1c20ea96139991f1d058e0dac63549fea4792c21d7bbcf', '[\"*\"]', '2026-01-10 01:24:33', NULL, '2026-01-10 01:24:28', '2026-01-10 01:24:33'),
+(6, 'App\\Models\\User', 5, 'banking-dashboard', 'a6f6640e8413f1813fac507a1da5ed2e79ee2648914792b6f27f54f68aefc894', '[\"*\"]', '2026-01-10 01:59:28', NULL, '2026-01-10 01:24:32', '2026-01-10 01:59:28'),
+(7, 'App\\Models\\User', 5, 'banking-dashboard', '6579cec1b9bdea091fa9459ef3c0c4c2fb41dded59a692a013b9b4328647234e', '[\"*\"]', '2026-01-10 02:01:13', NULL, '2026-01-10 02:00:53', '2026-01-10 02:01:13'),
+(8, 'App\\Models\\User', 5, 'banking-dashboard', '332c0f2549c8e3a1934baafe88bc776ba7f3a2b6b51c09a223f6d3d7ad1ee8c3', '[\"*\"]', '2026-01-10 02:04:15', NULL, '2026-01-10 02:03:58', '2026-01-10 02:04:15'),
+(9, 'App\\Models\\User', 5, 'banking-dashboard', '8d01380f98b62b1cc6bd52e2b78bd118cd3968286f65c12ef31da5e3b020d89c', '[\"*\"]', '2026-01-10 02:15:46', NULL, '2026-01-10 02:15:24', '2026-01-10 02:15:46'),
+(10, 'App\\Models\\User', 5, 'banking-dashboard', 'f15672e94cd5dd9055b1923c9054ace0eac2816198074c76f73223b1995b4dca', '[\"*\"]', '2026-01-10 03:15:53', NULL, '2026-01-10 02:17:03', '2026-01-10 03:15:53');
 
 -- --------------------------------------------------------
 
@@ -847,7 +911,7 @@ ALTER TABLE `account_types`
 -- AUTO_INCREMENT for table `approvals`
 --
 ALTER TABLE `approvals`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `approval_actions`
@@ -859,7 +923,7 @@ ALTER TABLE `approval_actions`
 -- AUTO_INCREMENT for table `approval_steps`
 --
 ALTER TABLE `approval_steps`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `branches`
@@ -889,7 +953,7 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `installments`
 --
 ALTER TABLE `installments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `interest_rates`
@@ -913,7 +977,7 @@ ALTER TABLE `kyc_forms`
 -- AUTO_INCREMENT for table `loans`
 --
 ALTER TABLE `loans`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `loan_payments`
@@ -931,13 +995,13 @@ ALTER TABLE `loan_types`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `roles`
