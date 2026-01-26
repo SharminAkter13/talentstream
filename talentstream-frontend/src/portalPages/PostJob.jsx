@@ -79,7 +79,7 @@ const PostJob = () => {
     <>
       <PortalNavbar />
       <div className="container mt-4 m-5 p-5">
-        <h2>Post A Job</h2>
+        <h2 className="mt-5">Post A Job</h2>
         <form onSubmit={handleSubmit}>
           <div className="row">
             <div className="col-md-6 mb-3">

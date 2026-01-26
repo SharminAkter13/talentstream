@@ -82,7 +82,7 @@ const MyAccount = () => {
   return (
     <>
       <PortalNavbar />
-      <div className="py-5" style={{ background: "#f7f9fc" }}>
+      <div className="py-5 m-5" style={{ background: "#f7f9fc" }}>
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-md-6">
