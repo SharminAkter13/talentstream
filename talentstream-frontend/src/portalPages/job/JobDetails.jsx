@@ -36,7 +36,7 @@ const JobDetails = () => {
 
       {/* Page Header */}
       <div
-        className="page-header"
+        className="page-header p-5 m-5"
         style={{ background: "url(assets/img/banner1.jpg)" }}
       >
         <div className="container">

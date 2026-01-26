@@ -57,7 +57,7 @@ const PortalNavbar = () => {
 
   return (
     <header id="home">
-      <nav className="navbar navbar-expand-lg fixed-top scrolling-navbar p-5 m-5">
+      <nav className="navbar navbar-expand-lg fixed-top scrolling-navbar mb-5">
         <div className="container">
           <div className="theme-header clearfix w-100 d-flex align-items-center justify-content-between">
             <div className="navbar-header d-flex align-items-center">

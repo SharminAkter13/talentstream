@@ -67,7 +67,7 @@ const JobPage = () => {
   return (
     <>
       <PortalNavbar />
-      <div className="container mt-4 mb-5">
+      <div className="container m-5 p-5">
         <h2>Post A Job</h2>
         <form onSubmit={handleSubmit}>
           <div className="row">

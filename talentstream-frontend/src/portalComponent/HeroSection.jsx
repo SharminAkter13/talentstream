@@ -39,8 +39,8 @@ const HeroSection = () => {
     };
 
     return (
-        <section className="hero-area">
-            <div className="container">
+        <section className="hero-area mt-5">
+            <div className="container mt-5">
                 <div className="row space-100 justify-content-center">
                     <div className="col-lg-10 col-md-12 col-xs-12">
                         <div className="contents">
