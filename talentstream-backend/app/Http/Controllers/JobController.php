@@ -27,9 +27,8 @@ class JobController extends Controller
 public function create(Request $request)
 {
     $user = $request->user();
+    $employer = $user->employer; // Access the employer profile linked to the user
 
-    // We need to load the company relationship or access the attribute
-    // based on your screenshot showing 'company_name'
     return response()->json([
         'categories' => Category::all(),
         'locations'  => JobLocation::all(),
@@ -37,47 +36,60 @@ public function create(Request $request)
         'skills'     => JobSkill::all(),
 
         'employer' => [
-            'id'    => $user->id,
+            'id'    => $employer?->id,
             'email' => $user->email,
+            'name'  => $employer?->name,
         ],
+
         'company' => [
-            // Adjust this to match your model's attribute or relationship
-            'id'   => $user->company->id ?? null,
-            'name' => $user->company->company_name ?? 'Company Name Not Found', 
+            // Use company_id for the ID
+            'id'   => $employer?->company_id, 
+            // Pull the name directly from the employer table's 'company_name' column
+            'name' => $employer?->company_name ?? 'Company Name Not Found',
         ],
     ]);
 }
+
+
     // ===============================
     // STORE JOB
     // ===============================
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title'                => 'required|string|max:255',
-            'category_id'          => 'required|integer',
-            'job_type_id'          => 'required|integer',
-            'job_skill_id'         => 'nullable|integer',
-            'job_location_id'      => 'required|integer',
-            'description'          => 'required|string',
-            'salary_min'           => 'nullable|numeric',
-            'salary_max'           => 'nullable|numeric',
-            'num_vacancies'        => 'nullable|integer',
-            'application_deadline' => 'nullable|date',
-            'status'               => 'required|in:active,inactive',
-        ]);
+   // JobController.php
 
-        // 🔐 FK AUTO-FILL (SECURE)
-        $validated['employer_id'] = $request->user()->id;
-        $validated['company_id'] = $request->user()->company_id;
-        $validated['posted_date'] = now();
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'title'                => 'required|string|max:255',
+        'category_id'          => 'required|integer',
+        'job_type_id'          => 'required|integer',
+        'job_skill_id'         => 'nullable|integer',
+        'job_location_id'      => 'required|integer',
+        'description'          => 'required|string',
+        'salary_min'           => 'nullable|numeric',
+        'salary_max'           => 'nullable|numeric',
+        'num_vacancies'        => 'nullable|integer',
+        'application_deadline' => 'nullable|date',
+        'status'               => 'required|in:active,inactive',
+    ]);
 
-        $job = Job::create($validated);
+    // 🔐 FIX: Use the Employer Profile ID, not the User ID
+    $employer = $request->user()->employer;
 
-        return response()->json([
-            'message' => 'Job created successfully',
-            'data'    => $job
-        ], 201);
+    if (!$employer) {
+        return response()->json(['message' => 'Employer profile not found.'], 404);
     }
+
+    $validated['employer_id'] = $employer->id; // This will now be '3' instead of '2'
+    $validated['company_id']  = $employer->company_id; // This will be '2'
+    $validated['posted_date'] = now();
+
+    $job = Job::create($validated);
+
+    return response()->json([
+        'message' => 'Job created successfully',
+        'data'    => $job
+    ], 201);
+}
     // Show single job (For Editing or Details)
     public function show($id)
     {
