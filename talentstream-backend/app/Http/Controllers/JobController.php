@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Job;
 use App\Models\Category;
 use App\Models\JobLocation;
+use App\Models\JobSkill;
 use App\Models\JobType;
 use Illuminate\Http\Request;
 
@@ -22,48 +23,61 @@ class JobController extends Controller
         return response()->json(['jobs' => $jobs]);
     }
 
-    // Dropdown data (For both Portal and Dashboard Forms)
-    public function create()
-    {
-        return response()->json([
-            'categories' => Category::all(),
-            'locations' => JobLocation::all(),
-            'types' => JobType::all(),
-        ]);
-    }
-
     // Store job (POST /api/employer/jobs)
-    public function store(Request $request)
+public function create(Request $request)
 {
-    $validated = $request->validate([
-        'title'                => 'required|string|max:255',
-        'company_name'         => 'required|string',
-        'category_id'          => 'required|integer',
-        'job_location_id'      => 'required|integer',
-        'job_type_id'          => 'required|integer',
-        'job_skill_id'         => 'nullable|integer', // Added skill
-        'description'          => 'required|string',
-        'salary_min'           => 'nullable|numeric',
-        'salary_max'           => 'nullable|numeric',
-        'num_vacancies'        => 'nullable|integer',
-        'application_deadline' => 'nullable|date',
-        'status'               => 'required|string|in:active,inactive',
-        'cover_image'          => 'nullable|image|max:2048'
+    $user = $request->user();
+
+    // We need to load the company relationship or access the attribute
+    // based on your screenshot showing 'company_name'
+    return response()->json([
+        'categories' => Category::all(),
+        'locations'  => JobLocation::all(),
+        'types'      => JobType::all(),
+        'skills'     => JobSkill::all(),
+
+        'employer' => [
+            'id'    => $user->id,
+            'email' => $user->email,
+        ],
+        'company' => [
+            // Adjust this to match your model's attribute or relationship
+            'id'   => $user->company->id ?? null,
+            'name' => $user->company->company_name ?? 'Company Name Not Found', 
+        ],
     ]);
-
-    if ($request->hasFile('cover_image')) {
-        $validated['cover_image'] = $request->file('cover_image')->store('jobs', 'public');
-    }
-
-    // AUTO-FILL LOGIC
-    $validated['employer_id'] = $request->user()->id;
-    $validated['posted_date'] = now(); // Auto-fill current date
-
-    $job = Job::create($validated);
-
-    return response()->json(['message' => 'Job created successfully', 'data' => $job], 201);
 }
+    // ===============================
+    // STORE JOB
+    // ===============================
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title'                => 'required|string|max:255',
+            'category_id'          => 'required|integer',
+            'job_type_id'          => 'required|integer',
+            'job_skill_id'         => 'nullable|integer',
+            'job_location_id'      => 'required|integer',
+            'description'          => 'required|string',
+            'salary_min'           => 'nullable|numeric',
+            'salary_max'           => 'nullable|numeric',
+            'num_vacancies'        => 'nullable|integer',
+            'application_deadline' => 'nullable|date',
+            'status'               => 'required|in:active,inactive',
+        ]);
 
+        // 🔐 FK AUTO-FILL (SECURE)
+        $validated['employer_id'] = $request->user()->id;
+        $validated['company_id'] = $request->user()->company_id;
+        $validated['posted_date'] = now();
+
+        $job = Job::create($validated);
+
+        return response()->json([
+            'message' => 'Job created successfully',
+            'data'    => $job
+        ], 201);
+    }
     // Show single job (For Editing or Details)
     public function show($id)
     {
