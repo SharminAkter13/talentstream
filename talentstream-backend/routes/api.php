@@ -29,7 +29,6 @@ Route::get('/companies/{company}/details', [CompanyController::class, 'getCompan
 Route::post('/jobs/{id}/view', [JobViewController::class, 'store']);
 Route::get('/packages', [PortalPackageController::class, 'getAllPackages']);
 
-
 // ==============================
 // AUTHENTICATED API
 // ==============================

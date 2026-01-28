@@ -5,15 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Job;
+use App\Models\JobLocation;
 
 class PortalController extends Controller
 {
     /**
-     * Fetch active categories and latest active jobs
+     * Fetch active categories, latest active jobs, and locations in one call.
      */
     public function index()
     {
-        // Fetch active categories with active jobs count
+        // 1. Fetch active categories with active jobs count
         $categories = Category::where('is_active', true)
             ->withCount(['jobs' => function($query) {
                 $query->where('status', 'active');
@@ -21,9 +22,9 @@ class PortalController extends Controller
             ->orderBy('sort_order', 'asc')
             ->get();
 
-        // Fetch latest 10 active jobs with related data
+        // 2. Fetch latest 10 active jobs
         $jobs = Job::where('status', 'active')
-            ->with(['jobLocation', 'jobType'])
+            ->with(['jobLocation', 'jobType', 'employer.company'])
             ->latest()
             ->take(10)
             ->get()
@@ -31,17 +32,21 @@ class PortalController extends Controller
                 return [
                     'id' => $job->id,
                     'title' => $job->title,
-                    'company_name' => $job->company_name,
-                    'company_logo' => $job->cover_image ?? null, // adjust field if needed
-                    'location' => $job->jobLocation->name ?? '',
-                    'type' => $job->jobType->name ?? '',
+                    'company_name' => $job->employer->company->name ?? 'Company',
+                    'company_logo' => $job->employer->company->logo ?? null,
+                    'location' => $job->jobLocation->name ?? 'Remote',
+                    'type' => $job->jobType->name ?? 'Full Time',
                 ];
             });
+
+        // 3. Fetch all locations for the Hero Section dropdown
+        $locations = JobLocation::all();
 
         return response()->json([
             'success' => true,
             'categories' => $categories,
-            'jobs' => $jobs
+            'jobs' => $jobs,
+            'locations' => $locations
         ]);
     }
 }

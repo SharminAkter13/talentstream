@@ -54,7 +54,7 @@ public function create(Request $request)
     // ===============================
     // STORE JOB
     // ===============================
-   // JobController.php
+ 
 
 public function store(Request $request)
 {
