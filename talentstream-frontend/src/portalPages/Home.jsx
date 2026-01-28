@@ -26,18 +26,14 @@ const Home = () => {
     loadHomeData();
   }, []);
   // 2. Load Pricing Packages
-  useEffect(() => {
+ useEffect(() => {
     const fetchPackages = async () => {
       try {
         const res = await api.get("/packages");
-        /**
-         * FIX: Your PortalPackageController returns:
-         * return response()->json(['data' => $formattedPackages]);
-         */
-        const packageData = res.data.data || [];
-        setPackages(packageData);
+        // Accessing res.data.data because of the wrapper in Controller
+        setPackages(res.data.data || []);
       } catch (err) {
-        console.error("Error fetching packages", err);
+        console.error("Package fetch error", err);
       }
     };
     fetchPackages();
@@ -184,43 +180,37 @@ const Home = () => {
           <div className="section-header text-center">
             <h2 className="section-title">Pricing Plan</h2>
           </div>
-          <div className="row g-4">
-            {packages.length > 0 ? (
-              packages.map((pkg) => (
-                <div className="col-lg-4 col-md-6 col-12" key={pkg.id}>
-                  <div className={`pricing-table ${pkg.borderColorClass || 'border-primary'}`}>
-                    <div className="pricing-details">
-                      <div className="icon">
-                        <i className={pkg.iconClass || 'lni-package'}></i>
-                      </div>
-                      <h2>{pkg.name}</h2>
-                      <ul>
-                        {/* Ensure features is an array before mapping */}
-                        {Array.isArray(pkg.features) ? (
-                          pkg.features.map((feature, idx) => (
-                            <li key={idx}>{feature}</li>
-                          ))
-                        ) : (
-                          <li>Standard Features</li>
-                        )}
-                      </ul>
-                      <div className="price">
-                        <span>$</span>
-                        {pkg.price}
-                        <span>/Month</span>
-                      </div>
+          <div className="row g-4 d-flex align-items-stretch"> {/* Forces equal row height */}
+            {packages.map((pkg) => (
+              <div className="col-lg-3 col-md-6 col-12 d-flex" key={pkg.id}>
+                {/* h-100 makes the div fill the column height, d-flex flex-column pushes button to bottom */}
+                <div className={`pricing-table shadow-sm h-100 d-flex flex-column border-top-wide ${pkg.borderColorClass || 'border-primary'}`} style={{ width: '100%', background: '#fff', padding: '30px' }}>
+                  <div className="pricing-details flex-grow-1"> {/* flex-grow-1 pushes the button div down */}
+                    <div className="icon text-center mb-3">
+                      <i className={pkg.iconClass} style={{ fontSize: '30px' }}></i>
                     </div>
-                    <div className="plan-button">
-                      <Link to={`/buy-package/${pkg.id}`} className="btn btn-border">
-                        Get Started
-                      </Link>
+                    <h2 className="text-center">{pkg.name}</h2>
+                    <div className="price text-center mb-3">
+                      <span style={{ fontSize: '24px', fontWeight: 'bold' }}>${pkg.price}</span>
                     </div>
+                    <p className="text-muted text-center small">{pkg.duration_days} Days Validity</p>
+                    <ul className="list-unstyled mt-4">
+                      {pkg.features.map((feature, idx) => (
+                        <li key={idx} className="mb-2 d-flex align-items-start">
+                          <i className="lni-check-mark-circle text-success mt-1 mr-2"></i> 
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="plan-button mt-auto pt-4 text-center">
+                    <Link to={`/buy-package/${pkg.id}`} className="btn btn-info w-100 fw-bold text-light">
+                      Get Started
+                    </Link>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="col-12 text-center">No packages available.</div>
-            )}
+              </div>
+            ))}
           </div>
         </div>
       </section>

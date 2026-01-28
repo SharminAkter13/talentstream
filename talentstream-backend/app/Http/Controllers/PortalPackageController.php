@@ -3,28 +3,48 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Package; // Ensure this is imported
+use App\Models\Package;
 
 class PortalPackageController extends Controller
 {
     public function getAllPackages() {
-        // Fetch packages from the database
         $packages = Package::latest()->get();
 
-        // Transform the data to include fields required by Home.jsx
         $formattedPackages = $packages->map(function($pkg) {
+            // Fix: Convert the comma-separated string from the DB into an array
+            $featuresArray = [];
+            if (!empty($pkg->features)) {
+                // Explode by comma and trim extra spaces
+                $featuresArray = array_map('trim', explode(',', $pkg->features));
+            }
+
             return [
                 'id' => $pkg->id,
                 'name' => $pkg->name,
                 'price' => $pkg->price,
-                // If features aren't in your DB, you can provide defaults or decode JSON
-                'features' => is_array($pkg->features) ? $pkg->features : ['Feature 1', 'Feature 2', 'Feature 3'], 
-                'iconClass' => $pkg->iconClass ?? 'lni-package', // Default icon if missing
-                'borderColorClass' => $pkg->borderColorClass ?? 'border-primary',
+                'duration_days' => $pkg->duration_days,
+                'features' => $featuresArray, // Now this is a proper array
+                'iconClass' => $this->getIconForPackage($pkg->name),
+                'borderColorClass' => $this->getBorderColor($pkg->name),
             ];
         });
 
-        // Return wrapped in a 'data' key for better consistency
         return response()->json(['data' => $formattedPackages]);
+    }
+
+    // Helper to assign icons based on package name
+    private function getIconForPackage($name) {
+        $name = strtolower($name);
+        if (str_contains($name, 'starter')) return 'lni-leaf';
+        if (str_contains($name, 'professional')) return 'lni-star';
+        if (str_contains($name, 'business')) return 'lni-briefcase';
+        return 'lni-rocket';
+    }
+
+    private function getBorderColor($name) {
+        $name = strtolower($name);
+        if (str_contains($name, 'starter')) return 'border-success';
+        if (str_contains($name, 'professional')) return 'border-primary';
+        return 'border-danger';
     }
 }
