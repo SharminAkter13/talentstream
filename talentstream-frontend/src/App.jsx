@@ -116,10 +116,9 @@ const App = () => {
                     <Route path="/manage-job" element={<ManageJob />} />
                     <Route path="/manage-application" element={<ManageApplicationPortal />} />
                     <Route path="/browse-resume" element={<BrowseResumes />} />
-                    <Route path="/jobs/:id" element={<JobDetails />} />
-                    <Route path="/apply-job/:job_id" element={<ApplyJobForm />} />
+                    <Route path="/job-details/:id" element={<JobDetails />} />
                 </Route>
-
+              
                 {/* AUTH */}
                 <Route path="/login" element={<MyAccount />} />
                 <Route path="/logout" element={<Logout />} />
@@ -168,6 +167,8 @@ const App = () => {
                     <Route path="/resume-edit/:id" element={<EditResume />} />
                     <Route path="/resume-view/:id" element={<ViewResume />} />
                     <Route path="/candidate/applications" element={<ApplicationList />} />
+                    <Route path="/apply/:id" element={<ApplyJobForm />} />
+
                 </Route>
 
                 {/* SHARED AUTH ROUTES */}

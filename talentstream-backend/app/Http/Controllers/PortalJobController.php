@@ -121,4 +121,43 @@ public function latestBlogs()
     // Return empty array for now so the frontend doesn't crash
     return response()->json([]);
 }
+
+// app/Http/Controllers/PortalJobController.php
+
+public function show($id)
+{
+    $job = Job::with(['category', 'jobLocation', 'jobType', 'employer.company'])
+        ->find($id);
+
+    if (!$job) {
+        return response()->json(['message' => 'Job not found'], 404);
+    }
+
+    return response()->json([
+        'id' => $job->id,
+        'title' => $job->title,
+        'description' => $job->description,
+
+        'salary_min' => $job->salary_min,
+        'salary_max' => $job->salary_max,
+
+        'vacancies' => $job->num_vacancies,
+        'deadline' => optional($job->application_deadline)->format('Y-m-d'),
+        'posted_date' => optional($job->posted_date)->format('Y-m-d'),
+
+        'category' => $job->category?->name,
+        'location' => $job->jobLocation?->name,
+        'type' => $job->jobType?->name,
+
+        'status' => $job->status,
+
+        'company_name' => $job->employer?->company?->name,
+        'company_logo' => $job->employer?->company?->logo,
+        'company_description' => $job->employer?->company?->description,
+
+        'created_at' => $job->created_at?->format('Y-m-d H:i'),
+    ]);
+}
+
+
 }

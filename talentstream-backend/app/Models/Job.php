@@ -15,9 +15,10 @@ protected $fillable = [
     'num_vacancies', 'status', 'cover_image', 'company_name'
 ];
     // Casts properties to specific types
-    protected $casts = [
-        'closing_date' => 'date',
-    ];
+   protected $casts = [
+    'application_deadline' => 'datetime',
+    'posted_date' => 'datetime',
+];
 
     // Scope for active jobs
     public function scopeActive(Builder $query)
@@ -26,20 +27,19 @@ protected $fillable = [
     }
 
     // Relations
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
+   public function category()
+{
+    return $this->belongsTo(Category::class, 'category_id', 'id');
+}
 
     public function jobLocation()
-    {
-        return $this->belongsTo(JobLocation::class);
-    }
-
-    public function jobType()
-    {
-        return $this->belongsTo(JobType::class);
-    }
+{
+    return $this->belongsTo(JobLocation::class, 'job_location_id', 'id');
+}
+public function jobType()
+{
+    return $this->belongsTo(JobType::class, 'job_type_id', 'id');
+}
 
     public function employer()
     {
