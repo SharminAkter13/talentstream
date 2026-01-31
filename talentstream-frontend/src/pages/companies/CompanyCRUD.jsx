@@ -1,134 +1,209 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "../../services/auth"; 
 import Master from "../Master";
-// import Master from './../Master';
-
-const API_URL = "http://127.0.0.1:8000/api/companies";
 
 export default function CompanyCRUD() {
   const [companies, setCompanies] = useState([]);
-  const [form, setForm] = useState({
+
+  const initialState = {
     name: "",
     industry: "",
     description: "",
     website: "",
-  });
+    address: "",
+    contact_email: "",
+    contact_phone: "",
+    logo: null, // IMPORTANT: file
+    established_year: "",
+    size: "",
+  };
+
+  const [form, setForm] = useState(initialState);
   const [editingId, setEditingId] = useState(null);
 
-  // Load all companies
   const fetchCompanies = async () => {
-    const res = await axios.get(API_URL);
-    setCompanies(res.data);
+    try {
+      const res = await api.get("/employer/companies");
+      setCompanies(Array.isArray(res.data) ? res.data : res.data.data || []);
+    } catch (error) {
+      console.error("Failed to fetch companies:", error);
+    }
   };
 
   useEffect(() => {
     fetchCompanies();
   }, []);
 
-  // Handle input
+  // Handle text inputs
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Create or Update Company
+  // Handle file input
+  const handleFileChange = (e) => {
+    setForm({ ...form, logo: e.target.files[0] });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingId) {
-      await axios.put(`${API_URL}/${editingId}`, form);
-    } else {
-      await axios.post(API_URL, form);
+    const formData = new FormData();
+    Object.keys(form).forEach((key) => {
+      if (form[key] !== null && form[key] !== "") {
+        formData.append(key, form[key]);
+      }
+    });
+
+    try {
+      if (editingId) {
+        await api.post(`/employer/companies/${editingId}?_method=PUT`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        await api.post("/employer/companies", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
+
+      setForm(initialState);
+      setEditingId(null);
+      fetchCompanies();
+    } catch (error) {
+      console.error("Error saving company:", error);
     }
-
-    setForm({ name: "", industry: "", description: "", website: "" });
-    setEditingId(null);
-    fetchCompanies();
   };
 
-  // Edit Mode
   const editCompany = (company) => {
-    setForm(company);
+    setForm({
+      ...company,
+      logo: null, // reset file input
+    });
     setEditingId(company.id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Delete Company
   const deleteCompany = async (id) => {
     if (!window.confirm("Delete this company?")) return;
-    await axios.delete(`${API_URL}/${id}`);
-    fetchCompanies();
+    try {
+      await api.delete(`/employer/companies/${id}`);
+      fetchCompanies();
+    } catch (error) {
+      console.error("Error deleting company:", error);
+    }
   };
 
   return (
     <Master>
-    <div className="container" style={{ padding: 20 }}>
-      <h2>Company CRUD</h2>
+      <div className="container py-4">
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: 20 }}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Company Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="industry"
-          placeholder="Industry"
-          value={form.industry}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="website"
-          placeholder="Website"
-          value={form.website}
-          onChange={handleChange}
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-        ></textarea>
+        <h2 className="mb-4 fw-semibold">Company Management</h2>
 
-        <button type="submit">
-          {editingId ? "Update" : "Create"}
-        </button>
-      </form>
+        {/* Form Card */}
+        <div className="card shadow-sm mb-4">
+          <div className="card-body">
+            <h5 className="card-title mb-3">
+              {editingId ? "Edit Company" : "Create Company"}
+            </h5>
 
-      {/* Table */}
-      <table border="1" cellPadding="10">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Industry</th>
-            <th>Website</th>
-            <th>Description</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+            <form onSubmit={handleSubmit} className="row g-3" encType="multipart/form-data">
 
-        <tbody>
-          {companies.map((c) => (
-            <tr key={c.id}>
-              <td>{c.name}</td>
-              <td>{c.industry}</td>
-              <td>{c.website}</td>
-              <td>{c.description}</td>
-              <td>
-                <button onClick={() => editCompany(c)}>Edit</button>
-                <button onClick={() => deleteCompany(c.id)} style={{ color: "red" }}>
-                  Delete
+              {/* Text Fields */}
+              {Object.keys(initialState).map(
+                (key) =>
+                  key !== "logo" && (
+                    <div className="col-md-6 col-lg-4" key={key}>
+                      <label className="form-label text-uppercase small">
+                        {key.replace("_", " ")}
+                      </label>
+                      <input
+                        type={key === "established_year" ? "number" : "text"}
+                        name={key}
+                        value={form[key] || ""}
+                        onChange={handleChange}
+                        required={key === "name"}
+                        className="form-control"
+                      />
+                    </div>
+                  )
+              )}
+
+              {/* Logo Upload */}
+              <div className="col-md-6 col-lg-4">
+                <label className="form-label text-uppercase small">
+                  Company Logo
+                </label>
+                <input
+                  type="file"
+                  className="form-control"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </div>
+
+              <div className="col-12">
+                <button type="submit" className="btn btn-primary">
+                  {editingId ? "Update Company" : "Create Company"}
                 </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Table Card */}
+        <div className="card shadow-sm">
+          <div className="card-body">
+            <h5 className="card-title mb-3">Company List</h5>
+
+            <div className="table-responsive">
+              <table className="table table-bordered table-hover align-middle">
+                <thead className="table-light">
+                  <tr>
+                    <th>Name</th>
+                    <th>Industry</th>
+                    <th>Email</th>
+                    <th>Website</th>
+                    <th className="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {companies.length > 0 ? (
+                    companies.map((c) => (
+                      <tr key={c.id}>
+                        <td>{c.name}</td>
+                        <td>{c.industry}</td>
+                        <td>{c.contact_email}</td>
+                        <td>{c.website}</td>
+                        <td className="text-center">
+                          <button
+                            className="btn btn-sm btn-outline-primary me-2"
+                            onClick={() => editCompany(c)}
+                          >
+                            <i className="bi bi-pencil-square"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => deleteCompany(c.id)}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="text-center py-4">
+                        No company data found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
     </Master>
   );
 }
