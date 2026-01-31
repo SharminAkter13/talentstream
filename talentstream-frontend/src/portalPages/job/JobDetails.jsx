@@ -113,7 +113,7 @@ const JobDetails = () => {
             <div className="col-lg-4 col-md-12 text-lg-right mt-3 mt-lg-0">
               <div className="price-tag">
                 <h4 className="text-success font-weight-bold">
-                  {job.salary_min} - {job.salary_max}
+                &#2547;  {job.salary_min} - {job.salary_max}
                 </h4>
               </div>
             </div>
@@ -198,7 +198,7 @@ const JobDetails = () => {
 
                     <li className="mb-2">
                       <strong>Salary Range:</strong>{" "}
-                      {job.salary_min} - {job.salary_max}
+                      &#2547; {job.salary_min} - {job.salary_max}
                     </li>
                   </ul>
                 </div>

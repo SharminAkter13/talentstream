@@ -191,7 +191,7 @@ const Home = () => {
                     </div>
                     <h2 className="text-center">{pkg.name}</h2>
                     <div className="price text-center mb-3">
-                      <span style={{ fontSize: '24px', fontWeight: 'bold' }}>${pkg.price}</span>
+                      <span style={{ fontSize: '24px', fontWeight: 'bold' }}>&#2547; {pkg.price}</span>
                     </div>
                     <p className="text-muted text-center small">{pkg.duration_days} Days Validity</p>
                     <ul className="list-unstyled mt-4">
