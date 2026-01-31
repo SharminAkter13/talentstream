@@ -122,10 +122,10 @@ public function latestBlogs()
     return response()->json([]);
 }
 
-// app/Http/Controllers/PortalJobController.php
 
 public function show($id)
 {
+    // Eager load the company through the employer relationship
     $job = Job::with(['category', 'jobLocation', 'jobType', 'employer.company'])
         ->find($id);
 
@@ -133,29 +133,21 @@ public function show($id)
         return response()->json(['message' => 'Job not found'], 404);
     }
 
+    // Access the logo from the company model linked via company_id
+    $company = $job->employer?->company;
+
     return response()->json([
         'id' => $job->id,
         'title' => $job->title,
         'description' => $job->description,
-
         'salary_min' => $job->salary_min,
         'salary_max' => $job->salary_max,
-
-        'vacancies' => $job->num_vacancies,
-        'deadline' => optional($job->application_deadline)->format('Y-m-d'),
-        'posted_date' => optional($job->posted_date)->format('Y-m-d'),
-
+        'company_name' => $company?->name,
+        // Map the company logo here so the frontend can find it easily
+        'company_logo' => $company?->logo, 
         'category' => $job->category?->name,
         'location' => $job->jobLocation?->name,
         'type' => $job->jobType?->name,
-
-        'status' => $job->status,
-
-        'company_name' => $job->employer?->company?->name,
-        'company_logo' => $job->employer?->company?->logo,
-        'company_description' => $job->employer?->company?->description,
-
-        'created_at' => $job->created_at?->format('Y-m-d H:i'),
     ]);
 }
 

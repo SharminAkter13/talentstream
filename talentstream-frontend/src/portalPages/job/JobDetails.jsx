@@ -10,8 +10,9 @@ const JobDetails = () => {
 
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [logoSrc, setLogoSrc] = useState("/assets/img/default-logo.png");
 
-  // ✅ Helper functions
+  // Helper functions
   const formatDate = (date) => {
     if (!date) return "N/A";
     return new Date(date).toLocaleDateString();
@@ -19,13 +20,9 @@ const JobDetails = () => {
 
   const getLocationText = (loc) => {
     if (!loc) return "N/A";
-
-    // If API sends object
     if (typeof loc === "object") {
       return [loc.city, loc.state, loc.country].filter(Boolean).join(", ");
     }
-
-    // If API sends string
     return loc;
   };
 
@@ -34,12 +31,20 @@ const JobDetails = () => {
       try {
         const res = await api.get(`/jobs/${id}`);
         setJob(res.data);
+
+        // Set the logo or default
+        if (res.data?.company_logo) {
+          setLogoSrc(`${ASSET_URL}/storage/${res.data.company_logo}`);
+        }
       } catch (err) {
         console.error("Fetch error", err);
         alert("Failed to load job details.");
       } finally {
         setLoading(false);
       }
+      if (res.data?.company_logo) {
+  setLogoSrc(`${ASSET_URL}/storage/${res.data.company_logo}`);
+}
     };
 
     fetchJob();
@@ -85,23 +90,22 @@ const JobDetails = () => {
             <div className="col-lg-8 col-md-12">
               <div className="d-flex align-items-center">
                 <img
-                  src={
-                    job.company_logo
-                      ? `${ASSET_URL}/storage/${job.company_logo}`
-                      : "/assets/img/default-logo.png"
-                  }
+                  src={logoSrc}
                   alt="company logo"
+                  onError={() => setLogoSrc("/assets/img/default-logo.png")}
                   style={{
                     width: "80px",
                     height: "80px",
+                    objectFit: "cover",
                     borderRadius: "8px",
                     marginRight: "20px",
                   }}
                 />
-
                 <div>
-                  <h3 className="font-weight-bold">{job.title}</h3>
-                  <p className="text-primary mb-1">{job.company_name}</p>
+                  <h3 className="font-weight-bold">{job.title || "N/A"}</h3>
+                  <p className="text-primary mb-1">
+                    {job.company_name || "N/A"}
+                  </p>
                   <span>
                     <i className="lni-map-marker"></i>{" "}
                     {getLocationText(job.job_location)}
@@ -113,7 +117,7 @@ const JobDetails = () => {
             <div className="col-lg-4 col-md-12 text-lg-right mt-3 mt-lg-0">
               <div className="price-tag">
                 <h4 className="text-success font-weight-bold">
-                &#2547;  {job.salary_min} - {job.salary_max}
+                  &#2547; {job.salary_min || "N/A"} - {job.salary_max || "N/A"}
                 </h4>
               </div>
             </div>
@@ -131,11 +135,8 @@ const JobDetails = () => {
                 <h4>Job Description</h4>
                 <div
                   className="mb-4"
-                  dangerouslySetInnerHTML={{
-                    __html: job.description || "",
-                  }}
+                  dangerouslySetInnerHTML={{ __html: job.description || "" }}
                 />
-
                 <div className="mt-4">
                   <button
                     onClick={handleApplyClick}
@@ -153,52 +154,36 @@ const JobDetails = () => {
                 {/* Job Summary */}
                 <div className="widget shadow-sm p-4 bg-white rounded mb-4">
                   <h5 className="widget-title fw-bold">Job Summary</h5>
-
                   <ul className="list-unstyled mt-3">
                     <li className="mb-2">
-                      <strong>Published:</strong>{" "}
-                      {formatDate(job.created_at)}
+                      <strong>Published:</strong> {formatDate(job.created_at)}
                     </li>
-
                     <li className="mb-2">
-                      <strong>Posted Date:</strong>{" "}
-                      {formatDate(job.posted_date)}
+                      <strong>Posted Date:</strong> {formatDate(job.posted_date)}
                     </li>
-
                     <li className="mb-2">
                       <strong>Deadline:</strong>{" "}
                       {formatDate(job.application_deadline)}
                     </li>
-
                     <li className="mb-2">
                       <strong>Vacancies:</strong> {job.num_vacancies || "N/A"}
                     </li>
-
                     <li className="mb-2">
-                      <strong>Category:</strong>{" "}
-                      {job.category?.name || "N/A"}
+                      <strong>Category:</strong> {job.category?.name || "N/A"}
                     </li>
-
                     <li className="mb-2">
                       <strong>Employment Type:</strong>{" "}
                       {job.job_type?.name || "N/A"}
                     </li>
-
                     <li className="mb-2">
-                      <strong>Location:</strong>{" "}
-                      {getLocationText(job.job_location)}
+                      <strong>Location:</strong> {getLocationText(job.job_location)}
                     </li>
-
                     <li className="mb-2">
                       <strong>Status:</strong>{" "}
-                      <span className="badge badge-success">
-                        {job.status || "N/A"}
-                      </span>
+                      <span className="badge badge-success">{job.status || "N/A"}</span>
                     </li>
-
                     <li className="mb-2">
-                      <strong>Salary Range:</strong>{" "}
-                      &#2547; {job.salary_min} - {job.salary_max}
+                      <strong>Salary Range:</strong> &#2547; {job.salary_min || "N/A"} - {job.salary_max || "N/A"}
                     </li>
                   </ul>
                 </div>

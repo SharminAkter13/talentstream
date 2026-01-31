@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { api } from "../../services/auth"; 
+import { api,ASSET_URL } from "../../services/auth"; 
 import Master from "../Master";
 
 export default function CompanyCRUD() {
@@ -158,6 +158,7 @@ export default function CompanyCRUD() {
               <table className="table table-bordered table-hover align-middle">
                 <thead className="table-light">
                   <tr>
+                    <th>Logo</th>
                     <th>Name</th>
                     <th>Industry</th>
                     <th>Email</th>
@@ -169,6 +170,13 @@ export default function CompanyCRUD() {
                   {companies.length > 0 ? (
                     companies.map((c) => (
                       <tr key={c.id}>
+                        <td>
+                          <img 
+                            src={c.logo ? `${ASSET_URL}/storage/${c.logo}` : "/default-logo.png"} 
+                            alt="logo" 
+                            width="50" 
+                          />
+                        </td>
                         <td>{c.name}</td>
                         <td>{c.industry}</td>
                         <td>{c.contact_email}</td>
