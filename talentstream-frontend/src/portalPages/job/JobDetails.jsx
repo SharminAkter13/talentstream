@@ -33,9 +33,11 @@ const JobDetails = () => {
         setJob(res.data);
 
         // Set the logo or default
-        if (res.data?.company_logo) {
-          setLogoSrc(`${ASSET_URL}/storage/${res.data.company_logo}`);
-        }
+          if (res.data?.company_logo) {
+                setLogoSrc(`${ASSET_URL}/storage/${res.data.company_logo}`);
+            } else {
+              setLogoSrc("/assets/img/default-logo.png"); // Fallback
+            }
       } catch (err) {
         console.error("Fetch error", err);
         alert("Failed to load job details.");
@@ -93,13 +95,7 @@ const JobDetails = () => {
                   src={logoSrc}
                   alt="company logo"
                   onError={() => setLogoSrc("/assets/img/default-logo.png")}
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                    marginRight: "20px",
-                  }}
+                  style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "8px", marginRight: "20px" }}
                 />
                 <div>
                   <h3 className="font-weight-bold">{job.title || "N/A"}</h3>
